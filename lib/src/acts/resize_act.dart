@@ -6,27 +6,18 @@ class ResizeAct extends Act {
     this.beginHeight,
     this.endWidth,
     this.endHeight,
+    this.then = const [],
     super.curve,
     super.timing,
     this.alignment,
-  }) : _phases = null,
-       _base = null;
+  });
 
   final AlignmentGeometry? alignment;
   final double? beginWidth;
   final double? beginHeight;
   final double? endWidth;
   final double? endHeight;
-  final List<Phase<SizeOrNull>>? _phases;
-  final SizeOrNull? _base;
-
-  const ResizeAct.sequence(SizeOrNull base, List<Phase<SizeOrNull>> phases, {this.alignment})
-    : _phases = phases,
-      _base = base,
-      beginWidth = null,
-      beginHeight = null,
-      endWidth = null,
-      endHeight = null;
+  final List<Phase<SizeOrNull>> then;
 
   SizeOrNullTween _buildTween(SizeOrNull begin, SizeOrNull end, Size maxSize) {
     final effectiveBeginWidth = begin.width != null && begin.width!.isInfinite ? maxSize.width : begin.width;
@@ -41,17 +32,14 @@ class ResizeAct extends Act {
 
   Animation<SizeOrNull> build(AnimationContext context, Size maxSize) {
     final List<FullPhase<SizeOrNull>> phases;
-    if (_phases != null) {
-      assert(_base != null, 'Base size must be provided when using phases');
-      phases = Phase.normalize(_base!, _phases);
+    final begin = SizeOrNull(beginWidth, beginHeight);
+    final end = SizeOrNull(endWidth, endHeight);
+    if (then.isEmpty) {
+      phases = [FullPhase<SizeOrNull>(begin: begin, end: end, weight: 1.0)];
     } else {
-      phases = [
-        FullPhase(
-          begin: SizeOrNull(beginWidth, beginHeight),
-          end: SizeOrNull(endWidth, endHeight),
-          weight: 1.0,
-        ),
-      ];
+      //todo: rethink this
+      then.add(.to(end));
+      phases = Phase.normalize(begin, then);
     }
     return TweenAct._build<SizeOrNull>(context, phases, (begin, end) {
       return _buildTween(begin, end, maxSize);

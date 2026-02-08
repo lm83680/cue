@@ -56,18 +56,19 @@ class _DemoPageState extends State<DemoPage> {
             alignment: Alignment.topLeft,
             child: Actor(
               acts: [
-                TranslationAct.sequence(Offset.zero, [
-                  .to(Offset(50, 0)),
-                  .to(Offset(50, 50)),
-                  .to(Offset(0, 50)),
-                  .to(Offset(0, 0)),
-                ]),
-                FadeAct.sequence(0.0, [
-                  .to(.2),
-                  .hold(.2, weight: 3),
-                  .to(4.0),
-                  .to(1.0),
-                ]),
+                .translate(
+                  begin: Offset.zero,
+                  then: [
+                    .to(Offset(50, 0)),
+                    .to(Offset(50, 50)),
+                    .to(Offset(0, 50)),
+                    .to(Offset(0, 0)),
+                  ],
+                ),
+                .fade(
+                  begin: 0.0,
+                  then: [.to(.2), .to(4.0), .to(1.0)],
+                ),
                 .fade(begin: 1.0, end: 0.0),
               ],
               child: Container(
