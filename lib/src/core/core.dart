@@ -40,27 +40,3 @@ class Timing {
   @override
   String toString() => 'Timing(start: $start, end: $end)';
 }
-
-class Phase<T> {
-  const Phase({
-    required this.begin,
-    required this.end,
-    required this.weight,
-  });
-
-  final T begin;
-  final T end;
-  final double weight;
-
-  const factory Phase.constant({
-    required T value,
-    required double weight,
-  }) = _ConstantPhase<T>;
-}
-
-class _ConstantPhase<T> extends Phase<T> {
-  const _ConstantPhase({
-    required T value,
-    required super.weight,
-  }) : super(begin: value, end: value);
-}

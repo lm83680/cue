@@ -3,6 +3,9 @@ import 'package:cue/src/cue/cue_debug_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+@optionalTypeArgs
+typedef ShowModalFunction<T extends Object> = Future<T?> Function();
+
 class ModalTransition extends StatefulWidget {
   const ModalTransition({
     super.key,
@@ -18,7 +21,7 @@ class ModalTransition extends StatefulWidget {
 
   final Duration duration;
   final Widget Function(BuildContext context, Rect triggerRect) builder;
-  final Widget Function(BuildContext context, Future<T?> Function<T extends Object>() showDialog) triggerBuilder;
+  final Widget Function(BuildContext context, ShowModalFunction showDialog) triggerBuilder;
   final AlignmentGeometry? alignment;
   final bool showDebug;
   final Widget? backdrop;
@@ -31,34 +34,45 @@ class ModalTransition extends StatefulWidget {
 
 class _ModalTransitionState extends State<ModalTransition> {
   final _triggerKey = GlobalKey();
+  late final _showDebug = ValueNotifier<bool>(widget.showDebug);
   Animation<double> _transitionAnimation = AlwaysStoppedAnimation(0.0);
+
+  @override
+  void didUpdateWidget(covariant ModalTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (kDebugMode) {
+      if (oldWidget.showDebug != widget.showDebug) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showDebug.value = widget.showDebug;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Animation<double> animation = _transitionAnimation;
     if (kDebugMode && widget.showDebug) {
-      if (CueDebugProvider.isWrappedByDebugProvider(context)) {
-        animation = CueDebugProvider.animationOf(context);
+      if (CueDebugTools.isWrappedByDebugProvider(context)) {
+        animation = CueDebugTools.animationOf(context);
       }
     }
-    return KeyedSubtree(
+    return Cue.controlled(
       key: _triggerKey,
-      child: Cue.controlled(
-        animation: animation,
-        child: Builder(
-          builder: (context) {
-            return widget.triggerBuilder(context, _showModel);
-          },
-        ),
+      animation: animation,
+      child: Builder(
+        builder: (context) {
+          return widget.triggerBuilder(context, _showModel);
+        },
       ),
     );
   }
 
+  @optionalTypeArgs
   Future<T?> _showModel<T extends Object>() {
     final renderBox = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
     final triggerOffset = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
-    final triggerSize = renderBox?.size ?? Size.zero;
-    final triggerRect = triggerOffset & triggerSize;
+    final triggerRect = triggerOffset & (renderBox?.size ?? Size.zero);
 
     final model = _ModalRoute<T>(
       barrierDismissible: widget.barrierDismissible,
@@ -67,33 +81,14 @@ class _ModalTransitionState extends State<ModalTransition> {
       transitionDuration: widget.duration,
       transitionBuilder: (context, _, _, child) => child,
       pageBuilder: (context, animation, _) {
-        return Cue.controlled(
-          debug: widget.showDebug,
+        return _ModelContent(
           animation: animation,
-          child: Material(
-            type: MaterialType.transparency,
-            child: Stack(
-              children: [
-                if (widget.backdrop case final backdrop?)
-                  Positioned.fill(
-                    child: widget.barrierDismissible
-                        ? GestureDetector(onTap: () => Navigator.of(context).pop(), child: backdrop)
-                        : backdrop,
-                  ),
-                if (widget.alignment != null)
-                  CustomSingleChildLayout(
-                    delegate: _ModalPositionDelegate(
-                      triggerOffset: triggerOffset,
-                      triggerSize: triggerSize,
-                      alignment: widget.alignment!.resolve(Directionality.of(context)),
-                    ),
-                    child: widget.builder(context, triggerRect),
-                  )
-                else
-                  widget.builder(context, triggerRect),
-              ],
-            ),
-          ),
+          backdrop: widget.backdrop,
+          alignment: widget.alignment,
+          builder: widget.builder,
+          barrierDismissible: widget.barrierDismissible,
+          showDebug: _showDebug,
+          triggerRect: triggerRect,
         );
       },
       onAnimationControllerReady: (controller) {
@@ -102,23 +97,83 @@ class _ModalTransitionState extends State<ModalTransition> {
         });
       },
     );
+
     return Navigator.of(context).push(model);
   }
 }
 
+class _ModelContent extends StatelessWidget {
+  const _ModelContent({
+    this.backdrop,
+    this.alignment,
+    required this.animation,
+    required this.builder,
+    required this.barrierDismissible,
+    required this.showDebug,
+    required this.triggerRect,
+  });
+
+  final Animation<double> animation;
+  final Widget? backdrop;
+  final AlignmentGeometry? alignment;
+  final Widget Function(BuildContext context, Rect triggerRect) builder;
+  final bool barrierDismissible;
+  final ValueNotifier<bool> showDebug;
+  final Rect triggerRect;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: showDebug,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Stack(
+          children: [
+            if (backdrop case final backdrop?)
+              Positioned.fill(
+                child: barrierDismissible
+                    ? GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: backdrop,
+                      )
+                    : backdrop,
+              ),
+            if (alignment != null)
+              CustomSingleChildLayout(
+                delegate: _ModalPositionDelegate(
+                  triggerRect: triggerRect,
+                  alignment: alignment!.resolve(Directionality.of(context)),
+                ),
+                child: builder(context, triggerRect),
+              )
+            else
+              builder(context, triggerRect),
+          ],
+        ),
+      ),
+      builder: (context, debug, child) {
+        return Cue.controlled(
+          debug: debug,
+          animation: animation,
+          child: child!,
+        );
+      },
+    );
+  }
+}
+
 class _ModalPositionDelegate extends SingleChildLayoutDelegate {
-  final Offset triggerOffset;
-  final Size triggerSize;
+  final Rect triggerRect;
   final Alignment alignment;
 
-  _ModalPositionDelegate({required this.triggerOffset, required this.triggerSize, required this.alignment});
+  _ModalPositionDelegate({required this.triggerRect, required this.alignment});
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
     // Calculate the base position (top-left corner of trigger)
-    final baseOffset = triggerOffset;
+    final baseOffset = triggerRect.topLeft;
     // Calculate the offset within the trigger box based on alignment
-    final triggerAlignmentOffset = alignment.alongSize(triggerSize);
+    final triggerAlignmentOffset = alignment.alongSize(triggerRect.size);
 
     // Calculate the offset for the modal based on alignment (inverted)
     final modalAlignmentOffset = alignment.alongSize(childSize);
@@ -132,7 +187,7 @@ class _ModalPositionDelegate extends SingleChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_ModalPositionDelegate oldDelegate) {
-    return triggerOffset != oldDelegate.triggerOffset || triggerSize != oldDelegate.triggerSize;
+    return triggerRect != oldDelegate.triggerRect;
   }
 }
 

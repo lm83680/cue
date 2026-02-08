@@ -11,7 +11,7 @@ abstract class Cue extends StatefulWidget {
 
   const factory Cue.onTransition({Key? key, required Widget child, Curve curve, bool debug}) = _RouteTransitionStage;
 
-  const factory Cue.animated({
+  const factory Cue.onMount({
     Key? key,
     required Widget child,
     Curve curve,
@@ -21,7 +21,7 @@ abstract class Cue extends StatefulWidget {
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
-  }) = _SelfAnimatedStage;
+  }) = _SelfAnimatedCue;
 
   const factory Cue.onHover({
     Key? key,
@@ -32,7 +32,7 @@ abstract class Cue extends StatefulWidget {
     Duration? reverseDuration,
     MouseCursor cursor,
     bool opaque,
-  }) = _OnHoverStage;
+  }) = _OnHoverCue;
 
   const factory Cue.controlled({
     Key? key,
@@ -40,7 +40,7 @@ abstract class Cue extends StatefulWidget {
     Curve curve,
     bool debug,
     required Animation<double> animation,
-  }) = _ControlledStage;
+  }) = _ControlledCue;
 
   const factory Cue.toggled({
     Key? key,
@@ -51,7 +51,7 @@ abstract class Cue extends StatefulWidget {
     Duration? reverseDuration,
     required bool toggled,
     bool skipFirstAnimation,
-  }) = _ToggledStage;
+  }) = _ToggledCue;
 
   const factory Cue.indexed({
     Key? key,
@@ -93,8 +93,8 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     super.initState();
     if (kDebugMode && widget.debug) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (CueDebugProvider.isWrappedByDebugProvider(context)) {
-          _deattachDebugOverlay = CueDebugProvider.showDebugOverlay(context);
+        if (CueDebugTools.isWrappedByDebugProvider(context)) {
+          _deattachDebugOverlay = CueDebugTools.showDebugOverlay(context);
         }
       });
     }
@@ -103,15 +103,17 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   @override
   void didUpdateWidget(covariant Cue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (kDebugMode && widget.debug && !oldWidget.debug) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (CueDebugProvider.isWrappedByDebugProvider(context)) {
-          _deattachDebugOverlay = CueDebugProvider.showDebugOverlay(context);
-        }
-      });
-    } else if (kDebugMode && !widget.debug && oldWidget.debug) {
-      _deattachDebugOverlay?.call();
-      _deattachDebugOverlay = null;
+    if (kDebugMode) {
+      if (widget.debug && !oldWidget.debug) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (CueDebugTools.isWrappedByDebugProvider(context)) {
+            _deattachDebugOverlay = CueDebugTools.showDebugOverlay(context);
+          }
+        });
+      } else if (!widget.debug && oldWidget.debug) {
+        _deattachDebugOverlay?.call();
+        _deattachDebugOverlay = null;
+      }
     }
   }
 
@@ -124,13 +126,14 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   @override
   Widget build(BuildContext context) {
     if (kDebugMode && widget.debug) {
-      if (CueDebugProvider.isWrappedByDebugProvider(context)) {
-        return CueScope(animation: CueDebugProvider.animationOf(context), child: widget.child);
+      if (CueDebugTools.isWrappedByDebugProvider(context)) {
+        return CueScope(animation: CueDebugTools.animationOf(context), child: widget.child);
       } else {
-        return CueDebugProvider(
+        return CueDebugTools(
+          global: false,
           child: Builder(
             builder: (context) {
-              return CueScope(animation: CueDebugProvider.animationOf(context), child: widget.child);
+              return CueScope(animation: CueDebugTools.animationOf(context), child: widget.child);
             },
           ),
         );
@@ -149,8 +152,8 @@ class _RouteTransitionStage extends Cue {
   State<StatefulWidget> createState() => _RouteTransitionStageState();
 }
 
-class _SelfAnimatedStage extends Cue {
-  const _SelfAnimatedStage({
+class _SelfAnimatedCue extends Cue {
+  const _SelfAnimatedCue({
     super.key,
     required super.child,
     super.curve,
@@ -172,7 +175,7 @@ class _SelfAnimatedStage extends Cue {
   State<Cue> createState() => _SelfAnimatedStageState();
 }
 
-class _SelfAnimatedStageState extends _AnimatedStageState<_SelfAnimatedStage> {
+class _SelfAnimatedStageState extends _AnimatedStageState<_SelfAnimatedCue> {
   @override
   Curve get curve => widget.curve;
 
@@ -245,8 +248,8 @@ abstract class _AnimatedStageState<T extends Cue> extends _CueState<T> with Sing
   }
 }
 
-class _OnHoverStage extends Cue {
-  const _OnHoverStage({
+class _OnHoverCue extends Cue {
+  const _OnHoverCue({
     super.key,
     required super.child,
     super.curve,
@@ -266,7 +269,7 @@ class _OnHoverStage extends Cue {
   State<StatefulWidget> createState() => _OnHoverStageState();
 }
 
-class _OnHoverStageState extends _AnimatedStageState<_OnHoverStage> {
+class _OnHoverStageState extends _AnimatedStageState<_OnHoverCue> {
   @override
   Curve get curve => widget.curve;
 
@@ -291,8 +294,8 @@ class _OnHoverStageState extends _AnimatedStageState<_OnHoverStage> {
   }
 }
 
-class _ToggledStage extends Cue {
-  const _ToggledStage({
+class _ToggledCue extends Cue {
+  const _ToggledCue({
     super.key,
     required super.child,
     super.curve,
@@ -312,7 +315,7 @@ class _ToggledStage extends Cue {
   State<StatefulWidget> createState() => _ToggledStageState();
 }
 
-class _ToggledStageState extends _AnimatedStageState<_ToggledStage> {
+class _ToggledStageState extends _AnimatedStageState<_ToggledCue> {
   @override
   Curve get curve => widget.curve;
 
@@ -336,7 +339,7 @@ class _ToggledStageState extends _AnimatedStageState<_ToggledStage> {
   }
 
   @override
-  void didUpdateWidget(covariant _ToggledStage oldWidget) {
+  void didUpdateWidget(covariant _ToggledCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.toggled != oldWidget.toggled) {
       _animate();
@@ -352,16 +355,16 @@ class _ToggledStageState extends _AnimatedStageState<_ToggledStage> {
   }
 }
 
-class _ControlledStage extends Cue {
-  const _ControlledStage({super.key, required super.child, super.curve, super.debug, required this.animation});
+class _ControlledCue extends Cue {
+  const _ControlledCue({super.key, required super.child, super.curve, super.debug, required this.animation});
 
   final Animation<double> animation;
 
   @override
-  State<StatefulWidget> createState() => _ControlledStageState();
+  State<StatefulWidget> createState() => _ControlledCueState();
 }
 
-class _ControlledStageState extends _CueState<_ControlledStage> {
+class _ControlledCueState extends _CueState<_ControlledCue> {
   @override
   Animation<double> getAnimation(_) => widget.animation;
 }

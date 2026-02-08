@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:cue/src/core.dart';
+import 'package:cue/src/core/core.dart';
 import 'package:cue/src/cue/cue.dart';
 import 'package:flutter/material.dart';
 

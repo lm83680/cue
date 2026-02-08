@@ -2,35 +2,35 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class CueDebugProvider extends StatefulWidget {
-  const CueDebugProvider({super.key, required this.child, this.global = true});
+class CueDebugTools extends StatefulWidget {
+  const CueDebugTools({super.key, required this.child, this.global = true});
 
   final Widget child;
   final bool global;
 
   static Widget wrap(BuildContext context, Widget? child) {
-    return CueDebugProvider(child: child ?? const SizedBox.shrink());
+    return CueDebugTools(child: child ?? const SizedBox.shrink());
   }
 
   @override
-  State<CueDebugProvider> createState() => _CueDebugProviderState();
+  State<CueDebugTools> createState() => _CueDebugToolsState();
 
   static bool isWrappedByDebugProvider(BuildContext context) {
-    return context.findAncestorWidgetOfExactType<CueDebugProvider>() != null;
+    return context.findAncestorWidgetOfExactType<CueDebugTools>() != null;
   }
 
   static VoidCallback? showDebugOverlay(BuildContext context) {
-    final provider = context.findAncestorStateOfType<_CueDebugProviderState>();
+    final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
     return provider?.showProgressControllerAsOverlay(context);
   }
 
   static Animation<double> animationOf(BuildContext context) {
-    final provider = context.findAncestorStateOfType<_CueDebugProviderState>();
+    final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
     return provider?._controller.view ?? AlwaysStoppedAnimation(1.0);
   }
 }
 
-class _CueDebugProviderState extends State<CueDebugProvider> with SingleTickerProviderStateMixin {
+class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   final _isLooping = ValueNotifier(false);
   final _speedIndex = ValueNotifier(0);

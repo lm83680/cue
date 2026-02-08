@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:cue/src/core.dart';
+import 'package:cue/src/core/core.dart';
+import 'package:cue/src/core/phase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -131,9 +132,10 @@ abstract class TweenAct<T> extends Act {
     return TweenAct._build<T>(context, phases, tweenBuilder ?? _defaultTweenBuilder);
   }
 
-  static Animation<T> _build<T>(AnimationContext context, List<Phase<T>> phases, TweenBuilder<T> tweenBuilder) {
+  static Animation<T> _build<T>(AnimationContext context, List<Phase<T>> partialPhase, TweenBuilder<T> tweenBuilder) {
+    final phases = Phase.convert(partialPhase);
     Animatable<T> tween;
-    if (phases.length == 1) {
+    if (partialPhase.length == 1) {
       final phase = phases.single;
       tween = tweenBuilder(phase.begin, phase.end);
     } else {

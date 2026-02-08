@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:cue/cue.dart';
 
-class ExpandingFloatingActions extends StatelessWidget {
-  const ExpandingFloatingActions({super.key});
+class ThreeDotsAction extends StatelessWidget {
+  const ThreeDotsAction({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ModalTransition(
-      showDebug: false,
-
+      showDebug: true,
+      barrierColor: Colors.transparent,
       alignment: Alignment.bottomRight,
-      triggerBuilder: (context, showModal) =>
-          FloatingActionButton(shape: CircleBorder(), onPressed: showModal, child: const Icon(Icons.more_vert)),
+      triggerBuilder: (context, showModal) => FloatingActionButton(
+        shape: CircleBorder(),
+        onPressed: showModal,
+        child: const Icon(Icons.more_vert),
+      ),
       builder: (context, rect) {
         return SizedBox(
           width: rect.width,
@@ -37,11 +40,19 @@ class ExpandingFloatingActions extends StatelessWidget {
                 child: Column(
                   mainAxisSize: .min,
                   children: [
-                    for (var icon in [Icons.add, Icons.edit, Icons.delete])
+                    for (var icon in [Icons.add, Icons.edit, Icons.translate])
                       Actor(
                         acts: [
-                          .pad(begin: EdgeInsets.all(.5), end: const EdgeInsets.only(bottom: 10.0)),
-                          .resize(beginWidth: 5, beginHeight: 5, endWidth: 48, endHeight: 48),
+                          .pad(
+                            begin: EdgeInsets.all(.5),
+                            end: const EdgeInsets.only(bottom: 10.0),
+                          ),
+                          .resize(
+                            beginWidth: 5,
+                            beginHeight: 5,
+                            endWidth: 48,
+                            endHeight: 48,
+                          ),
                         ],
                         child: FloatingActionButton(
                           mini: true,
@@ -51,7 +62,10 @@ class ExpandingFloatingActions extends StatelessWidget {
                           onPressed: () {},
                           child: Actor(
                             acts: [
-                              .clipReveal(borderRadius: BorderRadius.circular(4), alignment: Alignment.bottomRight),
+                              .clipReveal(
+                                borderRadius: BorderRadius.circular(4),
+                                alignment: Alignment.bottomRight,
+                              ),
                               .blur(begin: 8),
                             ],
                             child: Icon(icon, color: Colors.white, size: 24),
