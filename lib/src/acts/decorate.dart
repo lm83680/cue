@@ -1,20 +1,20 @@
 part of 'act.dart';
 
-class Decorate extends TweenAct<Decoration> {
-  const Decorate({
-    super.begin = const BoxDecoration(),
-    super.end = const BoxDecoration(),
+class DecorateAct extends TweenAct<Decoration> {
+  const DecorateAct({
+    super.from = const BoxDecoration(),
+    super.to = const BoxDecoration(),
     super.curve,
     super.timing,
   });
 
-  const Decorate.keyframes(
+  const DecorateAct.keyframes(
     super.keyframes, {
     super.curve,
   }) : super.keyframes();
 
   @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
+  Widget apply(AnimationContext context, Widget child) {
     return DecoratedBoxTransition(
       decoration: build(
         context,

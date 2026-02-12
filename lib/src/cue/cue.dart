@@ -1,4 +1,4 @@
-import 'package:cue/src/cue/cue_debug_provider.dart';
+import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +18,7 @@ abstract class Cue extends StatefulWidget {
     bool debug,
     Duration duration,
     Duration? reverseDuration,
-    Simulation? simulation,
+    SimulationBuilder? simulation,
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
@@ -30,7 +30,7 @@ abstract class Cue extends StatefulWidget {
     Curve curve,
     bool debug,
     Duration duration,
-    Simulation? simulation,
+    SimulationBuilder? simulation,
     Duration? reverseDuration,
     MouseCursor cursor,
     bool opaque,
@@ -44,17 +44,17 @@ abstract class Cue extends StatefulWidget {
     required Animation<double> animation,
   }) = _ControlledCue;
 
-  const factory Cue.toggled({
+  const factory Cue.onToggle({
     Key? key,
     required Widget child,
     Curve curve,
     bool debug,
     Duration duration,
     Duration? reverseDuration,
-    Simulation? simulation,
+    SimulationBuilder? simulation,
     required bool toggled,
     bool skipFirstAnimation,
-  }) = _ToggledCue;
+  }) = _TogglableCue;
 
   const factory Cue.indexed({
     Key? key,
@@ -168,7 +168,7 @@ class _SelfAnimatedCue extends Cue {
     this.reverseOnLoop = false,
     this.delay,
   });
-  final Simulation? simulation;
+  final SimulationBuilder? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final Duration? delay;
@@ -190,7 +190,7 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   Duration? get reverseDuration => widget.reverseDuration;
 
   @override
-  Simulation? get simulation => widget.simulation;
+  SimulationBuilder? get simulation => widget.simulation;
 
   @override
   void onControllerReady() async {
@@ -222,7 +222,7 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
 
   Curve get curve;
 
-  Simulation? get simulation => null;
+  SimulationBuilder? get simulation => null;
 
   Duration get duration;
 
@@ -269,7 +269,7 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
           if (_statusListener != null) {
             controller.removeStatusListener(_statusListener!);
           }
-          controller.animateWith(simulation!);
+          controller.animateWith(simulation!(true));
         }
       } else {
         if (loop) {
@@ -281,23 +281,23 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
     }
   }
 
-  void _loopWithSimulation(Simulation simulation, {bool reverseOnLoop = false}) {
+  void _loopWithSimulation(SimulationBuilder simulation, {bool reverseOnLoop = false}) {
     if (_statusListener != null) {
       controller.removeStatusListener(_statusListener!);
     }
     _statusListener = (status) {
       if (status == AnimationStatus.completed) {
         if (reverseOnLoop) {
-          controller.animateBack(0.0);
+          controller.animateBackWith(simulation(false));
         } else {
-          controller.animateWith(simulation);
+          controller.animateWith(simulation(true));
         }
       } else if (status == AnimationStatus.dismissed && reverseOnLoop) {
-        controller.animateWith(simulation);
+        controller.animateWith(simulation(false));
       }
     };
     controller.addStatusListener(_statusListener!);
-    controller.animateWith(simulation);
+    controller.animateWith(simulation(true));
   }
 
   @override
@@ -323,7 +323,7 @@ class _OnHoverCue extends Cue {
     this.opaque = false,
   });
 
-  final Simulation? simulation;
+  final SimulationBuilder? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final MouseCursor cursor;
@@ -344,7 +344,7 @@ class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
   Duration? get reverseDuration => widget.reverseDuration;
 
   @override
-  Simulation? get simulation => widget.simulation;
+  SimulationBuilder? get simulation => widget.simulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
@@ -361,8 +361,8 @@ class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
   }
 }
 
-class _ToggledCue extends Cue {
-  const _ToggledCue({
+class _TogglableCue extends Cue {
+  const _TogglableCue({
     super.key,
     required super.child,
     super.curve,
@@ -374,7 +374,7 @@ class _ToggledCue extends Cue {
     this.skipFirstAnimation = true,
   });
 
-  final Simulation? simulation;
+  final SimulationBuilder? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final bool toggled;
@@ -384,7 +384,7 @@ class _ToggledCue extends Cue {
   State<StatefulWidget> createState() => _ToggledStageState();
 }
 
-class _ToggledStageState extends _SelfAnimatedState<_ToggledCue> {
+class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
   @override
   Curve get curve => widget.curve;
 
@@ -395,7 +395,7 @@ class _ToggledStageState extends _SelfAnimatedState<_ToggledCue> {
   Duration? get reverseDuration => widget.reverseDuration;
 
   @override
-  Simulation? get simulation => widget.simulation;
+  SimulationBuilder? get simulation => widget.simulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
@@ -411,8 +411,9 @@ class _ToggledStageState extends _SelfAnimatedState<_ToggledCue> {
   }
 
   @override
-  void didUpdateWidget(covariant _ToggledCue oldWidget) {
+  void didUpdateWidget(covariant _TogglableCue oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.toggled != oldWidget.toggled) {
       _animate();
     }
@@ -420,9 +421,17 @@ class _ToggledStageState extends _SelfAnimatedState<_ToggledCue> {
 
   void _animate() {
     if (widget.toggled) {
-      controller.forward(from: 0);
+      if (simulation != null) {
+        controller.animateWith(simulation!(true));
+      } else {
+        controller.forward();
+      }
     } else {
-      controller.reverse(from: 1);
+      if (simulation != null) {
+        controller.animateBackWith(simulation!(false));
+      } else {
+        controller.reverse(from: 1);
+      }
     }
   }
 }

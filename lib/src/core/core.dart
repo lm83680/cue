@@ -6,12 +6,14 @@ class AnimationContext {
     required this.driver,
     this.timing,
     this.curve,
+    this.parentSize,
   });
 
   final BuildContext buildContext;
   final Animation<double> driver;
   final Timing? timing;
   final Curve? curve;
+  final Size? parentSize;
 
   TextDirection get textDirection => Directionality.of(buildContext);
 
@@ -20,12 +22,14 @@ class AnimationContext {
     Animation<double>? driver,
     Timing? timing,
     Curve? curve,
+    Size? parentSize,
   }) {
     return AnimationContext(
       buildContext: buildContext ?? this.buildContext,
       driver: driver ?? this.driver,
       timing: timing ?? this.timing,
       curve: curve ?? this.curve,
+      parentSize: parentSize ?? this.parentSize,
     );
   }
 }

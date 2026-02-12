@@ -43,7 +43,10 @@ class Phase<T extends Object?> {
 
   bool get isAlwaysStopped => begin == end;
 
-  static ({List<Phase<T>> phases, Timing? timing}) normalize<T extends Object?>(List<Keyframe<T>> frames) {
+  static ({List<Phase<R>> phases, Timing? timing}) normalize<T extends Object?, R extends Object?>(
+    List<Keyframe<T>> frames,
+    R Function(T value) transform,
+  ) {
     if (frames.isEmpty) {
       return (phases: [], timing: null);
     }
@@ -61,13 +64,13 @@ class Phase<T extends Object?> {
     // Handle single keyframe case - return constant phase (100% weight)
     if (sortedTimes.length < 2) {
       final time = sortedTimes.first;
-      final value = uniqueFrames[time] as T;
+      final value = transform(uniqueFrames[time] as T);
       final timing = (time != 0.0 && time != 1.0) ? Timing(start: time, end: time) : null;
       return (phases: [Phase(begin: value, end: value, weight: 100.0)], timing: timing);
     }
 
     // Calculate phases with weights based on time differences (converted to percentage 0-100)
-    final List<Phase<T>> phases = [];
+    final List<Phase<R>> phases = [];
     for (int i = 0; i < sortedTimes.length - 1; i++) {
       final currentTime = sortedTimes[i];
       final nextTime = sortedTimes[i + 1];
@@ -75,8 +78,8 @@ class Phase<T extends Object?> {
 
       phases.add(
         Phase(
-          begin: uniqueFrames[currentTime] as T,
-          end: uniqueFrames[nextTime] as T,
+          begin: transform(uniqueFrames[currentTime] as T),
+          end: transform(uniqueFrames[nextTime] as T),
           weight: weight,
         ),
       );

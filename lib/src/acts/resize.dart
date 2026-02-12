@@ -1,70 +1,100 @@
 part of 'act.dart';
 
-class Resize extends Act {
-  const Resize({
-    this.begin,
-    this.end,
+abstract class ResizeAct extends Act {
+  const factory ResizeAct({
+    required Size from,
+    required Size to,
+    Curve? curve,
+    Timing? timing,
+    AlignmentGeometry? alignment,
+  }) = _Resize;
+
+  const factory ResizeAct.keyframes(
+    List<Keyframe<Size?>> keyframes, {
+    Curve? curve,
+    AlignmentGeometry? alignment,
+  }) = _Resize.keyframes;
+
+  const factory ResizeAct.fractional({
+    Size from,
+    Size to,
+    Curve? curve,
+    Timing? timing,
+    AlignmentGeometry alignment,
+  }) = FractionalResizeAct;
+}
+
+class _Resize extends TweenAct<Size?> implements ResizeAct {
+  final AlignmentGeometry? alignment;
+
+  const _Resize({
+    super.from,
+    super.to,
     super.curve,
     super.timing,
     this.alignment,
-  }) : _keyframes = null;
+  });
 
-  final AlignmentGeometry? alignment;
-  final SizeOrNull? begin;
-  final SizeOrNull? end;
+  const _Resize.keyframes(
+    super.keyframes, {
+    super.curve,
+    this.alignment,
+  }) : super.keyframes();
 
-  final List<Keyframe<SizeOrNull>>? _keyframes;
+  Tween<Size?> _buildTween(Size? begin, Size? end, Size maxSize) {
+    double normalize(double? value, double max) {
+      if (value == null) return 0;
+      if (value.isInfinite) return max;
+      return value;
+    }
 
-  const Resize.keyframes(List<Keyframe<SizeOrNull>> keyframes, {super.curve, this.alignment})
-    : _keyframes = keyframes,
-      begin = null,
-      end = null;
-
-  SizeOrNullTween _buildTween(SizeOrNull begin, SizeOrNull end, Size maxSize) {
-    final effectiveBeginWidth = begin.width != null && begin.width!.isInfinite ? maxSize.width : begin.width;
-    final effectiveBeginHeight = begin.height != null && begin.height!.isInfinite ? maxSize.height : begin.height;
-    final effectiveEndWidth = end.width != null && end.width!.isInfinite ? maxSize.width : end.width;
-    final effectiveEndHeight = end.height != null && end.height!.isInfinite ? maxSize.height : end.height;
-    return SizeOrNullTween(
-      begin: SizeOrNull(effectiveBeginWidth, effectiveBeginHeight),
-      end: SizeOrNull(effectiveEndWidth, effectiveEndHeight),
+    final effectiveBeginWidth = normalize(begin?.width, maxSize.width);
+    final effectiveBeginHeight = normalize(begin?.height, maxSize.height);
+    final effectiveEndWidth = normalize(end?.width, maxSize.width);
+    final effectiveEndHeight = normalize(end?.height, maxSize.height);
+    return SizeTween(
+      begin: Size(effectiveBeginWidth, effectiveBeginHeight),
+      end: Size(effectiveEndWidth, effectiveEndHeight),
     );
   }
 
-  Animation<SizeOrNull> build(AnimationContext context, Size maxSize) {
-    final List<Phase<SizeOrNull>> phases;
-    final begin = this.begin ?? SizeOrNull.nullSize;
-    if (_keyframes == null) {
-      phases = [Phase<SizeOrNull>(begin: begin, end: end ?? begin, weight: 1.0)];
-    } else {
-      final result = Phase.normalize(_keyframes);
-      phases = result.phases;
-      context = context.copyWith(timing: result.timing);
-    }
-    return TweenAct.buildFromPhases<SizeOrNull>(context, phases, (begin, end) {
-      return _buildTween(begin, end, maxSize);
-    });
+  Size? get _biggestTargetSize {
+    if (_from == null) return _to;
+    if (_to == null) return _from;
+    return Size(
+      math.max(_from.width, _to.width),
+      math.max(_from.height, _to.height),
+    );
   }
 
   @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
+  Widget apply(AnimationContext context, Widget child) {
     return LayoutBuilder(
       builder: (_, constrains) {
-        final animation = build(context, constrains.biggest);
-        final builder = AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            return SizedBox(
-              width: animation.value.width,
-              height: animation.value.height,
-              child: child,
-            );
+        final animation = build(
+          context,
+          tweenBuilder: (begin, end) {
+            return _buildTween(begin, end, constrains.biggest);
           },
-          child: child,
+        );
+        final builder = LayoutInfoScope(
+          size: _biggestTargetSize,
+          child: AnimatedBuilder(
+            animation: animation,
+            builder: (context, child) {
+              return SizedBox(
+                width: animation.value?.width,
+                height: animation.value?.height,
+                child: child,
+              );
+            },
+            child: child,
+          ),
         );
         if (alignment case final alignment?) {
           return Align(
             alignment: alignment,
+            widthFactor: context.driver.value,
             child: builder,
           );
         }
@@ -74,45 +104,36 @@ class Resize extends Act {
   }
 }
 
-class SizeOrNull {
-  final double? width;
-  final double? height;
+class FractionalResizeAct extends TweenAct<Size> implements ResizeAct {
+  const FractionalResizeAct({
+    super.from = Size.zero,
+    super.to = Size.zero,
+    super.curve,
+    super.timing,
+    this.alignment = Alignment.center,
+  });
 
-  const SizeOrNull(this.width, this.height);
+  const FractionalResizeAct.keyframes(
+    super.keyframes, {
+    super.curve,
+    this.alignment = Alignment.center,
+  }) : super.keyframes();
 
-  static const infinite = SizeOrNull(double.infinity, double.infinity);
-
-  static const zero = SizeOrNull(0, 0);
-
-  static const nullSize = SizeOrNull(null, null);
-
-  factory SizeOrNull.width(double width) => SizeOrNull(width, null);
-  factory SizeOrNull.height(double height) => SizeOrNull(null, height);
-  factory SizeOrNull.size(double? width, double? height) => SizeOrNull(width, height);
-  factory SizeOrNull.square(double size) => SizeOrNull(size, size);
-  factory SizeOrNull.fromSize(Size size) => SizeOrNull(size.width, size.height);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is SizeOrNull && width == other.width && height == other.height;
+  final AlignmentGeometry alignment;
 
   @override
-  int get hashCode => Object.hash(width, height);
-}
-
-class SizeOrNullTween extends Tween<SizeOrNull> {
-  SizeOrNullTween({super.begin, super.end});
-
-  @override
-  SizeOrNull lerp(double t) {
-    final beginWidth = begin?.width;
-    final endWidth = end?.width;
-    final beginHeight = begin?.height;
-    final endHeight = end?.height;
-
-    return SizeOrNull(
-      beginWidth != null && endWidth != null ? lerpDouble(beginWidth, endWidth, t) : null,
-      beginHeight != null && endHeight != null ? lerpDouble(beginHeight, endHeight, t) : null,
+  Widget apply(AnimationContext context, Widget child) {
+    final animation = build(context);
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) {
+        return FractionallySizedBox(
+          widthFactor: animation.value.width,
+          heightFactor: animation.value.width,
+          alignment: alignment,
+          child: child,
+        );
+      },
     );
   }
 }

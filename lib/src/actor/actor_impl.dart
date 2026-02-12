@@ -1,27 +1,62 @@
 import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+part 'actor.dart';
 
-class Actor extends StatelessWidget {
+abstract class SingleActProxy extends StatelessWidget implements Actor {
+  final Widget child;
+  final Curve? curve;
+  final Timing? timing;
+  final BoxOverflow overflow;
+
+  const SingleActProxy({
+    super.key,
+    required this.child,
+    this.curve,
+    this.timing,
+    this.overflow = const BoxOverflow.none(),
+  });
+}
+
+class ActorBase extends StatelessWidget implements Actor {
   final Curve? curve;
   final Timing? timing;
   final List<Act> acts;
   final Widget child;
+  final BoxOverflow overflow;
 
-  const Actor({
+  const ActorBase({
     super.key,
     required this.acts,
     required this.child,
     this.curve,
     this.timing,
+    this.overflow = const BoxOverflow.none(),
   });
 
   @override
   Widget build(BuildContext context) {
+    if (acts.isEmpty) return child;
     final scope = CueScope.of(context);
+
     Widget current = child;
+
+    if (!overflow.isNone) {
+      final targetSize = LayoutInfoScope.of(context)?.size;
+      if (targetSize != null) {
+        current = OverflowBox(
+          maxWidth: overflow.horizontal ? targetSize.width - overflow.horizontalPadding : null,
+          maxHeight: overflow.vertical ? targetSize.height - overflow.verticalPadding : null,
+          fit: overflow.fit,
+          alignment: overflow.alignment,
+          child: current,
+        );
+      }
+    }
+
     for (final effect in acts.reversed) {
-      current = effect.wrapWidget(
+      current = effect.apply(
         AnimationContext(
           buildContext: context,
           driver: scope.animation,
@@ -129,7 +164,7 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
     );
 
     if (widget._tween case final tween?) {
-      animation = TweenAct.buildFromPhases<T>(
+      animation = TweenActBase.buildFromPhases<T>(
         animationContext,
         [Phase<T>(begin: tween.begin as T, end: tween.end as T, weight: 100)],
         (_, _) => tween,
@@ -137,11 +172,11 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
       return;
     }
 
-    final result = Phase.normalize(widget._keyframes!);
+    final result = Phase.normalize(widget._keyframes!, (value) => value);
     if (result.timing != null) {
       animationContext = animationContext.copyWith(timing: result.timing);
     }
-    animation = TweenAct.buildFromPhases<T>(
+    animation = TweenActBase.buildFromPhases<T>(
       animationContext,
       result.phases,
       widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
@@ -160,7 +195,56 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
 }
 
 extension StaggeredActorExtension on Iterable<Widget> {
-  List<Widget> stagger({required List<Act> Function(int index) acts}) {
-    return [for (var i = 0; i < length; i++) Actor(acts: acts(i), child: elementAt(i))];
+  List<Widget> stagger({required List<Act> Function(int index) acts, Curve? curve}) {
+    return [
+      for (var i = 0; i < length; i++)
+        Actor(
+          curve: curve,
+          acts: acts(i),
+          child: elementAt(i),
+        ),
+    ];
   }
+}
+
+class BoxOverflow {
+  final bool horizontal;
+  final bool vertical;
+  final OverflowBoxFit fit;
+  final double verticalPadding;
+  final double horizontalPadding;
+  final AlignmentGeometry alignment;
+
+  const BoxOverflow({
+    this.horizontal = true,
+    this.vertical = true,
+    this.fit = OverflowBoxFit.deferToChild,
+    this.alignment = Alignment.center,
+    this.verticalPadding = 0.0,
+    this.horizontalPadding = 0.0,
+  });
+
+  const BoxOverflow.horizontal({this.fit = OverflowBoxFit.deferToChild, this.alignment = .center, double padding = 0.0})
+    : vertical = false,
+      verticalPadding = 0.0,
+      horizontalPadding = padding,
+      horizontal = true;
+
+  const BoxOverflow.vertical({this.fit = OverflowBoxFit.deferToChild, this.alignment = .center, double padding = 0.0})
+    : horizontal = false,
+      horizontalPadding = 0.0,
+      verticalPadding = padding,
+      vertical = true;
+
+  const BoxOverflow.none()
+    : horizontal = false,
+      vertical = false,
+      fit = OverflowBoxFit.deferToChild,
+      verticalPadding = 0.0,
+      horizontalPadding = 0.0,
+      alignment = Alignment.center;
+
+  bool get isNone => !horizontal && !vertical;
+
+  bool get isAll => horizontal && vertical;
 }

@@ -84,7 +84,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       }
     }
 
-    if (_entry?.mounted == true) return deattachCallback;
+    if (_entry != null) return deattachCallback;
     _entry = OverlayEntry(
       builder: (context) {
         return _DebugOverlay(

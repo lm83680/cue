@@ -1,28 +1,28 @@
 part of 'act.dart';
 
-abstract class Translate extends Act {
-  const factory Translate({
-    Offset begin,
-    Offset end,
+abstract class TranslateAct extends Act {
+  const factory TranslateAct({
+    Offset from,
+    Offset to,
     Curve? curve,
     Timing? timing,
   }) = _TranslateOffset;
 
-  const factory Translate.keyframes(List<Keyframe<Offset>> keyframes, {Curve? curve}) = _TranslateOffset.keyframes;
+  const factory TranslateAct.keyframes(List<Keyframe<Offset>> keyframes, {Curve? curve}) = _TranslateOffset.keyframes;
 
-  const factory Translate.x({double begin, double end, Curve? curve, Timing? timing}) = _TranslateX;
+  const factory TranslateAct.x({double from, double to, Curve? curve, Timing? timing}) = _TranslateX;
 
-  const factory Translate.keyframesX(List<Keyframe<double>> keyframes, {Curve? curve}) = _TranslateX.keyframes;
+  const factory TranslateAct.keyframesX(List<Keyframe<double>> keyframes, {Curve? curve}) = _TranslateX.keyframes;
 
-  const factory Translate.y({double begin, double end, Curve? curve, Timing? timing}) = _TranslateY;
+  const factory TranslateAct.y({double from, double to, Curve? curve, Timing? timing}) = _TranslateY;
 
-  const factory Translate.keyframesY(List<Keyframe<double>> keyframes, {Curve? curve}) = _TranslateY.keyframes;
+  const factory TranslateAct.keyframesY(List<Keyframe<double>> keyframes, {Curve? curve}) = _TranslateY.keyframes;
 }
 
-class _TranslateOffset extends TweenAct<Offset> implements Translate {
+class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
   const _TranslateOffset({
-    super.begin = Offset.zero,
-    super.end = Offset.zero,
+    super.from = Offset.zero,
+    super.to = Offset.zero,
     super.curve,
     super.timing,
   });
@@ -30,7 +30,7 @@ class _TranslateOffset extends TweenAct<Offset> implements Translate {
   const _TranslateOffset.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
+  Widget apply(AnimationContext context, Widget child) {
     return _TranslateTransition(
       position: build(context),
       transformHitTests: true,
@@ -40,10 +40,10 @@ class _TranslateOffset extends TweenAct<Offset> implements Translate {
   }
 }
 
-class _TranslateY extends TweenAct<double> implements Translate {
+class _TranslateY extends TweenAct<double> implements TranslateAct {
   const _TranslateY({
-    super.begin = 0,
-    super.end = 0,
+    super.from = 0,
+    super.to = 0,
     super.curve,
     super.timing,
   });
@@ -51,7 +51,7 @@ class _TranslateY extends TweenAct<double> implements Translate {
   const _TranslateY.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
+  Widget apply(AnimationContext context, Widget child) {
     return _TranslateTransition(
       position: build(context),
       transformHitTests: true,
@@ -61,10 +61,10 @@ class _TranslateY extends TweenAct<double> implements Translate {
   }
 }
 
-class _TranslateX extends TweenAct<double> implements Translate {
+class _TranslateX extends TweenAct<double> implements TranslateAct {
   const _TranslateX({
-    super.begin = 0,
-    super.end = 0,
+    super.from = 0,
+    super.to = 0,
     super.curve,
     super.timing,
   });
@@ -72,7 +72,7 @@ class _TranslateX extends TweenAct<double> implements Translate {
   const _TranslateX.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
+  Widget apply(AnimationContext context, Widget child) {
     return _TranslateTransition(
       position: build(context),
       transformHitTests: true,
