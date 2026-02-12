@@ -125,7 +125,7 @@ abstract class Actor extends Widget {
     BoxOverflow overflow,
   }) = BlurActorFactory;
 
-  const factory Actor.inset({
+  const factory Actor.padding({
     Key? key,
     required EdgeInsetsGeometry from,
     required EdgeInsetsGeometry to,
@@ -133,7 +133,7 @@ abstract class Actor extends Widget {
     Curve? curve,
     Timing? timing,
     BoxOverflow overflow,
-  }) = InsetActorFactory;
+  }) = PaddingActorFactory;
 
   const factory Actor.translate({
     Key? key,
@@ -195,4 +195,54 @@ abstract class Actor extends Widget {
     Timing? timing,
     BoxOverflow overflow,
   }) = ClipRevealActorFactory.vertical;
+
+  const factory Actor.position({
+    Key? key,
+    required Position from,
+    required Position to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    BoxOverflow overflow,
+  }) = PositionActorFactory;
+
+  const factory Actor.textStyle({
+    Key? key,
+    required TextStyle from,
+    required TextStyle to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    BoxOverflow overflow,
+  }) = TextStyleActorFactory;
+
+  const factory Actor.iconTheme({
+    Key? key,
+    required IconThemeData from,
+    required IconThemeData to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    BoxOverflow overflow,
+  }) = IconThemeActorFactory;
+
+  const factory Actor.decorate({
+    Key? key,
+    required Decoration from,
+    required Decoration to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    BoxOverflow overflow,
+  }) = DecoratedBoxActorFactory;
+
+  const factory Actor.color({
+    Key? key,
+    required Color from,
+    required Color to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    BoxOverflow overflow,
+  }) = ColorActorFactory;
 }

@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:cue/src/actor/actor_impl.dart';
 import 'package:cue/src/core/core.dart';
 import 'package:cue/src/core/phase.dart';
 import 'package:flutter/foundation.dart';
@@ -20,6 +19,7 @@ part 'insets.dart';
 part 'style.dart';
 part 'clip_reveal.dart';
 part 'slide.dart';
+part 'position.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
 

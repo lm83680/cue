@@ -1,14 +1,14 @@
 part of 'act.dart';
 
-class InsetsAct extends TweenAct<EdgeInsetsGeometry> {
-  const InsetsAct({
+class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
+  const PaddingAct({
     super.from = EdgeInsets.zero,
     super.to = EdgeInsets.zero,
     super.curve,
     super.timing,
   });
 
-  const InsetsAct.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const PaddingAct.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
   Widget apply(AnimationContext context, Widget child) {

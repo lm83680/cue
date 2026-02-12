@@ -297,11 +297,11 @@ class BlurActorFactory extends SingleActProxy {
 }
 
 @internal
-class InsetActorFactory extends SingleActProxy {
+class PaddingActorFactory extends SingleActProxy {
   final EdgeInsetsGeometry from;
   final EdgeInsetsGeometry to;
 
-  const InsetActorFactory({
+  const PaddingActorFactory({
     super.key,
     required this.from,
     required this.to,
@@ -315,7 +315,7 @@ class InsetActorFactory extends SingleActProxy {
   Widget build(BuildContext context) {
     return ActorBase(
       acts: [
-        InsetsAct(
+        PaddingAct(
           from: from,
           to: to,
           curve: curve,
@@ -460,6 +460,161 @@ class ClipRevealActorFactory extends SingleActProxy {
             timing: timing,
           ),
         },
+      ],
+      child: child,
+    );
+  }
+}
+
+@internal
+class PositionActorFactory extends SingleActProxy {
+  final Position from;
+  final Position to;
+
+  const PositionActorFactory({
+    super.key,
+    required this.from,
+    required this.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActorBase(
+      acts: [
+        PositionAct(
+          from: from,
+          to: to,
+          curve: curve,
+          timing: timing,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
+@internal
+class TextStyleActorFactory extends SingleActProxy {
+  final TextStyle from;
+  final TextStyle to;
+
+  const TextStyleActorFactory({
+    super.key,
+    required this.from,
+    required this.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActorBase(
+      acts: [
+        Style.text(
+          from: from,
+          to: to,
+          curve: curve,
+          timing: timing,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
+@internal
+class IconThemeActorFactory extends SingleActProxy {
+  final IconThemeData from;
+  final IconThemeData to;
+
+  const IconThemeActorFactory({
+    super.key,
+    required this.from,
+    required this.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActorBase(
+      acts: [
+        Style.iconTheme(
+          from: from,
+          to: to,
+          curve: curve,
+          timing: timing,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
+@internal
+class DecoratedBoxActorFactory extends SingleActProxy {
+  final Decoration from;
+  final Decoration to;
+
+  const DecoratedBoxActorFactory({
+    super.key,
+    required this.from,
+    required this.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActorBase(
+      acts: [
+        DecorateAct(
+          from: from,
+          to: to,
+          curve: curve,
+          timing: timing,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
+@internal
+class ColorActorFactory extends SingleActProxy {
+  final Color from;
+  final Color to;
+
+  const ColorActorFactory({
+    super.key,
+    required this.from,
+    required this.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActorBase(
+      acts: [
+        ColorAct(
+          from: from,
+          to: to,
+          curve: curve,
+          timing: timing,
+        ),
       ],
       child: child,
     );
