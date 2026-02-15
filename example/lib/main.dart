@@ -52,7 +52,7 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
               child: ModalTransition(
                 // barrierColor: Colors.transparent,
                 simulation: Spring.iosDefault,
-                // showDebug: true,
+                showDebug: true,
                 duration: Duration(milliseconds: 600),
                 triggerBuilder: (context, showModal) {
                   return AnimatedBuilder(

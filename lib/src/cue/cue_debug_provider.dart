@@ -36,9 +36,14 @@ class CueDebugTools extends StatefulWidget {
 
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  final _verticalOffset = ValueNotifier<double>(0.0);
-  final _speedIndex = ValueNotifier(0);
-  final _isLooping = ValueNotifier(false);
+  final _overlayData = ValueNotifier<_OverlayData>(
+    _OverlayData(
+      speedIndex: 0,
+      isLooping: false,
+      isActive: true,
+      verticalOffset: 0,
+    ),
+  );
 
   OverlayEntry? _entry;
   final Set<BuildContext> _attachedCallers = {};
@@ -60,8 +65,8 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     }
   }
 
-  void _startAutoPlay([bool isLooping = false]) {
-    if (isLooping) {
+  void _startAutoPlay() {
+    if (_overlayData.value.isLooping) {
       _controller.repeat();
     } else {
       double startValue = _controller.value;
@@ -92,9 +97,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
           controller: _controller,
           onPlay: _startAutoPlay,
           baseDuration: widget.baseDuration,
-          verticalOffset: _verticalOffset,
-          speedIndex: _speedIndex,
-          isLooping: _isLooping,
+          overlayData: _overlayData,
         );
       },
     );
@@ -106,9 +109,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   void dispose() {
     _controller.dispose();
     _entry?.remove();
-    _verticalOffset.dispose();
-    _speedIndex.dispose();
-    _isLooping.dispose();
     super.dispose();
   }
 
@@ -123,16 +123,13 @@ class _DebugOverlay extends StatefulWidget {
     required this.controller,
     required this.onPlay,
     required this.baseDuration,
-    required this.verticalOffset,
-    required this.speedIndex,
-    required this.isLooping,
+    required this.overlayData,
   });
 
-  final ValueNotifier<double> verticalOffset;
-  final ValueNotifier<int> speedIndex;
-  final ValueNotifier<bool> isLooping;
+  final ValueNotifier<_OverlayData> overlayData;
+
   final AnimationController controller;
-  final void Function(bool isLooping) onPlay;
+  final void Function() onPlay;
   final Duration baseDuration;
 
   @override
@@ -143,14 +140,16 @@ class _DebugOverlayState extends State<_DebugOverlay> {
   static const List<int> _speedMultipliers = [1, 2, 4, 8, 16];
 
   AnimationController get _controller => widget.controller;
-  ValueNotifier<int> get _speedIndex => widget.speedIndex;
-  ValueNotifier<bool> get _isLooping => widget.isLooping;
+
+  ValueNotifier<_OverlayData> get _dataNotifier => widget.overlayData;
+
+  _OverlayData get _data => widget.overlayData.value;
 
   void _togglePlayPause() {
     if (_controller.isAnimating) {
       _controller.stop();
     } else {
-      widget.onPlay(_isLooping.value);
+      widget.onPlay();
     }
   }
 
@@ -162,14 +161,14 @@ class _DebugOverlayState extends State<_DebugOverlay> {
   }
 
   void _toggleLoop() {
-    _isLooping.value = !_isLooping.value;
+    _dataNotifier.value = _data.copyWith(isLooping: !_data.isLooping);
     _controller.stop();
-    widget.onPlay(_isLooping.value);
+    widget.onPlay();
   }
 
   void _cycleSpeed() {
-    _speedIndex.value = (_speedIndex.value + 1) % _speedMultipliers.length;
-    final speed = _speedMultipliers[_speedIndex.value];
+    _dataNotifier.value = _data.copyWith(speedIndex: (_data.speedIndex + 1) % _speedMultipliers.length);
+    final speed = _speedMultipliers[_data.speedIndex];
     _setSpeed(speed);
   }
 
@@ -180,21 +179,25 @@ class _DebugOverlayState extends State<_DebugOverlay> {
     if (wasAnimating) {
       _controller.stop();
     }
-    widget.onPlay(_isLooping.value);
+    widget.onPlay();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<double>(
-      valueListenable: widget.verticalOffset,
-      builder: (context, offset, _) {
+    return ListenableBuilder(
+      listenable: widget.overlayData,
+      builder: (context, _) {
         return GestureDetector(
           onVerticalDragUpdate: (details) {
             final maxTop = MediaQuery.sizeOf(context).height - 220;
             final minTop = 0.0;
-            widget.verticalOffset.value += details.delta.dy.clamp(
-              minTop - widget.verticalOffset.value,
-              maxTop - widget.verticalOffset.value,
+            _dataNotifier.value = _data.copyWith(
+              verticalOffset:
+                  _data.verticalOffset +
+                  details.delta.dy.clamp(
+                    minTop - _data.verticalOffset,
+                    maxTop - _data.verticalOffset,
+                  ),
             );
           },
           child: Align(
@@ -267,11 +270,10 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                       ],
                                     ),
                                   ),
-                                  ValueListenableBuilder(
-                                    valueListenable: _speedIndex,
-                                    builder: (context, speedIdx, _) {
-                                      final speed = _speedMultipliers[speedIdx];
-                                      final speedLabel = speedIdx == 0 ? '1X' : '-${speed}X';
+                                  Builder(
+                                    builder: (context) {
+                                      final speed = _speedMultipliers[_data.speedIndex];
+                                      final speedLabel = _data.speedIndex == 0 ? '1X' : '-${speed}X';
                                       return Row(
                                         children: [
                                           InkWell(
@@ -302,12 +304,12 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             ),
                                             onPressed: () {
                                               final slowestSpeedIndex = _speedMultipliers.length - 1;
-                                              if (_speedIndex.value == slowestSpeedIndex) {
-                                                _speedIndex.value = 0;
+                                              if (_data.speedIndex == slowestSpeedIndex) {
+                                                _dataNotifier.value = _data.copyWith(speedIndex: 0);
                                               } else {
-                                                _speedIndex.value = slowestSpeedIndex;
+                                                _dataNotifier.value = _data.copyWith(speedIndex: slowestSpeedIndex);
                                               }
-                                              _setSpeed(_speedMultipliers[_speedIndex.value]);
+                                              _setSpeed(_speedMultipliers[_data.speedIndex]);
                                             },
                                             icon: Icon(Icons.slow_motion_video_outlined),
                                           ),
@@ -315,9 +317,8 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                       );
                                     },
                                   ),
-                                  ValueListenableBuilder(
-                                    valueListenable: _isLooping,
-                                    builder: (context, isLooping, _) {
+                                  Builder(
+                                    builder: (context) {
                                       final iconColor =
                                           IconTheme.of(context).color ?? Theme.of(context).colorScheme.onSurface;
                                       return IconButton(
@@ -326,7 +327,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                         ),
                                         icon: Icon(
                                           Icons.loop_rounded,
-                                          color: isLooping ? iconColor : iconColor.withValues(alpha: .4),
+                                          color: _data.isLooping ? iconColor : iconColor.withValues(alpha: .4),
                                         ),
                                         onPressed: _toggleLoop,
                                         padding: EdgeInsets.zero,
@@ -505,5 +506,46 @@ class _TimelineTickMarkShape extends SliderTrackShape {
       final x = i * stepWidth;
       canvas.drawLine(Offset(x, yOffset), Offset(x, height + yOffset), tickPaint);
     }
+  }
+}
+
+class _OverlayData {
+  final int speedIndex;
+  final bool isLooping;
+  final bool isActive;
+  final double verticalOffset;
+
+  _OverlayData({
+    required this.speedIndex,
+    required this.isLooping,
+    required this.isActive,
+    required this.verticalOffset,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _OverlayData &&
+          runtimeType == other.runtimeType &&
+          speedIndex == other.speedIndex &&
+          isLooping == other.isLooping &&
+          isActive == other.isActive &&
+          verticalOffset == other.verticalOffset;
+
+  @override
+  int get hashCode => Object.hash(speedIndex, isLooping, isActive, verticalOffset);
+
+  _OverlayData copyWith({
+    int? speedIndex,
+    bool? isLooping,
+    bool? isActive,
+    double? verticalOffset,
+  }) {
+    return _OverlayData(
+      speedIndex: speedIndex ?? this.speedIndex,
+      isLooping: isLooping ?? this.isLooping,
+      isActive: isActive ?? this.isActive,
+      verticalOffset: verticalOffset ?? this.verticalOffset,
+    );
   }
 }
