@@ -126,16 +126,16 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TweenAct &&
+      other is TweenActBase &&
           runtimeType == other.runtimeType &&
           _from == other._from &&
           _to == other._to &&
-          _keyframes == other._keyframes &&
+          listEquals(_keyframes, other._keyframes) &&
           curve == other.curve &&
           timing == other.timing;
 
   @override
-  int get hashCode => Object.hash(_from, _to, _keyframes, curve, timing);
+  int get hashCode => Object.hash(_from, _to, curve, timing, Object.hashAll(_keyframes ?? []));
 }
 
 abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {

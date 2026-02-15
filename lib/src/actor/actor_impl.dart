@@ -31,7 +31,7 @@ class _ActorBaseState extends State<ActorBase> {
 
   void _setupAnimations(Animation<double> driver) {
     _cachedDriver = driver;
-    print('Setting up animations for ${widget.acts.length} acts');
+    print('Setting up animations for ${widget.child.runtimeType} acts');
 
     _animations.clear();
     for (final act in widget.acts) {

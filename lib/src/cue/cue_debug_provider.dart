@@ -194,12 +194,13 @@ class _DebugOverlayState extends State<_DebugOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListenableBuilder(
       listenable: widget.overlayData,
       builder: (context, _) {
         return GestureDetector(
           onVerticalDragUpdate: (details) {
-            final maxTop = MediaQuery.sizeOf(context).height - 220;
+            final maxTop = MediaQuery.sizeOf(context).height - 240;
             final minTop = 0.0;
             _dataNotifier.value = _data.copyWith(
               verticalOffset:
@@ -221,206 +222,209 @@ class _DebugOverlayState extends State<_DebugOverlay> {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Material(
-                      color: Theme.of(context).colorScheme.surface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(_dataNotifier.value.isMinimized ? 32 : 24),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .52),
-                          width: .5,
+                  child: IconTheme(
+                    data: theme.iconTheme.copyWith(color: theme.primaryColor),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        color: theme.colorScheme.surface,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(_dataNotifier.value.isMinimized ? 32 : 16),
+                          side: BorderSide(
+                            color: theme.colorScheme.onSurface.withValues(alpha: .52),
+                            width: .5,
+                          ),
                         ),
-                      ),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 500),
-                        child: AnimatedSize(
-                          duration: const Duration(milliseconds: 200),
-                          alignment: .topLeft,
-                          child: ListenableBuilder(
-                            listenable: widget.controller,
-                            builder: (context, _) {
-                              if (_data.isMinimized) {
-                                return IconButton(
-                                  style: IconButton.styleFrom(
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    shape: CircleBorder(),
-                                    minimumSize: .square(40),
-                                  ),
-                                  icon: Icon(Icons.play_circle),
-                                  onPressed: () {
-                                    _dataNotifier.value = _data.copyWith(isMinimized: false);
-                                  },
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                );
-                              }
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 500),
+                          child: AnimatedSize(
+                            duration: const Duration(milliseconds: 200),
+                            alignment: .topLeft,
+                            child: ListenableBuilder(
+                              listenable: widget.controller,
+                              builder: (context, _) {
+                                if (_data.isMinimized) {
+                                  return IconButton(
+                                    style: IconButton.styleFrom(
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      shape: CircleBorder(),
+                                      minimumSize: .square(40),
+                                    ),
+                                    icon: Icon(Icons.play_circle),
+                                    onPressed: () {
+                                      _dataNotifier.value = _data.copyWith(isMinimized: false);
+                                    },
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  );
+                                }
 
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            widget.controller.isAnimating
-                                                ? Icons.pause_circle_outline_rounded
-                                                : Icons.play_circle_outline_rounded,
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(
+                                              widget.controller.isAnimating
+                                                  ? Icons.pause_circle_outline_rounded
+                                                  : Icons.play_circle_outline_rounded,
+                                            ),
+                                            style: IconButton.styleFrom(iconSize: 32),
+                                            onPressed: _togglePlayPause,
+                                            padding: EdgeInsets.zero,
                                           ),
-                                          style: IconButton.styleFrom(iconSize: 32),
-                                          onPressed: _togglePlayPause,
-                                          padding: EdgeInsets.zero,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${widget.controller.value.toStringAsFixed(2)} ',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontFamily: 'monospace',
-                                                  fontFeatures: [FontFeature.tabularFigures()],
-                                                ),
-                                              ),
-                                              SizedBox(width: 16, height: 12, child: VerticalDivider(thickness: 2)),
-                                              Builder(
-                                                builder: (context) {
-                                                  final totalInMs = (widget.controller.duration?.inMilliseconds ?? 0);
-                                                  final fixedWidth = totalInMs.toString().length;
-                                                  final currentInMs = ((widget.controller.value * totalInMs).round())
-                                                      .toString()
-                                                      .padLeft(fixedWidth, '0');
-                                                  return Text(
-                                                    '$currentInMs / ${totalInMs}ms',
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontFamily: 'monospace',
-                                                      fontFeatures: [FontFeature.tabularFigures()],
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Builder(
-                                          builder: (context) {
-                                            final speed = _speedMultipliers[_data.speedIndex];
-                                            final speedLabel = _data.speedIndex == 0 ? '1X' : '-${speed}X';
-                                            return Row(
+                                          SizedBox(width: 4),
+                                          Expanded(
+                                            child: Row(
                                               children: [
-                                                InkWell(
-                                                  onTap: _cycleSpeed,
-                                                  borderRadius: BorderRadius.circular(32),
-                                                  child: Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                      color: Theme.of(
-                                                        context,
-                                                      ).colorScheme.primary.withValues(alpha: .1),
-                                                      borderRadius: BorderRadius.circular(32),
-                                                    ),
-                                                    child: Text(
-                                                      speedLabel,
-                                                      style: const TextStyle(
-                                                        fontSize: 13,
-                                                        fontFamily: 'monospace',
-                                                        fontWeight: FontWeight.w600,
-                                                      ),
-                                                      textAlign: TextAlign.center,
-                                                    ),
+                                                Text(
+                                                  '${widget.controller.value.toStringAsFixed(2)} ',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: 'monospace',
+                                                    fontFeatures: [FontFeature.tabularFigures()],
                                                   ),
                                                 ),
-                                                SizedBox(width: 6),
-                                                IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  style: IconButton.styleFrom(
-                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  ),
-                                                  onPressed: () {
-                                                    final slowestSpeedIndex = _speedMultipliers.length - 1;
-                                                    if (_data.speedIndex == slowestSpeedIndex) {
-                                                      _dataNotifier.value = _data.copyWith(speedIndex: 0);
-                                                    } else {
-                                                      _dataNotifier.value = _data.copyWith(
-                                                        speedIndex: slowestSpeedIndex,
-                                                      );
-                                                    }
-                                                    _setSpeed(_speedMultipliers[_data.speedIndex]);
+                                                SizedBox(width: 16, height: 12, child: VerticalDivider(thickness: 2)),
+                                                Builder(
+                                                  builder: (context) {
+                                                    final totalInMs = (widget.controller.duration?.inMilliseconds ?? 0);
+                                                    final fixedWidth = totalInMs.toString().length;
+                                                    final currentInMs = ((widget.controller.value * totalInMs).round())
+                                                        .toString()
+                                                        .padLeft(fixedWidth, '0');
+                                                    return Text(
+                                                      '$currentInMs / ${totalInMs}ms',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontFamily: 'monospace',
+                                                        fontFeatures: [FontFeature.tabularFigures()],
+                                                      ),
+                                                    );
                                                   },
-                                                  icon: Icon(Icons.slow_motion_video_outlined),
                                                 ),
                                               ],
-                                            );
-                                          },
-                                        ),
-                                        IconButton(
-                                          style: IconButton.styleFrom(
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            ),
                                           ),
-                                          icon: Icon(
-                                            Icons.change_circle_outlined,
-                                            color: IconTheme.of(
-                                              context,
-                                            ).color?.withValues(alpha: _data.isLooping ? 1 : .4),
+                                          Builder(
+                                            builder: (context) {
+                                              final speed = _speedMultipliers[_data.speedIndex];
+                                              final speedLabel = _data.speedIndex == 0 ? '1X' : '-${speed}X';
+                                              return Row(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: _cycleSpeed,
+                                                    borderRadius: BorderRadius.circular(32),
+                                                    child: Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary.withValues(alpha: .1),
+                                                        borderRadius: BorderRadius.circular(32),
+                                                      ),
+                                                      child: Text(
+                                                        speedLabel,
+                                                        style: const TextStyle(
+                                                          fontSize: 13,
+                                                          fontFamily: 'monospace',
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                        textAlign: TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 6),
+                                                  IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    style: IconButton.styleFrom(
+                                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                    ),
+                                                    onPressed: () {
+                                                      final slowestSpeedIndex = _speedMultipliers.length - 1;
+                                                      if (_data.speedIndex == slowestSpeedIndex) {
+                                                        _dataNotifier.value = _data.copyWith(speedIndex: 0);
+                                                      } else {
+                                                        _dataNotifier.value = _data.copyWith(
+                                                          speedIndex: slowestSpeedIndex,
+                                                        );
+                                                      }
+                                                      _setSpeed(_speedMultipliers[_data.speedIndex]);
+                                                    },
+                                                    icon: Icon(Icons.slow_motion_video_outlined),
+                                                  ),
+                                                ],
+                                              );
+                                            },
                                           ),
-                                          onPressed: _toggleLoop,
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                        ),
-                                        SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: VerticalDivider(thickness: 1),
-                                        ),
-                                        IconButton(
-                                          style: IconButton.styleFrom(
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          IconButton(
+                                            style: IconButton.styleFrom(
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            ),
+                                            icon: Icon(
+                                              Icons.change_circle_outlined,
+                                              color: IconTheme.of(
+                                                context,
+                                              ).color?.withValues(alpha: _data.isLooping ? 1 : .4),
+                                            ),
+                                            onPressed: _toggleLoop,
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
                                           ),
-                                          icon: Icon(Icons.remove_circle_outline),
-                                          onPressed: () {
-                                            _dataNotifier.value = _data.copyWith(isMinimized: true);
-                                          },
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                        ),
-                                        SizedBox(width: 8),
-                                      ],
-                                    ),
+                                          SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: VerticalDivider(thickness: 1),
+                                          ),
+                                          IconButton(
+                                            style: IconButton.styleFrom(
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            ),
+                                            icon: Icon(Icons.remove_circle_outline),
+                                            onPressed: () {
+                                              _dataNotifier.value = _data.copyWith(isMinimized: true);
+                                            },
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                          ),
+                                          SizedBox(width: 8),
+                                        ],
+                                      ),
 
-                                    Container(
-                                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.surfaceContainer,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: SliderTheme(
-                                        data: SliderThemeData(
-                                          trackShape: _TimelineTickMarkShape(start: 0, end: 1),
-                                          tickMarkShape: SliderTickMarkShape.noTickMark,
-                                          inactiveTrackColor: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface.withValues(alpha: .6),
-                                          thumbShape: _NeedleThumb(height: 60),
+                                      Container(
+                                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.surfaceContainer,
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
-                                        child: Slider(
-                                          padding: EdgeInsets.zero,
-                                          value: widget.controller.value,
-                                          activeColor: Colors.transparent,
-                                          thumbColor: Theme.of(context).colorScheme.primary,
-                                          overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                                          onChanged: _onSliderChanged,
+                                        child: SliderTheme(
+                                          data: SliderThemeData(
+                                            trackShape: _TimelineTickMarkShape(start: 0, end: 1),
+                                            tickMarkShape: SliderTickMarkShape.noTickMark,
+                                            inactiveTrackColor: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface.withValues(alpha: .6),
+                                            thumbShape: _NeedleThumb(height: 60),
+                                          ),
+                                          child: Slider(
+                                            padding: EdgeInsets.zero,
+                                            value: widget.controller.value,
+                                            activeColor: Colors.transparent,
+                                            thumbColor: theme.colorScheme.primary,
+                                            overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                                            onChanged: _onSliderChanged,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
