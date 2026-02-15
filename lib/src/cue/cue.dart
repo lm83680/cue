@@ -3,11 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class Cue extends StatefulWidget {
-  const Cue._({super.key, required this.child, this.curve = Curves.linear, this.debug = false});
+  const Cue._({super.key, required this.child, this.curve = Curves.linear, this.debug = false, this.acts});
 
   final bool debug;
   final Curve curve;
   final Widget child;
+  final List<Act>? acts;
 
   const factory Cue.onTransition({Key? key, required Widget child, Curve curve, bool debug}) = _RouteTransitionStage;
 
@@ -16,6 +17,7 @@ abstract class Cue extends StatefulWidget {
     required Widget child,
     Curve curve,
     bool debug,
+    List<Act>? acts,
     Duration duration,
     Duration? reverseDuration,
     SimulationBuilder? simulation,
@@ -29,6 +31,7 @@ abstract class Cue extends StatefulWidget {
     required Widget child,
     Curve curve,
     bool debug,
+    List<Act>? acts,
     Duration duration,
     SimulationBuilder? simulation,
     Duration? reverseDuration,
@@ -41,6 +44,7 @@ abstract class Cue extends StatefulWidget {
     required Widget child,
     Curve curve,
     bool debug,
+    List<Act>? acts,
     required Animation<double> animation,
   }) = _ControlledCue;
 
@@ -49,6 +53,7 @@ abstract class Cue extends StatefulWidget {
     required Widget child,
     Curve curve,
     bool debug,
+    List<Act>? acts,
     Duration duration,
     Duration? reverseDuration,
     SimulationBuilder? simulation,
@@ -60,6 +65,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
+    List<Act>? acts,
     bool debug,
     required Listenable listenable,
     required ValueGetter<double> getOffset,
@@ -71,6 +77,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
+    List<Act>? acts,
     bool debug,
     required PageController controller,
     required int targetIndex,
@@ -128,11 +135,15 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = widget.child;
+    if (widget.acts case final acts?) {
+      child = Actor(acts: acts, child: child);
+    }
     if (kDebugMode && widget.debug) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
         final debugAnimation = CueDebugTools.animationOf(context);
         if (debugAnimation != null) {
-          return CueScope(animation: debugAnimation, child: widget.child);
+          return CueScope(animation: debugAnimation, child: child);
         }
       } else {
         return CueDebugTools(
@@ -141,22 +152,28 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             builder: (context) {
               final debugAnimation = CueDebugTools.animationOf(context);
               if (debugAnimation != null) {
-                return CueScope(animation: debugAnimation, child: widget.child);
+                return CueScope(animation: debugAnimation, child: child);
               }
-              return CueScope(animation: getAnimation(context), child: widget.child);
+              return CueScope(animation: getAnimation(context), child: child);
             },
           ),
         );
       }
     }
-    return CueScope(animation: getAnimation(context), child: widget.child);
+    return CueScope(animation: getAnimation(context), child: child);
   }
 
   Animation<double> getAnimation(BuildContext context);
 }
 
 class _RouteTransitionStage extends Cue {
-  const _RouteTransitionStage({super.key, required super.child, super.curve, super.debug}) : super._();
+  const _RouteTransitionStage({
+    super.key,
+    required super.child,
+    super.curve,
+    super.debug,
+    super.acts,
+  }) : super._();
 
   @override
   State<StatefulWidget> createState() => _RouteTransitionStageState();
@@ -168,6 +185,7 @@ class _SelfAnimatedCue extends Cue {
     required super.child,
     super.curve,
     super.debug,
+    super.acts,
     this.duration = const Duration(milliseconds: 300),
     this.reverseDuration,
     this.loop = false,
@@ -323,6 +341,7 @@ class _OnHoverCue extends Cue {
     required super.child,
     super.curve,
     super.debug,
+    super.acts,
     this.simulation,
     this.duration = const Duration(milliseconds: 200),
     this.reverseDuration,
@@ -374,6 +393,7 @@ class _TogglableCue extends Cue {
     required super.child,
     super.curve,
     super.debug,
+    super.acts,
     this.simulation,
     this.duration = const Duration(milliseconds: 300),
     this.reverseDuration,
@@ -444,8 +464,14 @@ class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
 }
 
 class _ControlledCue extends Cue {
-  const _ControlledCue({super.key, required super.child, super.curve, super.debug, required this.animation})
-    : super._();
+  const _ControlledCue({
+    super.key,
+    required super.child,
+    super.acts,
+    super.curve,
+    super.debug,
+    required this.animation,
+  }) : super._();
 
   final Animation<double> animation;
 
@@ -484,6 +510,7 @@ class _IndexedStage extends Cue {
     super.key,
     super.curve,
     super.debug,
+    super.acts,
     required super.child,
     required this.listenable,
     required this.getOffset,
@@ -504,6 +531,7 @@ class _IndexedStage extends Cue {
     required Widget child,
     Curve curve = Curves.linear,
     bool debug = false,
+    List<Act>? acts,
     required PageController controller,
     required int targetIndex,
     IndexDistanceCalculator? calculator,
