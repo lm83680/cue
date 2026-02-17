@@ -43,12 +43,36 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Expanded;
     return Scaffold(
       appBar: AppBar(title: Text('Cue Demo')),
       body: Padding(
         padding: const EdgeInsets.only(top: 100),
-        child: Center(child: ThreeDotsAction()),
+        child: ColoredBox(
+          color: Colors.red,
+          child: Cue.onMount(
+            debug: true,
+            child: RotateActor.flipY(
+              child: ColorActor(
+                from: Colors.blue,
+                to: Colors.green,
+                timing: .switchAt(.5),
+                child: SizedBox(
+                  width: 200,
+                  height: 100,
+                  child: Center(
+                    child: Text(
+                      'Hello Cue!',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

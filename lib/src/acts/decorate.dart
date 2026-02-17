@@ -31,7 +31,7 @@ class DecorateEffect extends TweenEffect<Decoration> {
   }
 }
 
-class ColorEffect extends TweenEffect<Color> {
+class ColorEffect extends TweenEffect<Color?> {
   const ColorEffect({
     required super.from,
     required super.to,
@@ -39,21 +39,20 @@ class ColorEffect extends TweenEffect<Color> {
     super.timing,
   });
 
-  const ColorEffect.keyframes(super.keyframes, {super.curve})
-    : super.keyframes();
+  const ColorEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Animatable<Color> buildSinglePhaseTween(Color from, Color to) {
-    return ColorTween(begin: from, end: to) as Animatable<Color>;
+  Animatable<Color?> buildSinglePhaseTween(Color? from, Color? to) {
+    return ColorTween(begin: from, end: to);
   }
 
   @override
-  Widget apply(BuildContext context, Animation<Color> animation, Widget child) {
+  Widget apply(BuildContext context, Animation<Color?> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (context, child) {
-        return ColoredBox(color: animation.value, child: child!);
+        return ColoredBox(color: animation.value ?? Colors.transparent, child: child!);
       },
     );
   }

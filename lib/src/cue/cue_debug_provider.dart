@@ -29,15 +29,13 @@ class CueDebugTools extends StatefulWidget {
   }
 
   static Animation<double>? animationOf(BuildContext context) {
-    final scope = context
-        .dependOnInheritedWidgetOfExactType<_DebugDataProvider>();
+    final scope = context.dependOnInheritedWidgetOfExactType<_DebugDataProvider>();
     if (scope?.isMinimized == true) return null;
     return scope?.animation ?? AlwaysStoppedAnimation(1.0);
   }
 }
 
-class _CueDebugToolsState extends State<CueDebugTools>
-    with SingleTickerProviderStateMixin {
+class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   final _overlayData = ValueNotifier<_OverlayData>(
     _OverlayData(
@@ -256,8 +254,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                 if (_data.isMinimized) {
                                   return IconButton(
                                     style: IconButton.styleFrom(
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       shape: CircleBorder(),
                                       minimumSize: .square(40),
                                     ),
@@ -279,18 +276,15 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           IconButton(
                                             icon: Icon(
                                               widget.controller.isAnimating
-                                                  ? Icons
-                                                        .pause_circle_outline_rounded
-                                                  : Icons
-                                                        .play_circle_outline_rounded,
+                                                  ? Icons.pause_circle_outline_rounded
+                                                  : Icons.play_circle_outline_rounded,
                                             ),
                                             style: IconButton.styleFrom(
                                               iconSize: 32,
@@ -321,26 +315,16 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                 ),
                                                 Builder(
                                                   builder: (context) {
-                                                    final totalInMs =
-                                                        (widget
-                                                            .controller
-                                                            .duration
-                                                            ?.inMilliseconds ??
-                                                        0);
-                                                    final fixedWidth = totalInMs
+                                                    final totalInMs = (widget.controller.duration?.inMilliseconds ?? 0);
+                                                    final fixedWidth = totalInMs.toString().length;
+                                                    final currentInMs = ((widget.controller.value * totalInMs).round())
                                                         .toString()
-                                                        .length;
-                                                    final currentInMs =
-                                                        ((widget.controller.value *
-                                                                    totalInMs)
-                                                                .round())
-                                                            .toString()
-                                                            .padLeft(
-                                                              fixedWidth,
-                                                              '0',
-                                                            );
+                                                        .padLeft(
+                                                          fixedWidth,
+                                                          '0',
+                                                        );
                                                     return Text(
-                                                      '$currentInMs / ${totalInMs}ms',
+                                                      '${currentInMs}ms / ${totalInMs}ms',
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                         fontFamily: 'monospace',
@@ -356,53 +340,39 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           ),
                                           Builder(
                                             builder: (context) {
-                                              final speed =
-                                                  _speedMultipliers[_data
-                                                      .speedIndex];
-                                              final speedLabel =
-                                                  _data.speedIndex == 0
-                                                  ? '1X'
-                                                  : '-${speed}X';
+                                              final speed = _speedMultipliers[_data.speedIndex];
+                                              final speedLabel = _data.speedIndex == 0 ? '1X' : '-${speed}X';
                                               return Row(
                                                 children: [
                                                   InkWell(
                                                     onTap: _cycleSpeed,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          32,
-                                                        ),
+                                                    borderRadius: BorderRadius.circular(
+                                                      32,
+                                                    ),
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 4,
-                                                          ),
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
                                                       decoration: BoxDecoration(
                                                         color:
                                                             Theme.of(
-                                                                  context,
-                                                                )
-                                                                .colorScheme
-                                                                .primary
-                                                                .withValues(
-                                                                  alpha: .1,
-                                                                ),
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              32,
+                                                              context,
+                                                            ).colorScheme.primary.withValues(
+                                                              alpha: .1,
                                                             ),
+                                                        borderRadius: BorderRadius.circular(
+                                                          32,
+                                                        ),
                                                       ),
                                                       child: Text(
                                                         speedLabel,
                                                         style: const TextStyle(
                                                           fontSize: 13,
-                                                          fontFamily:
-                                                              'monospace',
-                                                          fontWeight:
-                                                              FontWeight.w600,
+                                                          fontFamily: 'monospace',
+                                                          fontWeight: FontWeight.w600,
                                                         ),
-                                                        textAlign:
-                                                            TextAlign.center,
+                                                        textAlign: TextAlign.center,
                                                       ),
                                                     ),
                                                   ),
@@ -410,36 +380,25 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                   IconButton(
                                                     padding: EdgeInsets.zero,
                                                     style: IconButton.styleFrom(
-                                                      tapTargetSize:
-                                                          MaterialTapTargetSize
-                                                              .shrinkWrap,
+                                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                     ),
                                                     onPressed: () {
-                                                      final slowestSpeedIndex =
-                                                          _speedMultipliers
-                                                              .length -
-                                                          1;
-                                                      if (_data.speedIndex ==
-                                                          slowestSpeedIndex) {
-                                                        _dataNotifier.value =
-                                                            _data.copyWith(
-                                                              speedIndex: 0,
-                                                            );
+                                                      final slowestSpeedIndex = _speedMultipliers.length - 1;
+                                                      if (_data.speedIndex == slowestSpeedIndex) {
+                                                        _dataNotifier.value = _data.copyWith(
+                                                          speedIndex: 0,
+                                                        );
                                                       } else {
-                                                        _dataNotifier.value =
-                                                            _data.copyWith(
-                                                              speedIndex:
-                                                                  slowestSpeedIndex,
-                                                            );
+                                                        _dataNotifier.value = _data.copyWith(
+                                                          speedIndex: slowestSpeedIndex,
+                                                        );
                                                       }
                                                       _setSpeed(
-                                                        _speedMultipliers[_data
-                                                            .speedIndex],
+                                                        _speedMultipliers[_data.speedIndex],
                                                       );
                                                     },
                                                     icon: Icon(
-                                                      Icons
-                                                          .slow_motion_video_outlined,
+                                                      Icons.slow_motion_video_outlined,
                                                     ),
                                                   ),
                                                 ],
@@ -448,9 +407,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           ),
                                           IconButton(
                                             style: IconButton.styleFrom(
-                                              tapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                             ),
                                             icon: Icon(
                                               Icons.change_circle_outlined,
@@ -458,9 +415,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                   IconTheme.of(
                                                     context,
                                                   ).color?.withValues(
-                                                    alpha: _data.isLooping
-                                                        ? 1
-                                                        : .4,
+                                                    alpha: _data.isLooping ? 1 : .4,
                                                   ),
                                             ),
                                             onPressed: _toggleLoop,
@@ -476,18 +431,15 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           ),
                                           IconButton(
                                             style: IconButton.styleFrom(
-                                              tapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                             ),
                                             icon: Icon(
                                               Icons.remove_circle_outline,
                                             ),
                                             onPressed: () {
-                                              _dataNotifier.value = _data
-                                                  .copyWith(
-                                                    isMinimized: true,
-                                                  );
+                                              _dataNotifier.value = _data.copyWith(
+                                                isMinimized: true,
+                                              );
                                             },
                                             padding: EdgeInsets.zero,
                                             constraints: const BoxConstraints(),
@@ -504,9 +456,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: theme
-                                              .colorScheme
-                                              .surfaceContainer,
+                                          color: theme.colorScheme.surfaceContainer,
                                           borderRadius: BorderRadius.circular(
                                             10,
                                           ),
@@ -517,13 +467,10 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                               start: 0,
                                               end: 1,
                                             ),
-                                            tickMarkShape:
-                                                SliderTickMarkShape.noTickMark,
-                                            inactiveTrackColor:
-                                                Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface
-                                                    .withValues(alpha: .6),
+                                            tickMarkShape: SliderTickMarkShape.noTickMark,
+                                            inactiveTrackColor: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface.withValues(alpha: .6),
                                             thumbShape: _NeedleThumb(
                                               height: 60,
                                             ),
@@ -532,12 +479,10 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             padding: EdgeInsets.zero,
                                             value: widget.controller.value,
                                             activeColor: Colors.transparent,
-                                            thumbColor:
-                                                theme.colorScheme.primary,
-                                            overlayColor:
-                                                WidgetStatePropertyAll(
-                                                  Colors.transparent,
-                                                ),
+                                            thumbColor: theme.colorScheme.primary,
+                                            overlayColor: WidgetStatePropertyAll(
+                                              Colors.transparent,
+                                            ),
                                             onChanged: _onSliderChanged,
                                           ),
                                         ),
@@ -568,8 +513,7 @@ class _NeedleThumb extends SliderComponentShape {
   const _NeedleThumb({this.height = 60});
 
   @override
-  Size getPreferredSize(bool isEnabled, bool isDiscrete) =>
-      Size(height, height);
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) => Size(height, height);
 
   @override
   void paint(
@@ -657,9 +601,7 @@ class _TimelineTickMarkShape extends SliderTrackShape {
 
     final size = parentBox.size;
     final canvas = context.canvas;
-    final color =
-        sliderTheme.inactiveTrackColor?.withValues(alpha: .6) ??
-        Colors.grey.withValues(alpha: .6);
+    final color = sliderTheme.inactiveTrackColor?.withValues(alpha: .6) ?? Colors.grey.withValues(alpha: .6);
 
     final tickPaint = Paint()
       ..color = color
@@ -686,8 +628,7 @@ class _TimelineTickMarkShape extends SliderTrackShape {
 
       // draw small labels for every full tick
       if (isFullTick) {
-        final labelValue = (start + (i / count) * (end - start))
-            .toStringAsFixed(1);
+        final labelValue = (start + (i / count) * (end - start)).toStringAsFixed(1);
         final textPainter = TextPainter(
           text: TextSpan(
             text: labelValue,
@@ -736,8 +677,7 @@ class _OverlayData {
           verticalOffset == other.verticalOffset;
 
   @override
-  int get hashCode =>
-      Object.hash(speedIndex, isLooping, isMinimized, verticalOffset);
+  int get hashCode => Object.hash(speedIndex, isLooping, isMinimized, verticalOffset);
 
   _OverlayData copyWith({
     int? speedIndex,
@@ -766,7 +706,6 @@ class _DebugDataProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant _DebugDataProvider oldWidget) {
-    return animation != oldWidget.animation ||
-        isMinimized != oldWidget.isMinimized;
+    return animation != oldWidget.animation || isMinimized != oldWidget.isMinimized;
   }
 }

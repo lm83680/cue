@@ -129,8 +129,8 @@ class TweenActor<T> extends StatefulWidget {
   State<StatefulWidget> createState() => _TweenActorState<T>();
 }
 
-class _LerpDoubleTweenActor extends TweenActor<double> {
-  _LerpDoubleTweenActor({
+class ProgressActor extends TweenActor<double> {
+  ProgressActor({
     super.key,
     required super.builder,
     super.curve,
@@ -181,8 +181,7 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
       }
       effectiveTween = TweenEffectBase.buildFromPhases<T>(
         result.phases,
-        widget._tweenBuilder ??
-            (begin, end) => Tween<T>(begin: begin, end: end),
+        widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
       );
     }
     final effectiveCurve = timing != null

@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
 part 'size.dart';
 part 'translate.dart';
@@ -19,7 +19,7 @@ part 'style.dart';
 part 'clip_reveal.dart';
 part 'slide.dart';
 part 'position.dart';
-part 'flex.dart';
+part 'transfrom.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
 
@@ -45,8 +45,7 @@ abstract class Effect {
   );
 }
 
-abstract class TweenEffectBase<T extends Object?, R extends Object?>
-    extends Effect {
+abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Effect {
   final T? _from;
   final T? _to;
   final List<Keyframe<T>>? _keyframes;
@@ -170,8 +169,7 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?>
           timing == other.timing;
 
   @override
-  int get hashCode =>
-      Object.hash(_from, _to, curve, timing, Object.hashAll(_keyframes ?? []));
+  int get hashCode => Object.hash(_from, _to, curve, timing, Object.hashAll(_keyframes ?? []));
 }
 
 abstract class TweenEffect<T extends Object?> extends TweenEffectBase<T, T> {

@@ -1,6 +1,7 @@
 import 'package:cue/src/actor/actor.dart';
 import 'package:cue/src/acts/act.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:math' as math;
 
 class RotateActor extends SingleEffectProxy {
   final double from;
@@ -8,6 +9,7 @@ class RotateActor extends SingleEffectProxy {
   final AlignmentGeometry alignment;
   final bool _rotateAsTurns;
   final bool _inDegrees;
+  final RotateAxis axis;
 
   const RotateActor({
     super.key,
@@ -17,8 +19,33 @@ class RotateActor extends SingleEffectProxy {
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
+    this.axis = RotateAxis.z,
   }) : _rotateAsTurns = false,
        _inDegrees = false;
+
+  const RotateActor.flipX({
+    super.key,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+  }) : _rotateAsTurns = false,
+       _inDegrees = false,
+       axis = RotateAxis.x,
+       from = 0,
+       to = math.pi;
+
+  const RotateActor.flipY({
+    super.key,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+  }) : _rotateAsTurns = false,
+       _inDegrees = false,
+       axis = RotateAxis.y,
+       from = 0,
+       to = math.pi;
 
   const RotateActor.turns({
     super.key,
@@ -28,6 +55,7 @@ class RotateActor extends SingleEffectProxy {
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
+    this.axis = RotateAxis.z,
   }) : _rotateAsTurns = true,
        _inDegrees = false;
 
@@ -39,6 +67,7 @@ class RotateActor extends SingleEffectProxy {
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
+    this.axis = RotateAxis.z,
   }) : _rotateAsTurns = false,
        _inDegrees = true;
 
@@ -52,6 +81,7 @@ class RotateActor extends SingleEffectProxy {
           alignment: alignment,
           asQuarterTurns: _rotateAsTurns,
           inDegrees: _inDegrees,
+          axis: axis,
           curve: curve,
           timing: timing,
         ),
@@ -411,6 +441,38 @@ class BlurActor extends SingleEffectProxy {
   }
 }
 
+class BackdropBlurActor extends SingleEffectProxy {
+  final double from;
+  final double to;
+  final BlendMode blendMode;
+
+  const BackdropBlurActor({
+    super.key,
+    required this.from,
+    required this.to,
+    this.blendMode = BlendMode.srcOver,
+    required super.child,
+    super.curve,
+    super.timing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Actor(
+      effects: [
+        BackdropBlurEffect(
+          from: from,
+          to: to,
+          blendMode: blendMode,
+          curve: curve,
+          timing: timing,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
 class PaddingActor extends SingleEffectProxy {
   final EdgeInsetsGeometry from;
   final EdgeInsetsGeometry to;
@@ -544,7 +606,7 @@ class ClipActor extends SingleEffectProxy {
 class PositionActor extends SingleEffectProxy {
   final Position from;
   final Position to;
-  final bool _relative;
+  final Size? _relativeTo;
 
   const PositionActor({
     super.key,
@@ -553,16 +615,17 @@ class PositionActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
-  }) : _relative = false;
+  }) : _relativeTo = null;
 
   const PositionActor.relative({
     super.key,
     required this.from,
     required this.to,
+    required Size size,
     required super.child,
     super.curve,
     super.timing,
-  }) : _relative = true;
+  }) : _relativeTo = size;
 
   @override
   Widget build(BuildContext context) {
@@ -571,7 +634,7 @@ class PositionActor extends SingleEffectProxy {
         PositionEffect.internal(
           from: from,
           to: to,
-          relative: _relative,
+          relativeTo: _relativeTo,
           curve: curve,
           timing: timing,
         ),
@@ -688,6 +751,41 @@ class ColorActor extends SingleEffectProxy {
         ColorEffect(
           from: from,
           to: to,
+          curve: curve,
+          timing: timing,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
+class TransformActor extends SingleEffectProxy {
+  final Matrix4 from;
+  final Matrix4 to;
+  final AlignmentGeometry? alignment;
+  final Offset? origin;
+
+  const TransformActor({
+    super.key,
+    required super.child,
+    required this.from,
+    required this.to,
+    this.alignment,
+    this.origin,
+    super.curve,
+    super.timing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Actor(
+      effects: [
+        TransformEffect(
+          from: from,
+          to: to,
+          alignment: alignment,
+          origin: origin,
           curve: curve,
           timing: timing,
         ),

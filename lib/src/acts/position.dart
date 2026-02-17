@@ -1,36 +1,43 @@
 part of 'act.dart';
 
 class PositionEffect extends TweenEffect<Position> {
-  final bool _relative;
+  final Size? _relativeTo;
+
   const PositionEffect({
     required super.from,
     required super.to,
     super.curve,
     super.timing,
-  }) : _relative = false;
+  }) : _relativeTo = null;
+
+  const PositionEffect.relative({
+    required super.from,
+    required super.to,
+    required Size size,
+    super.curve,
+    super.timing,
+  }) : _relativeTo = size;
 
   @internal
   const PositionEffect.internal({
     required super.from,
     required super.to,
-    required bool relative,
     super.curve,
     super.timing,
-  }) : _relative = relative;
+    Size? relativeTo,
+  }) : _relativeTo = relativeTo;
 
   const PositionEffect.keyframes(
     super.keyframes, {
     super.curve,
-    bool relative = false,
-  }) : _relative = relative,
+    Size? relativeTo,
+  }) : _relativeTo = relativeTo,
        super.keyframes();
 
-  const PositionEffect.relative({
-    required super.from,
-    required super.to,
-    super.curve,
-    super.timing,
-  }) : _relative = true;
+  @override
+  Animatable<Position> buildSinglePhaseTween(Position from, Position to) {
+    return _PositionTween(begin: from, end: to);
+  }
 
   @override
   Widget apply(
@@ -38,48 +45,24 @@ class PositionEffect extends TweenEffect<Position> {
     Animation<Position> animation,
     Widget child,
   ) {
-    if (_relative) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          return _AnimatedPostion(
-            postion: animation,
-            child: child,
-            transform: (p) => p._relativeTo(constraints.biggest),
-          );
-        },
-      );
-    } else {
-      return _AnimatedPostion(
-        postion: animation,
-        child: child,
-        transform: (p) => p,
-      );
-    }
-  }
-}
-
-class _AnimatedPostion extends AnimatedWidget {
-  final Animation<Position> postion;
-  final Widget child;
-  final Function(Position) transform;
-
-  const _AnimatedPostion({
-    required this.postion,
-    required this.child,
-    required this.transform,
-  }) : super(listenable: postion);
-
-  @override
-  Widget build(BuildContext context) {
-    final pos = transform(postion.value);
-    return PositionedDirectional(
-      top: pos.top,
-      start: pos.start,
-      end: pos.end,
-      bottom: pos.bottom,
-      width: pos.width,
-      height: pos.height,
+    return AnimatedBuilder(
+      animation: animation,
       child: child,
+      builder: (context, child) {
+        final pos = _relativeTo == null
+            ? animation.value
+            : animation.value._relative(_relativeTo);
+        return Positioned.directional(
+          textDirection: Directionality.of(context),
+          top: pos.top,
+          start: pos.start,
+          end: pos.end,
+          bottom: pos.bottom,
+          width: pos.width,
+          height: pos.height,
+          child: child!,
+        );
+      },
     );
   }
 }
@@ -102,7 +85,7 @@ class Position {
   }) : assert(start == null || end == null || width == null),
        assert(top == null || bottom == null || height == null);
 
-  Position _relativeTo(Size size) {
+  Position _relative(Size size) {
     return Position(
       top: top != null ? top! * size.height : null,
       start: start != null ? start! * size.width : null,
@@ -130,4 +113,11 @@ class Position {
     if (a == null && b == null) return null;
     return (a ?? 0) + ((b ?? 0) - (a ?? 0)) * t;
   }
+}
+
+class _PositionTween extends Tween<Position> {
+  _PositionTween({required super.begin, required super.end});
+
+  @override
+  Position lerp(double t) => Position.lerp(begin!, end!, t);
 }

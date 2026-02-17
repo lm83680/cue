@@ -4,6 +4,7 @@ class RotateEffect extends TweenEffect<double> {
   final AlignmentGeometry alignment;
   final bool _asQuarterTurns;
   final bool _inDegrees;
+  final RotateAxis axis;
 
   @internal
   const RotateEffect.internal({
@@ -14,6 +15,7 @@ class RotateEffect extends TweenEffect<double> {
     this.alignment = Alignment.center,
     bool asQuarterTurns = false,
     bool inDegrees = false,
+    this.axis = RotateAxis.z,
   }) : _asQuarterTurns = asQuarterTurns,
        _inDegrees = inDegrees;
 
@@ -22,14 +24,34 @@ class RotateEffect extends TweenEffect<double> {
     super.to = 0,
     super.curve,
     super.timing,
+    this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
   }) : _asQuarterTurns = false,
        _inDegrees = false;
+
+  const RotateEffect.flipX({
+    super.curve,
+    super.timing,
+    this.alignment = Alignment.center,
+  }) : _asQuarterTurns = false,
+       _inDegrees = false,
+       axis = RotateAxis.x,
+       super(from: 0, to: math.pi);
+
+  const RotateEffect.flipY({
+    super.curve,
+    super.timing,
+    this.alignment = Alignment.center,
+  }) : _asQuarterTurns = false,
+       _inDegrees = false,
+       axis = RotateAxis.y,
+       super(from: 0, to: math.pi);
 
   const RotateEffect.keyframes(
     super.keyframes, {
     super.curve,
     this.alignment = Alignment.center,
+    this.axis = RotateAxis.z,
   }) : _asQuarterTurns = false,
        _inDegrees = false,
        super.keyframes();
@@ -40,6 +62,7 @@ class RotateEffect extends TweenEffect<double> {
     super.curve,
     super.timing,
     this.alignment = Alignment.center,
+    this.axis = RotateAxis.z,
   }) : _asQuarterTurns = false,
        _inDegrees = true;
 
@@ -48,6 +71,7 @@ class RotateEffect extends TweenEffect<double> {
     super.to = 0,
     super.curve,
     super.timing,
+    this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
   }) : _asQuarterTurns = true,
        _inDegrees = false;
@@ -72,7 +96,11 @@ class RotateEffect extends TweenEffect<double> {
     return MatrixTransition(
       animation: animation,
       alignment: alignment.resolve(Directionality.of(context)),
-      onTransform: Matrix4.rotationZ,
+      onTransform: switch (axis) {
+        RotateAxis.x => Matrix4.rotationX,
+        RotateAxis.y => Matrix4.rotationY,
+        RotateAxis.z => Matrix4.rotationZ,
+      },
       child: child,
     );
   }
@@ -221,3 +249,5 @@ class _RenderRotateLayout extends RenderProxyBox {
     );
   }
 }
+
+enum RotateAxis { x, y, z }
