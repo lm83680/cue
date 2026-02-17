@@ -1,8 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:cue/src/core/core.dart';
-import 'package:cue/src/core/phase.dart';
+import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +19,7 @@ part 'style.dart';
 part 'clip_reveal.dart';
 part 'slide.dart';
 part 'position.dart';
+part 'flex.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
 
@@ -34,7 +34,11 @@ abstract class Act {
 
   Animation<Object?> buildAnimation(Animation<double> driver);
 
-  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child);
+  Widget build(
+    BuildContext context,
+    covariant Animation<Object?> animation,
+    Widget child,
+  );
 }
 
 abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
@@ -61,8 +65,15 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
 
   @nonVirtual
   @override
-  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child) {
-    assert(animation is Animation<R>, 'Expected animation of type Animation<$T>, but got ${animation.runtimeType}');
+  Widget build(
+    BuildContext context,
+    covariant Animation<Object?> animation,
+    Widget child,
+  ) {
+    assert(
+      animation is Animation<R>,
+      'Expected animation of type Animation<$T>, but got ${animation.runtimeType}',
+    );
     return apply(context, animation as Animation<R>, child);
   }
 
@@ -79,8 +90,17 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
     final List<Phase<R>> phases;
     Timing? timing = this.timing;
     if (_keyframes == null) {
-      assert(_from != null && _to != null, 'Begin and end values must be provided when not using keyframes');
-      phases = [Phase<R>(begin: transform(_from as T), end: transform(_to as T), weight: 100)];
+      assert(
+        _from != null && _to != null,
+        'Begin and end values must be provided when not using keyframes',
+      );
+      phases = [
+        Phase<R>(
+          begin: transform(_from as T),
+          end: transform(_to as T),
+          weight: 100,
+        ),
+      ];
     } else {
       final result = Phase.normalize(_keyframes, (value) => transform(value));
       phases = result.phases;
@@ -88,7 +108,10 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
         timing = result.timing;
       }
     }
-    final tween = TweenActBase.buildFromPhases<R>(phases, buildSinglePhaseTween);
+    final tween = TweenActBase.buildFromPhases<R>(
+      phases,
+      buildSinglePhaseTween,
+    );
     final effectiveCurve = timing != null
         ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
         : curve ?? Curves.linear;
@@ -135,7 +158,8 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
           timing == other.timing;
 
   @override
-  int get hashCode => Object.hash(_from, _to, curve, timing, Object.hashAll(_keyframes ?? []));
+  int get hashCode =>
+      Object.hash(_from, _to, curve, timing, Object.hashAll(_keyframes ?? []));
 }
 
 abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {

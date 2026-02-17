@@ -159,8 +159,18 @@ class SlideActorFactory extends SingleActProxy {
   @override
   Widget build(BuildContext context) {
     final Act act = switch (_axis) {
-      Axis.horizontal => SlideAct.x(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
-      Axis.vertical => SlideAct.y(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
+      Axis.horizontal => SlideAct.x(
+        from: _axisFrom!,
+        to: _axisTo!,
+        curve: curve,
+        timing: timing,
+      ),
+      Axis.vertical => SlideAct.y(
+        from: _axisFrom!,
+        to: _axisTo!,
+        curve: curve,
+        timing: timing,
+      ),
       _ => SlideAct(from: from!, to: to!, curve: curve, timing: timing),
     };
     return ActorBase(
@@ -205,6 +215,7 @@ class ResizeActorFactory extends SingleActProxy {
   final Size from;
   final Size to;
   final AlignmentGeometry alignment;
+  final bool allowOverflow;
 
   final bool _resizeFractionally;
 
@@ -213,6 +224,7 @@ class ResizeActorFactory extends SingleActProxy {
     required this.from,
     required this.to,
     this.alignment = Alignment.center,
+    this.allowOverflow = false,
     required super.child,
     super.curve,
     super.timing,
@@ -223,6 +235,7 @@ class ResizeActorFactory extends SingleActProxy {
     required this.from,
     required this.to,
     this.alignment = Alignment.center,
+    this.allowOverflow = false,
     required super.child,
     super.curve,
     super.timing,
@@ -246,6 +259,7 @@ class ResizeActorFactory extends SingleActProxy {
             alignment: alignment,
             curve: curve,
             timing: timing,
+            allowOverflow: allowOverflow,
           ),
         },
       ],
@@ -568,7 +582,7 @@ class TranslateActorFactory extends SingleActProxy {
   const TranslateActorFactory.x({
     super.key,
     required double from,
-    required double to,
+    double to = 0,
     required super.child,
     super.curve,
     super.timing,
@@ -581,7 +595,7 @@ class TranslateActorFactory extends SingleActProxy {
   const TranslateActorFactory.y({
     super.key,
     required double from,
-    required double to,
+    double to = 0,
     required super.child,
     super.curve,
     super.timing,
@@ -606,9 +620,23 @@ class TranslateActorFactory extends SingleActProxy {
   @override
   Widget build(BuildContext context) {
     final Act act = switch (_variant) {
-      _TranslateVariant.horizontal => TranslateAct.x(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
-      _TranslateVariant.vertical => TranslateAct.y(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
-      _TranslateVariant.fromGlobal => TranslateAct.fromGlobal(offset: from!, curve: curve, timing: timing),
+      _TranslateVariant.horizontal => TranslateAct.x(
+        from: _axisFrom!,
+        to: _axisTo!,
+        curve: curve,
+        timing: timing,
+      ),
+      _TranslateVariant.vertical => TranslateAct.y(
+        from: _axisFrom!,
+        to: _axisTo!,
+        curve: curve,
+        timing: timing,
+      ),
+      _TranslateVariant.fromGlobal => TranslateAct.fromGlobal(
+        offset: from!,
+        curve: curve,
+        timing: timing,
+      ),
       _ => TranslateAct(from: from!, to: to!, curve: curve, timing: timing),
     };
     return ActorBase(

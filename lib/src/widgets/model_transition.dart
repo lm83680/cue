@@ -1,3 +1,4 @@
+import 'package:cue/cue.dart';
 import 'package:cue/src/cue/cue.dart';
 import 'package:cue/src/cue/cue_debug_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -5,8 +6,9 @@ import 'package:flutter/material.dart';
 
 @optionalTypeArgs
 typedef ShowModalFunction<T extends Object> = Future<T?> Function();
-typedef SimulationBuilder = Simulation Function(bool forward);
-typedef ModalContentBuilder = Widget Function(BuildContext context, Rect triggerRect);
+
+typedef ModalContentBuilder =
+    Widget Function(BuildContext context, Rect triggerRect);
 
 class ModalTransition extends StatefulWidget {
   const ModalTransition({
@@ -24,7 +26,8 @@ class ModalTransition extends StatefulWidget {
 
   final Duration duration;
   final ModalContentBuilder builder;
-  final Widget Function(BuildContext context, ShowModalFunction showDialog) triggerBuilder;
+  final Widget Function(BuildContext context, ShowModalFunction showDialog)
+  triggerBuilder;
   final AlignmentGeometry? alignment;
   final bool showDebug;
   final Widget? backdrop;
@@ -79,7 +82,8 @@ class _ModalTransitionState extends State<ModalTransition> {
 
   @optionalTypeArgs
   Future<T?> _showModel<T extends Object>() {
-    final renderBox = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox =
+        _triggerKey.currentContext?.findRenderObject() as RenderBox?;
     final triggerOffset = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
     final triggerRect = triggerOffset & (renderBox?.size ?? Size.zero);
     final model = _ModalRoute<T>(
@@ -202,7 +206,8 @@ class _ModalPositionDelegate extends SingleChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_ModalPositionDelegate oldDelegate) {
-    return triggerRect != oldDelegate.triggerRect || alignment != oldDelegate.alignment;
+    return triggerRect != oldDelegate.triggerRect ||
+        alignment != oldDelegate.alignment;
   }
 }
 
@@ -231,7 +236,13 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
   @override
   Simulation? createSimulation({required bool forward}) {
     if (simulation case final simulation?) {
-      return simulation(forward);
+      return simulation(
+        SimulationBuildData(
+          velocity: controller?.velocity,
+          forward: forward,
+          progress: controller?.value ?? 0.0,
+        ),
+      );
     }
     return super.createSimulation(forward: forward);
   }

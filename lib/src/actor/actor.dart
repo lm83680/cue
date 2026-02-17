@@ -94,6 +94,7 @@ abstract class Actor extends Widget {
     required Size from,
     required Size to,
     AlignmentGeometry alignment,
+    bool allowOverflow,
     required Widget child,
     Curve? curve,
     Timing? timing,
@@ -148,7 +149,7 @@ abstract class Actor extends Widget {
   const factory Actor.translateY({
     Key? key,
     required double from,
-    required double to,
+    double to,
     required Widget child,
     Curve? curve,
     Timing? timing,

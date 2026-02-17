@@ -3,14 +3,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class Cue extends StatefulWidget {
-  const Cue._({super.key, required this.child, this.curve, this.debug = false, this.acts});
+  const Cue._({
+    super.key,
+    required this.child,
+    this.curve,
+    this.debug = false,
+    this.acts,
+  });
 
   final bool debug;
   final Curve? curve;
   final Widget child;
   final List<Act>? acts;
 
-  const factory Cue.onTransition({Key? key, required Widget child, Curve curve, bool debug}) = _RouteTransitionStage;
+  const factory Cue.onTransition({
+    Key? key,
+    required Widget child,
+    Curve curve,
+    bool debug,
+  }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
     Key? key,
@@ -231,14 +242,16 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   @override
   void didUpdateWidget(covariant _SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop) {
+    if (widget.loop != oldWidget.loop ||
+        widget.reverseOnLoop != oldWidget.reverseOnLoop) {
       controller.stop();
       play(loop: widget.loop, reverseOnLoop: widget.reverseOnLoop);
     }
   }
 }
 
-abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with SingleTickerProviderStateMixin {
+abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T>
+    with SingleTickerProviderStateMixin {
   late final AnimationController controller;
   Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
   AnimationStatusListener? _statusListener;
@@ -256,7 +269,11 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(vsync: this, duration: duration, reverseDuration: reverseDuration);
+    controller = AnimationController(
+      vsync: this,
+      duration: duration,
+      reverseDuration: reverseDuration,
+    );
     _buildAnimation();
     onControllerReady();
   }
@@ -267,6 +284,16 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
     } else {
       _animation = controller.view;
     }
+  }
+
+  Simulation _createSimulation(bool forward) {
+    return simulation!(
+      SimulationBuildData(
+        velocity: controller.velocity,
+        forward: forward,
+        progress: controller.value,
+      ),
+    );
   }
 
   @override
@@ -302,7 +329,7 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
           if (_statusListener != null) {
             controller.removeStatusListener(_statusListener!);
           }
-          controller.animateWith(simulation!(true));
+          controller.animateWith(_createSimulation(true));
         }
       } else {
         if (loop) {
@@ -314,23 +341,26 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
     }
   }
 
-  void _loopWithSimulation(SimulationBuilder simulation, {bool reverseOnLoop = false}) {
+  void _loopWithSimulation(
+    SimulationBuilder simulation, {
+    bool reverseOnLoop = false,
+  }) {
     if (_statusListener != null) {
       controller.removeStatusListener(_statusListener!);
     }
     _statusListener = (status) {
       if (status == AnimationStatus.completed) {
         if (reverseOnLoop) {
-          controller.animateBackWith(simulation(false));
+          controller.animateBackWith(_createSimulation(false));
         } else {
-          controller.animateWith(simulation(true));
+          controller.animateWith(_createSimulation(true));
         }
       } else if (status == AnimationStatus.dismissed && reverseOnLoop) {
-        controller.animateWith(simulation(false));
+        controller.animateWith(_createSimulation(false));
       }
     };
     controller.addStatusListener(_statusListener!);
-    controller.animateWith(simulation(true));
+    controller.animateWith(_createSimulation(true));
   }
 
   @override
@@ -457,15 +487,15 @@ class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
   void _animate() {
     if (widget.toggled) {
       if (simulation != null) {
-        controller.animateWith(simulation!(true));
+        controller.animateWith(_createSimulation(true));
       } else {
-        controller.forward(from: 0.0);
+        controller.forward();
       }
     } else {
       if (simulation != null) {
-        controller.animateBackWith(simulation!(false));
+        controller.animateBackWith(_createSimulation(false));
       } else {
-        controller.reverse(from: 1.0);
+        controller.reverse();
       }
     }
   }
@@ -511,7 +541,8 @@ class CueScope extends InheritedWidget {
 
 /// Calculates the animation value based on the distance between current and target index.
 /// Returns a value typically between 0.0 and 1.0.
-typedef IndexDistanceCalculator = double Function(double offset, int targetIndex);
+typedef IndexDistanceCalculator =
+    double Function(double offset, int targetIndex);
 
 class _IndexedStage extends Cue {
   const _IndexedStage({
@@ -580,7 +611,9 @@ class _IndexedStageState extends _CueState<_IndexedStage> {
     // Check if this target is the previous, current, or next index
     final roundedCurrent = currentIndex.round();
     final isPreviousOrNext =
-        (targetIndex == roundedCurrent - 1) || (targetIndex == roundedCurrent) || (targetIndex == roundedCurrent + 1);
+        (targetIndex == roundedCurrent - 1) ||
+        (targetIndex == roundedCurrent) ||
+        (targetIndex == roundedCurrent + 1);
 
     if (!isPreviousOrNext) return 0.0;
 

@@ -68,18 +68,24 @@ class Spring extends SpringSimulation {
     snapToEnd: true,
   );
 
-  factory Spring.smooth([bool forward = true]) => Spring(
-    SpringDescription(
-      mass: 1.0,
-      stiffness: 157.91,
-      damping: 25.13,
-    ),
-    forward ? 0.0 : 1.0,
-    forward ? 1.0 : 0.0,
-    0.0,
-    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
-    snapToEnd: true,
-  );
+  factory Spring.smooth({
+    double start = 0.0,
+    double end = 1.0,
+    double? velocity,
+  }) {
+    return Spring(
+      SpringDescription(
+        mass: 1.0,
+        stiffness: 157.91,
+        damping: 25.13,
+      ),
+      start,
+      end,
+      velocity ?? 0.0,
+      tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+      snapToEnd: true,
+    );
+  }
 
   factory Spring.snappy([bool forward = true]) => Spring(
     SpringDescription(

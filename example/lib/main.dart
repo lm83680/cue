@@ -1,8 +1,8 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/horizinally_expanding_cards.dart';
+import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'examples/horizinally_expanding_cards.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,28 +39,17 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin {
+  int _activeIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    Expanded;
     return Scaffold(
       appBar: AppBar(title: Text('Cue Demo')),
       body: Padding(
         padding: const EdgeInsets.only(top: 100),
-        child: Cue.onMount(
-          debug: true,
-          acts: [
-            ResizeAct(
-              from: Size(50, 200),
-              to: Size(200, 200),
-              allowOverflow: true,
-              alignment: .center,
-            ),
-          ],
-          child: Container(
-            color: Colors.green,
-            child: Text('Hello there this is some text that should be visible when the card is expanded.'),
-          ),
-        ),
+        child: Center(child: ThreeDotsAction()),
       ),
     );
   }

@@ -27,8 +27,12 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                   final isPrevious = i - 1 == _expandedIndex;
                   final isNext = i + 1 == _expandedIndex;
 
-                  final fromTopRadius = isActive || isPrevious || i == 0 ? Radius.circular(28) : Radius.zero;
-                  final fromBottomRadius = isActive || isNext || i == 2 ? Radius.circular(28) : Radius.zero;
+                  final fromTopRadius = isActive || isPrevious || i == 0
+                      ? Radius.circular(28)
+                      : Radius.zero;
+                  final fromBottomRadius = isActive || isNext || i == 2
+                      ? Radius.circular(28)
+                      : Radius.zero;
 
                   return Actor(
                     acts: [
@@ -82,7 +86,11 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                                 SlideAct.y(from: .2),
                               ],
                               child: Padding(
-                                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                                padding: const EdgeInsets.only(
+                                  left: 8,
+                                  right: 8,
+                                  bottom: 8,
+                                ),
                                 child: Column(
                                   children: [
                                     Text(

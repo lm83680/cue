@@ -64,9 +64,14 @@ class RotateAct extends TweenAct<double> {
   }
 
   @override
-  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
+  Widget apply(
+    BuildContext context,
+    Animation<double> animation,
+    Widget child,
+  ) {
     return MatrixTransition(
       animation: animation,
+      alignment: alignment.resolve(Directionality.of(context)),
       onTransform: Matrix4.rotationZ,
       child: child,
     );
@@ -148,7 +153,10 @@ class _RotateLayout extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context, _RenderRotateLayout renderObject) {
+  void updateRenderObject(
+    BuildContext context,
+    _RenderRotateLayout renderObject,
+  ) {
     renderObject.radians = radians;
   }
 }
