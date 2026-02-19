@@ -32,6 +32,21 @@ class SizeEffect extends TweenEffect<double> {
        _sizeKeyframes = keyframes,
        super.keyframes(const []);
 
+  @internal
+  const SizeEffect.internal({
+    Size? from,
+    Size? to,
+    List<Keyframe<Size?>>? keyframes,
+    super.curve,
+    super.timing,
+    this.alignment,
+    this.clipBehavior = Clip.hardEdge,
+    this.allowOverflow = false,
+  }) : _fromSize = from,
+       _toSize = to,
+       _sizeKeyframes = keyframes,
+       super.internal();
+
   ({Animatable<double> tween, Timing? timing}) _buildSizeTween({
     List<Keyframe<Size?>>? keyframes,
     Timing? timing,
@@ -472,36 +487,111 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   }
 }
 
-class FractionalSizeEffect extends TweenEffect<Size> {
-  const FractionalSizeEffect({
-    super.from = Size.zero,
-    super.to = Size.zero,
+class SizeActor extends SingleEffectProxy<Size> {
+  final AlignmentGeometry alignment;
+  final bool allowOverflow;
+  final Axis? _axis;
+  final double? _axisFrom;
+  final double? _axisTo;
+  final double? _fixedCrossAxisSize;
+  final Clip clipBehavior;
+
+  const SizeActor({
+    super.key,
+    required super.from,
+    required super.to,
+    this.alignment = Alignment.center,
+    this.allowOverflow = false,
+    this.clipBehavior = Clip.hardEdge,
+    required super.child,
     super.curve,
     super.timing,
-    this.alignment = Alignment.center,
-  });
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = null,
+       _axisFrom = null,
+       _axisTo = null,
+       _fixedCrossAxisSize = null;
 
-  const FractionalSizeEffect.keyframes(
-    super.keyframes, {
+  const SizeActor.keyframes({
+    super.key,
+    required super.frames,
+    this.alignment = Alignment.center,
+    this.allowOverflow = false,
+    this.clipBehavior = Clip.hardEdge,
+    required super.child,
     super.curve,
-    this.alignment = Alignment.center,
-  }) : super.keyframes();
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = null,
+       _axisFrom = null,
+       _axisTo = null,
+       _fixedCrossAxisSize = null,
+       super.keyframes();
 
-  final AlignmentGeometry alignment;
+  const SizeActor.width({
+    super.key,
+    required double from,
+    required double to,
+    double? fixedHeight,
+    this.alignment = Alignment.center,
+    this.allowOverflow = false,
+    this.clipBehavior = Clip.hardEdge,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = Axis.horizontal,
+       _axisFrom = from,
+       _axisTo = to,
+       _fixedCrossAxisSize = fixedHeight,
+       super(from: Size.zero, to: Size.zero);
+
+  const SizeActor.height({
+    super.key,
+    required double from,
+    required double to,
+    double? fixedWidth,
+    this.clipBehavior = Clip.hardEdge,
+    this.alignment = Alignment.center,
+    this.allowOverflow = false,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = Axis.vertical,
+       _axisFrom = from,
+       _axisTo = to,
+       _fixedCrossAxisSize = fixedWidth,
+       super(from: Size.zero, to: Size.zero);
 
   @override
-  Widget apply(BuildContext context, Animation<Size> animation, Widget child) {
-    return AnimatedBuilder(
-      animation: animation,
-      child: child,
-      builder: (context, child) {
-        return FractionallySizedBox(
-          widthFactor: animation.value.width,
-          heightFactor: animation.value.height,
-          alignment: alignment,
-          child: child,
-        );
-      },
+  Effect get effect {
+    Size? from = this.from;
+    Size? to = this.to;
+    if (_axis != null) {
+      from = switch (_axis) {
+        Axis.horizontal => Size(_axisFrom!, _fixedCrossAxisSize ?? double.infinity),
+        Axis.vertical => Size(_fixedCrossAxisSize ?? double.infinity, _axisFrom!),
+      };
+      to = switch (_axis) {
+        Axis.horizontal => Size(_axisTo!, _fixedCrossAxisSize ?? double.infinity),
+        Axis.vertical => Size(_fixedCrossAxisSize ?? double.infinity, _axisTo!),
+      };
+    }
+    return SizeEffect.internal(
+      from: from,
+      to: to,
+      alignment: alignment,
+      allowOverflow: allowOverflow,
+      clipBehavior: clipBehavior,
+      keyframes: frames,
     );
   }
 }

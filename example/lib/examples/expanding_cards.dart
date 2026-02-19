@@ -57,7 +57,7 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                   return Actor(
                     effects: [
                       PaddingEffect(to: const .symmetric(vertical: 12), from: const .symmetric(vertical: 2)),
-                      DecorateEffect(
+                      DecoratationEffect(
                         from: decoration.copyWith(
                           borderRadius: .vertical(
                             top: fromTopRadius,

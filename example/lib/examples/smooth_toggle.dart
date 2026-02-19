@@ -32,14 +32,12 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
             _toggled = details.localPosition.dx > width / 2;
           });
         },
-        child: Actor(
-          effects: [
-            ScaleEffect.keyframes([
-              .key(1, at: .0),
-              .key(.90, at: .45),
-              .key(.99, at: .65),
-              .key(1.0, at: 1.0),
-            ]),
+        child: ScaleActor.keyframes(
+          frames: [
+            .key(1, at: .0),
+            .key(.90, at: .45),
+            .key(.99, at: .65),
+            .key(1.0, at: 1.0),
           ],
           child: Container(
             width: width,
@@ -58,15 +56,14 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
             child: Stack(
               fit: .expand,
               children: [
-                Actor(
-                  effects: [
-                    PositionEffect.keyframes([
-                      .key(Position.fill(end: .5), at: .0),
-                      .key(Position.fill(end: 0, top: .15, bottom: .15), at: .45),
-                      .key(Position.fill(end: 0, top: .15, bottom: .15), at: .55),
-                      .key(Position.fill(start: .5), at: 1.0),
-                    ], relativeTo: Size(width, height)),
+                PositionActor.keyframes(
+                  frames: [
+                    .key(Position.fill(end: .5), at: .0),
+                    .key(Position.fill(end: 0, top: .15, bottom: .15), at: .45),
+                    .key(Position.fill(end: 0, top: .15, bottom: .15), at: .55),
+                    .key(Position.fill(start: .5), at: 1.0),
                   ],
+                  relativeTo: Size(width, height),
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: thumbColor,
@@ -77,7 +74,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                 Row(
                   children: [
                     Expanded(
-                      child: DecorateActor(
+                      child: DecorationActor(
                         from: BoxDecoration(color: trackColor, shape: .circle),
                         to: BoxDecoration(color: thumbColor, shape: .circle),
                         timing: .endAt(.5),
@@ -86,7 +83,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                     ),
                     Expanded(
                       child: Center(
-                        child: DecorateActor(
+                        child: DecorationActor(
                           from: BoxDecoration(
                             color: thumbColor,
                             borderRadius: .circular(width * .2),

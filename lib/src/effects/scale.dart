@@ -17,6 +17,16 @@ class ScaleEffect extends TweenEffect<double> {
     this.alignment,
   }) : super.keyframes();
 
+  @internal
+  const ScaleEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+    this.alignment,
+  }) : super.internal();
+
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     final directionality = Directionality.maybeOf(context);
@@ -27,4 +37,38 @@ class ScaleEffect extends TweenEffect<double> {
       child: child,
     );
   }
+}
+
+class ScaleActor extends SingleEffectProxy<double> {
+  final AlignmentGeometry? alignment;
+
+  const ScaleActor({
+    super.key,
+    required super.from,
+    required super.to,
+    required super.child,
+    this.alignment,
+    super.curve,
+    super.timing,
+    super.role,
+  });
+
+  const ScaleActor.keyframes({
+    super.key,
+    required super.frames,
+    required super.child,
+    this.alignment,
+    super.curve,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : super.keyframes();
+
+  @override
+  Effect get effect => ScaleEffect.internal(
+    from: from,
+    to: to,
+    keyframes: frames,
+    alignment: alignment,
+  );
 }

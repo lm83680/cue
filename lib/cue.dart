@@ -8,4 +8,3 @@ export 'src/simulation/cue_simulation.dart';
 export 'src/simulation/spring.dart';
 export 'src/effects/effect.dart';
 export 'src/actor/actor.dart';
-export 'src/actor/actor_factories.dart';

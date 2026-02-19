@@ -8,6 +8,19 @@ class AlignEffect extends TweenEffect<AlignmentGeometry?> {
     super.timing,
   });
 
+  const AlignEffect.keyframes(
+    super.keyframes, {
+    super.curve,
+  }) : super.keyframes();
+
+  const AlignEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+  }) : super.internal();
+
   @override
   Animatable<AlignmentGeometry?> buildSinglePhaseTween(
     AlignmentGeometry? from,
@@ -29,4 +42,35 @@ class AlignEffect extends TweenEffect<AlignmentGeometry?> {
       child: child,
     );
   }
+}
+
+class AlignActor extends SingleEffectProxy<AlignmentGeometry?> {
+  const AlignActor({
+    required super.child,
+    super.key,
+    super.from,
+    super.to,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  });
+
+  const AlignActor.keyframes({
+    required super.child,
+    required super.frames,
+    super.key,
+    super.role,
+    super.curve,
+  }) : super.keyframes();
+
+  @override
+  Effect get effect => AlignEffect.internal(
+    from: from,
+    to: to,
+    keyframes: frames,
+    curve: curve,
+    timing: timing,
+  );
 }

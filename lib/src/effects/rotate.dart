@@ -2,22 +2,20 @@ part of 'effect.dart';
 
 class RotateEffect extends TweenEffect<double> {
   final AlignmentGeometry alignment;
-  final bool _asQuarterTurns;
-  final bool _inDegrees;
+  final RotateUnit unit;
   final RotateAxis axis;
 
   @internal
   const RotateEffect.internal({
     super.from = 0,
     super.to = 0,
+    super.keyframes,
     super.curve,
     super.timing,
     this.alignment = Alignment.center,
-    bool asQuarterTurns = false,
-    bool inDegrees = false,
-    this.axis = RotateAxis.z,
-  }) : _asQuarterTurns = asQuarterTurns,
-       _inDegrees = inDegrees;
+    required this.unit,
+    required this.axis,
+  }) : super.internal();
 
   const RotateEffect({
     super.from = 0,
@@ -26,15 +24,13 @@ class RotateEffect extends TweenEffect<double> {
     super.timing,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
-  }) : _asQuarterTurns = false,
-       _inDegrees = false;
+  }) : unit = RotateUnit.radians;
 
   const RotateEffect.flipX({
     super.curve,
     super.timing,
     this.alignment = Alignment.center,
-  }) : _asQuarterTurns = false,
-       _inDegrees = false,
+  }) : unit = RotateUnit.radians,
        axis = RotateAxis.x,
        super(from: 0, to: math.pi);
 
@@ -42,8 +38,7 @@ class RotateEffect extends TweenEffect<double> {
     super.curve,
     super.timing,
     this.alignment = Alignment.center,
-  }) : _asQuarterTurns = false,
-       _inDegrees = false,
+  }) : unit = RotateUnit.radians,
        axis = RotateAxis.y,
        super(from: 0, to: math.pi);
 
@@ -52,9 +47,8 @@ class RotateEffect extends TweenEffect<double> {
     super.curve,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
-  }) : _asQuarterTurns = false,
-       _inDegrees = false,
-       super.keyframes();
+    this.unit = RotateUnit.radians,
+  }) : super.keyframes();
 
   const RotateEffect.degrees({
     super.from = 0,
@@ -63,8 +57,7 @@ class RotateEffect extends TweenEffect<double> {
     super.timing,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
-  }) : _asQuarterTurns = false,
-       _inDegrees = true;
+  }) : unit = RotateUnit.degrees;
 
   const RotateEffect.turns({
     super.from = 0,
@@ -73,26 +66,22 @@ class RotateEffect extends TweenEffect<double> {
     super.timing,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
-  }) : _asQuarterTurns = true,
-       _inDegrees = false;
+  }) : unit = RotateUnit.quarterTurns;
 
   @override
   double transform(double value) {
-    if (_inDegrees) {
-      return value * math.pi / 180;
+    switch (unit) {
+      case RotateUnit.degrees:
+        return value * math.pi / 180;
+      case RotateUnit.quarterTurns:
+        return value * math.pi / 2;
+      case RotateUnit.radians:
+        return value;
     }
-    if (_asQuarterTurns) {
-      return value * math.pi / 2;
-    }
-    return value;
   }
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<double> animation,
-    Widget child,
-  ) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return MatrixTransition(
       animation: animation,
       alignment: alignment.resolve(Directionality.of(context)),
@@ -106,148 +95,77 @@ class RotateEffect extends TweenEffect<double> {
   }
 }
 
-class RotateLayoutEffect extends TweenEffect<double> {
-  final bool _asQuarterTurns;
-  final bool _inDegrees;
-
-  const RotateLayoutEffect({
-    super.from = 0,
-    super.to = 0,
-    super.curve,
-    super.timing,
-  }) : _asQuarterTurns = false,
-       _inDegrees = false;
-
-  const RotateLayoutEffect.keyframes(
-    super.keyframes, {
-    super.curve,
-  }) : _asQuarterTurns = false,
-       _inDegrees = false,
-       super.keyframes();
-
-  const RotateLayoutEffect.degrees({
-    super.from = 0,
-    super.to = 0,
-    super.curve,
-    super.timing,
-  }) : _asQuarterTurns = false,
-       _inDegrees = true;
-
-  const RotateLayoutEffect.turns({
-    super.from = 0,
-    super.to = 0,
-    super.curve,
-    super.timing,
-  }) : _asQuarterTurns = true,
-       _inDegrees = false;
-
-  @override
-  double transform(double value) {
-    if (_inDegrees) {
-      return value * math.pi / 180;
-    }
-    if (_asQuarterTurns) {
-      return value * math.pi / 2;
-    }
-    return value;
-  }
-
-  @override
-  Widget apply(BuildContext ctx, Animation<double> animation, Widget child) {
-    return ListenableBuilder(
-      listenable: animation,
-      child: child,
-      builder: (context, child) {
-        return _RotateLayout(
-          radians: animation.value,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class _RotateLayout extends SingleChildRenderObjectWidget {
-  final double radians;
-
-  const _RotateLayout({
-    required this.radians,
-    required super.child,
-  });
-
-  @override
-  _RenderRotateLayout createRenderObject(BuildContext context) {
-    return _RenderRotateLayout(radians);
-  }
-
-  @override
-  void updateRenderObject(
-    BuildContext context,
-    _RenderRotateLayout renderObject,
-  ) {
-    renderObject.radians = radians;
-  }
-}
-
-class _RenderRotateLayout extends RenderProxyBox {
-  double _radians;
-
-  _RenderRotateLayout(this._radians);
-
-  double get radians => _radians;
-  set radians(double value) {
-    if (_radians == value) return;
-    _radians = value;
-    markNeedsLayout();
-  }
-
-  Matrix4 _paintTransform = Matrix4.identity();
-
-  @override
-  void performLayout() {
-    if (child == null) {
-      size = constraints.smallest;
-      return;
-    }
-
-    child!.layout(constraints.loosen(), parentUsesSize: true);
-
-    final childSize = child!.size;
-    final w = childSize.width;
-    final h = childSize.height;
-
-    final c = math.cos(radians).abs();
-    final s = math.sin(radians).abs();
-
-    // Calculate rotated bounding box size
-    final rotatedW = w * c + h * s;
-    final rotatedH = w * s + h * c;
-
-    size = constraints.constrain(Size(rotatedW, rotatedH));
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final childCenter = Offset(childSize.width / 2, childSize.height / 2);
-
-    _paintTransform = Matrix4.identity()
-      ..translateByDouble(center.dx, center.dy, 0, 1)
-      ..rotateZ(radians)
-      ..translateByDouble(-childCenter.dx, -childCenter.dy, 0, 1);
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    if (child == null) {
-      layer = null;
-      return;
-    }
-    layer = context.pushTransform(
-      needsCompositing,
-      offset,
-      _paintTransform,
-      (context, offset) => context.paintChild(child!, offset),
-      oldLayer: layer is TransformLayer ? layer as TransformLayer? : null,
-    );
-  }
-}
-
 enum RotateAxis { x, y, z }
+
+enum RotateUnit { degrees, radians, quarterTurns }
+
+class RotateActor extends SingleEffectProxy<double> {
+  final AlignmentGeometry alignment;
+  final RotateUnit unit;
+  final RotateAxis axis;
+
+  const RotateActor({
+    super.key,
+    required double super.from,
+    required double super.to,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+    this.axis = RotateAxis.z,
+  }) : unit = RotateUnit.radians;
+
+  const RotateActor.flipX({
+    super.key,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+  }) : unit = RotateUnit.radians,
+       axis = RotateAxis.x,
+       super(from: 0, to: math.pi);
+
+  const RotateActor.flipY({
+    super.key,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+  }) : unit = RotateUnit.radians,
+       axis = RotateAxis.y,
+       super(from: 0, to: math.pi);
+
+  const RotateActor.turns({
+    super.key,
+    super.from = 0,
+    required double super.to,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+    this.axis = RotateAxis.z,
+  }) : unit = RotateUnit.quarterTurns;
+
+  const RotateActor.degrees({
+    super.key,
+    double super.from = 0,
+    required double super.to,
+    required super.child,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+    this.axis = RotateAxis.z,
+  }) : unit = RotateUnit.degrees;
+
+  @override
+  Effect get effect => RotateEffect.internal(
+    from: from as double,
+    to: to as double,
+    curve: curve,
+    timing: timing,
+    alignment: alignment,
+    keyframes: frames,
+    unit: unit,
+    axis: axis,
+  );
+}

@@ -25,8 +25,9 @@ class PositionEffect extends TweenEffect<Position> {
     super.curve,
     super.timing,
     Size? relativeTo,
-    List<Keyframe<Position>>? keyframes,
-  }) : _relativeTo = relativeTo;
+    super.keyframes,
+  }) : _relativeTo = relativeTo,
+       super.internal();
 
   const PositionEffect.keyframes(
     super.keyframes, {
@@ -41,11 +42,7 @@ class PositionEffect extends TweenEffect<Position> {
   }
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<Position> animation,
-    Widget child,
-  ) {
+  Widget apply(BuildContext context, Animation<Position> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       child: child,
@@ -125,4 +122,55 @@ class _PositionTween extends Tween<Position> {
 
   @override
   Position lerp(double t) => Position.lerp(begin!, end!, t);
+}
+
+class PositionActor extends SingleEffectProxy<Position> {
+  final Size? _relativeTo;
+
+  const PositionActor({
+    super.key,
+    required super.from,
+    required super.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _relativeTo = null;
+
+  const PositionActor.keyframes({
+    super.key,
+    required super.frames,
+    required super.child,
+    super.curve,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+    Size? relativeTo,
+  }) : _relativeTo = relativeTo,
+       super.keyframes();
+
+  const PositionActor.relative({
+    super.key,
+    required super.from,
+    required super.to,
+    required Size size,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _relativeTo = size;
+
+  @override
+  Effect get effect => PositionEffect.internal(
+    from: from,
+    to: to,
+    keyframes: frames,
+    relativeTo: _relativeTo,
+    curve: curve,
+    timing: timing,
+  );
 }

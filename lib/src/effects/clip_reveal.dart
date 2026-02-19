@@ -9,12 +9,12 @@ abstract class ClipEffect extends Effect {
     Timing? timing,
   }) = _ClipEffect;
 
-  const factory ClipEffect.circluar({
+  const factory ClipEffect.circular({
     Size fromSize,
     AlignmentGeometry alignment,
     Curve? curve,
     Timing? timing,
-  }) = _ClipEffect.circluar;
+  }) = _ClipEffect.circular;
 
   const factory ClipEffect.horizontal({
     double from,
@@ -56,11 +56,7 @@ class _AxisClipEffect extends TweenEffect<double> implements ClipEffect {
        super();
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<double> animation,
-    Widget child,
-  ) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     final directionality = Directionality.of(context);
     final effectiveAlignment = alignment.resolve(directionality);
     return AnimatedBuilder(
@@ -93,7 +89,7 @@ class _ClipEffect extends TweenEffect<double> implements ClipEffect {
     super.timing,
   }) : super(from: 0, to: 1);
 
-  const _ClipEffect.circluar({
+  const _ClipEffect.circular({
     this.fromSize = Size.zero,
     this.alignment,
     super.curve,
@@ -188,4 +184,109 @@ class ExpandingPathClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant ExpandingPathClipper oldClipper) {
     return oldClipper.progress != progress || oldClipper.minSize != minSize;
   }
+}
+
+class ClipActor extends SingleEffectProxy<Size> {
+  final double? _fromAxisSize;
+  final double? _toAxisSize;
+  final BorderRadiusGeometry? borderRadius;
+  final AlignmentGeometry alignment;
+  final Axis? _axis;
+
+  const ClipActor({
+    super.key,
+    Size fromSize = Size.zero,
+    BorderRadiusGeometry this.borderRadius = BorderRadius.zero,
+    this.alignment = Alignment.center,
+    required super.child,
+    super.role,
+    super.curve,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = null,
+       _fromAxisSize = null,
+       _toAxisSize = null,
+       super(from: fromSize, to: Size.zero);
+
+  const ClipActor.circular({
+    super.key,
+    Size fromSize = Size.zero,
+    this.alignment = Alignment.center,
+    required super.child,
+    super.role,
+    super.curve,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = null,
+       _fromAxisSize = null,
+       _toAxisSize = null,
+       borderRadius = null,
+       super(from: fromSize, to: Size.zero);
+
+  const ClipActor.horizontal({
+    super.key,
+    double from = 0,
+    double to = 1,
+    this.alignment = AlignmentDirectional.centerStart,
+    required super.child,
+    super.curve,
+    super.role,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = Axis.horizontal,
+       _fromAxisSize = from,
+       _toAxisSize = to,
+       borderRadius = BorderRadius.zero,
+       super(from: Size.zero, to: Size.zero);
+
+  const ClipActor.vertical({
+    super.key,
+    double from = 0,
+    double to = 1,
+    this.alignment = AlignmentDirectional.topCenter,
+    required super.child,
+    super.curve,
+    super.role,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : _axis = Axis.vertical,
+       _toAxisSize = to,
+       _fromAxisSize = from,
+       borderRadius = BorderRadius.zero,
+       super(from: Size.zero, to: Size.zero);
+
+  @override
+  Effect get effect => switch (_axis) {
+    Axis.horizontal => ClipEffect.horizontal(
+      from: _fromAxisSize!,
+      to: _toAxisSize!,
+      alignment: alignment,
+      curve: curve,
+      timing: timing,
+    ),
+    Axis.vertical => ClipEffect.vertical(
+      from: _fromAxisSize!,
+      to: _toAxisSize!,
+      alignment: alignment,
+      curve: curve,
+      timing: timing,
+    ),
+    _ when borderRadius != null => ClipEffect(
+      fromSize: from!,
+      alignment: alignment,
+      borderRadius: borderRadius!,
+      curve: curve,
+      timing: timing,
+    ),
+    _ => ClipEffect.circular(
+      fromSize: from!,
+      alignment: alignment,
+      curve: curve,
+      timing: timing,
+    ),
+  };
 }

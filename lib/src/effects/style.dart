@@ -8,17 +8,27 @@ class TextStyleEffect extends TweenEffect<TextStyle> {
     super.timing,
   });
 
+  const TextStyleEffect.keyframes(
+    super.keyframes, {
+    super.curve,
+  }) : super.keyframes();
+
+  @internal
+  const TextStyleEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+  }) : super.internal();
+
   @override
   Animatable<TextStyle> buildSinglePhaseTween(TextStyle from, TextStyle to) {
     return TextStyleTween(begin: from, end: to);
   }
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<TextStyle> animation,
-    Widget child,
-  ) {
+  Widget apply(BuildContext context, Animation<TextStyle> animation, Widget child) {
     return DefaultTextStyleTransition(style: animation, child: child);
   }
 }
@@ -30,6 +40,20 @@ class IconThemeEffect extends TweenEffect<IconThemeData> {
     super.curve,
     super.timing,
   });
+
+  const IconThemeEffect.keyframes(
+    super.keyframes, {
+    super.curve,
+  }) : super.keyframes();
+
+  @internal
+  const IconThemeEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+  }) : super.internal();
 
   @override
   Animatable<IconThemeData> buildSinglePhaseTween(
@@ -62,4 +86,66 @@ class _IconThemeDataTween extends Tween<IconThemeData> {
   IconThemeData lerp(double t) {
     return IconThemeData.lerp(begin, end, t);
   }
+}
+
+class TextStyleActor extends SingleEffectProxy<TextStyle> {
+  const TextStyleActor({
+    super.key,
+    required super.from,
+    required super.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  });
+
+  const TextStyleActor.keyframes({
+    super.key,
+    required super.frames,
+    required super.child,
+    super.curve,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : super.keyframes();
+
+  @override
+  Effect get effect => TextStyleEffect.internal(
+    from: from,
+    to: to,
+    keyframes: frames,
+  );
+}
+
+class IconThemeActor extends SingleEffectProxy<IconThemeData> {
+  const IconThemeActor({
+    super.key,
+    required super.from,
+    required super.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  });
+
+  const IconThemeActor.keyframes({
+    super.key,
+    required super.frames,
+    required super.child,
+    super.curve,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : super.keyframes();
+
+  @override
+  Effect get effect => IconThemeEffect.internal(
+    from: from,
+    to: to,
+    keyframes: frames,
+  );
 }

@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 part 'size.dart';
+part 'fractional_size.dart';
 part 'translate.dart';
 part 'decorate.dart';
 part 'rotate.dart';
+part 'rotate_layout.dart';
 part 'scale.dart';
 part 'fade.dart';
 part 'blur.dart';
@@ -58,6 +60,17 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
   }) : _keyframes = keyframes,
        _from = null,
        _to = null;
+
+  @internal
+  const TweenEffectBase.internal({
+    T? from,
+    T? to,
+    List<Keyframe<T>>? keyframes,
+    super.curve,
+    super.timing,
+  }) : _keyframes = keyframes,
+       _from = from,
+       _to = to;
 
   @nonVirtual
   @override
@@ -221,6 +234,15 @@ abstract class TweenEffect<T extends Object?> extends TweenEffectBase<T, T> {
     super.keyframes, {
     super.curve,
   }) : super.keyframes();
+
+  @internal
+  const TweenEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+  }) : super.internal();
 }
 
 class AnimationBuildData {

@@ -10,6 +10,14 @@ class BlurEffect extends TweenEffect<double> {
 
   const BlurEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
+  const BlurEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+  }) : super.internal();
+
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return AnimatedBuilder(
@@ -46,6 +54,15 @@ class BackdropBlurEffect extends TweenEffect<double> {
     this.blendMode = BlendMode.srcOver,
   }) : super.keyframes();
 
+  const BackdropBlurEffect.internal({
+    super.from,
+    super.to,
+    super.keyframes,
+    super.curve,
+    super.timing,
+    this.blendMode = BlendMode.srcOver,
+  }) : super.internal();
+
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return AnimatedBuilder(
@@ -64,4 +81,56 @@ class BackdropBlurEffect extends TweenEffect<double> {
       },
     );
   }
+}
+
+class BlurActor extends SingleEffectProxy<double> {
+  const BlurActor({
+    super.key,
+    required super.from,
+    required super.to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  });
+
+  const BlurActor.keyframes({
+    required super.child,
+    super.key,
+    required super.frames,
+    super.curve,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  }) : super.keyframes();
+
+  @override
+  Effect get effect => BlurEffect.internal(from: from, to: to, keyframes: frames);
+}
+
+class BackdropBlurActor extends SingleEffectProxy<double> {
+  final BlendMode blendMode;
+
+  const BackdropBlurActor({
+    super.key,
+    required super.from,
+    required super.to,
+    this.blendMode = BlendMode.srcOver,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
+  });
+
+  @override
+  Effect get effect => BackdropBlurEffect.internal(
+    from: from,
+    to: to,
+    keyframes: frames,
+    blendMode: blendMode,
+  );
 }

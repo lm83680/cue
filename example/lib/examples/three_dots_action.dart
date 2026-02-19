@@ -10,7 +10,6 @@ class ThreeDotsAction extends StatelessWidget {
       // showDebug: true,
       barrierColor: Colors.black12,
       alignment: Alignment.bottomCenter,
-      simulation: const Spring.bouncy(),
       triggerBuilder: (context, showModal) => FloatingActionButton(
         shape: CircleBorder(),
         heroTag: null,

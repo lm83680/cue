@@ -102,27 +102,38 @@ abstract class SingleEffectProxy<T> extends StatelessWidget {
   final Timing? timing;
   final Timing? reverseTiming;
   final ActorRole role;
-  final List<Keyframe<T>>? keys;
+  final List<Keyframe<T>>? frames;
+  final T? _from;
+  final T? _to;
+
+  T? get from => _from;
+  T? get to => _to;
 
   const SingleEffectProxy({
     super.key,
     required this.child,
+    required T from,
+    required T to,
     this.curve,
     this.timing,
     this.role = ActorRole.both,
     this.reverseCurve,
     this.reverseTiming,
-  }) : keys = null;
+  }) : frames = null,
+       _from = from,
+       _to = to;
 
-  const SingleEffectProxy.keyFrames({
-    required List<Keyframe<T>> this.keys,
+  const SingleEffectProxy.keyframes({
+    required List<Keyframe<T>> this.frames,
     super.key,
     required this.child,
     this.role = ActorRole.both,
     this.reverseCurve,
     this.reverseTiming,
     this.curve,
-  }) : timing = null;
+  }) : timing = null,
+       _from = null,
+       _to = null;
 
   Effect get effect;
 
