@@ -26,88 +26,79 @@ class OptionsButton extends StatelessWidget {
         );
       },
       builder: (context, rect) {
-        return Actor(
-          role: .reverse,
-          effects: [
-            FadeEffect(from: 1, to: 0),
-            SlideEffect.y(to: 1),
-          ],
-          child: ClipActor(
-            role: .forward,
-            fromSize: rect.size,
-            borderRadius: BorderRadius.circular(32),
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: FractionallySizedBox(
-                widthFactor: .8,
-                child: Material(
-                  color: theme.colorScheme.surfaceContainer,
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  elevation: 1,
-                  child: Column(
-                    mainAxisSize: .min,
-                    crossAxisAlignment: .start,
-                    children: [
-                      TranslateActor.fromGlobal(
-                        offset: rect.topLeft,
-                        role: .forward,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                          child: TextStyleActor(
-                            role: .forward,
-                            from: theme.textTheme.labelLarge!.copyWith(
-                              color: theme.primaryColor,
-                            ),
-                            to: theme.textTheme.labelLarge!.copyWith(fontSize: 22),
-                            child: Text('Options'),
+        return ClipActor(
+          fromSize: rect.size,
+          borderRadius: BorderRadius.circular(32),
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: FractionallySizedBox(
+              widthFactor: .8,
+              child: Material(
+                color: theme.colorScheme.surfaceContainer,
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                elevation: 1,
+                child: Column(
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .start,
+                  children: [
+                    Actor(
+                      effects: [
+                        TranslateEffect.fromGlobal(offset: rect.topLeft),
+                        TextStyleEffect(
+                          from: theme.textTheme.labelLarge!.copyWith(
+                            color: theme.primaryColor,
                           ),
+                          to: theme.textTheme.labelLarge!.copyWith(fontSize: 22),
                         ),
+                      ],
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        child: Text('Options'),
                       ),
-                      Actor(
-                        role: .forward,
-                        effects: [
-                          // FadeEffect(),
-                          ScaleEffect(from: .2),
-                          BlurEffect(from: 10),
-                          SlideEffect(from: Offset(0, 1)),
-                        ],
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                          child: Column(
-                            children:
-                                [
-                                  for (var i = 0; i < 4; i++)
-                                    Card(
-                                      clipBehavior: .hardEdge,
-                                      elevation: 0,
-                                      child: ListTile(
-                                        onTap: () => Navigator.of(context).pop(),
-                                        leading: Icon(
-                                          [
-                                            Icons.animation,
-                                            Icons.access_alarm_outlined,
-                                            Icons.sailing_outlined,
-                                            Icons.sanitizer_outlined,
-                                          ][i],
-                                        ),
-                                        title: Text('Option ${i + 1}'),
-                                        subtitle: Text('Subtitle text goes here'),
+                    ),
+                    Actor(
+                      effects: [
+                        FadeEffect(),
+                        ScaleEffect(from: .2),
+                        BlurEffect(from: 10),
+                        SlideEffect.y(from: 1),
+                      ],
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          children:
+                              [
+                                for (var i = 0; i < 4; i++)
+                                  Card(
+                                    clipBehavior: .hardEdge,
+                                    elevation: 0,
+                                    child: ListTile(
+                                      onTap: () => Navigator.of(context).pop(),
+                                      leading: Icon(
+                                        [
+                                          Icons.animation,
+                                          Icons.access_alarm_outlined,
+                                          Icons.sailing_outlined,
+                                          Icons.sanitizer_outlined,
+                                        ][i],
                                       ),
+                                      title: Text('Option ${i + 1}'),
+                                      subtitle: Text('Subtitle text goes here'),
                                     ),
-                                ].staggerEffects(
-                                  (int index) => [
-                                    // TranslateEffect(from: Offset(0, 10 * (index + 1))),
-                                    // ScaleEffect(from: index * -.1),
-                                  ],
-                                ),
-                          ),
+                                  ),
+                              ].staggerEffects(
+                                (int index) => [
+                                  TranslateEffect.y(from: 10 * (index + 1)),
+                                  ScaleEffect(from: index * -.1),
+                                ],
+                              ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

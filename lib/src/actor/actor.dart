@@ -266,11 +266,15 @@ extension StaggeredActorExtension on Iterable<Widget> {
   List<Widget> staggerEffects(
     List<Effect> Function(int index) effects, {
     Curve? curve,
+    ActorRole role = ActorRole.both,
+    Curve? reverseCurve,
   }) {
     return [
       for (var i = 0; i < length; i++)
         Actor(
           curve: curve,
+          role: role,
+          reverseCurve: reverseCurve,
           effects: effects(i),
           child: elementAt(i),
         ),
