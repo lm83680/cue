@@ -17,8 +17,8 @@ class SizeEffect extends TweenEffect<double> {
     this.clipBehavior = Clip.hardEdge,
     this.allowOverflow = false,
   }) : _fromSize = from,
-       _sizeKeyframes = null,
        _toSize = to,
+       _sizeKeyframes = null,
        super(from: 0, to: 1);
 
   const SizeEffect.keyframes(

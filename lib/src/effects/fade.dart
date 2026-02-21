@@ -38,15 +38,6 @@ class FadeActor extends SingleEffectProxy<double> {
     super.timing,
   });
 
-  const FadeActor.out({
-    super.key,
-    super.from = 1,
-    required super.child,
-    super.role,
-    super.curve,
-    super.timing,
-  }) : super(to: 0);
-
   const FadeActor.keyframes({
     required super.child,
     required super.frames,

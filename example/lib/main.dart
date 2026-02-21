@@ -1,10 +1,9 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
-import 'package:example/examples/options_button.dart';
-import 'package:example/examples/smooth_toggle.dart';
+import 'package:example/examples/bottom_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+
+import 'package:iconsax/iconsax.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
       // showPerformanceOverlay: true,
       darkTheme: ThemeData.dark(),
       theme: ThemeData(
-        splashFactory: InkSparkle.splashFactory,
+        splashFactory: NoSplash.splashFactory,
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
       home: DemoPage(),
@@ -43,54 +42,17 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin {
-  bool _toggled = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      // backgroundColor: Colors.grey.shade50,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(),
+      bottomNavigationBar: SafeArea(top: false, child: BottomBar()),
       body: Padding(
-        padding: const EdgeInsets.only(top: 80),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: .center,
-            children: [
-              SmoothSwitch(),
-              SizedBox(height: 32),
-              SmoothSwitch(),
-              OptionsButton(),
-            ],
-          ),
-          // child: Cue.onToggle(
-          //   toggled: _toggled,
-          //   // debug: true,
-          //   child: Actor(
-          //     effects: [
-          //       SizeEffect(
-          //         from: Size(100, 60),
-          //         to: Size(60, 100),
-          //       ),
-          //       DecorateEffect(
-          //         from: BoxDecoration(
-          //           color: Colors.deepPurple,
-          //           borderRadius: BorderRadius.circular(16),
-          //         ),
-          //         to: BoxDecoration(
-          //           color: Colors.deepPurple.shade200,
-          //           borderRadius: BorderRadius.circular(24),
-          //         ),
-          //       ),
-          //     ],
-          //     child: GestureDetector(
-          //       onTap: () => setState(() => _toggled = !_toggled),
-          //       child: Padding(
-          //         padding: const EdgeInsets.all(12.0),
-          //         child: const Icon(Icons.play_arrow),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+        padding: const EdgeInsets.only(top: 0),
+        child: Column(
+          mainAxisAlignment: .center,
         ),
       ),
     );

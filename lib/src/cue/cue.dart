@@ -76,7 +76,7 @@ abstract class Cue extends StatefulWidget {
     required ValueGetter<double> getOffset,
     required int targetIndex,
     IndexDistanceCalculator? calculator,
-  }) = _IndexedStage;
+  }) = _IndexedCue;
 
   factory Cue.paged({
     Key? key,
@@ -86,7 +86,7 @@ abstract class Cue extends StatefulWidget {
     required PageController controller,
     required int targetIndex,
     IndexDistanceCalculator? calculator,
-  }) = _IndexedStage.fromPageController;
+  }) = _IndexedCue.fromPageController;
 }
 
 class _RouteTransitionStageState extends _CueState<_RouteTransitionStage> {
@@ -140,8 +140,6 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     if (kDebugMode) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
         final scope = CueDebugTools.of(context);
-        print(scope.activeTargetId);
-
         if (scope.isSelectMode) {
           final color = scope.activeTargetId == _debugId ? Colors.blue : Colors.amber;
           return GestureDetector(
@@ -564,8 +562,8 @@ class CueScope extends InheritedWidget {
 /// Returns a value typically between 0.0 and 1.0.
 typedef IndexDistanceCalculator = double Function(double offset, int targetIndex);
 
-class _IndexedStage extends Cue {
-  const _IndexedStage({
+class _IndexedCue extends Cue {
+  const _IndexedCue({
     super.key,
     super.curve,
     super.debugLabel,
@@ -582,9 +580,9 @@ class _IndexedStage extends Cue {
   final IndexDistanceCalculator? calculator;
 
   @override
-  State<StatefulWidget> createState() => _IndexedStageState();
+  State<StatefulWidget> createState() => _IndexedCueState();
 
-  factory _IndexedStage.fromPageController({
+  factory _IndexedCue.fromPageController({
     Key? key,
     required Widget child,
     Curve curve = Curves.linear,
@@ -593,7 +591,7 @@ class _IndexedStage extends Cue {
     required int targetIndex,
     IndexDistanceCalculator? calculator,
   }) {
-    return _IndexedStage(
+    return _IndexedCue(
       key: key,
       curve: curve,
       debugLabel: debugLabel,
@@ -609,7 +607,7 @@ class _IndexedStage extends Cue {
   }
 }
 
-class _IndexedStageState extends _CueState<_IndexedStage> {
+class _IndexedCueState extends _CueState<_IndexedCue> {
   Animation<double> _animation = AlwaysStoppedAnimation(0.0);
 
   @override
@@ -655,7 +653,7 @@ class _IndexedStageState extends _CueState<_IndexedStage> {
   }
 
   @override
-  void didUpdateWidget(covariant _IndexedStage oldWidget) {
+  void didUpdateWidget(covariant _IndexedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.listenable != oldWidget.listenable) {
       oldWidget.listenable.removeListener(_updateAnimation);

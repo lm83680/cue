@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sprung: ^3.0.1
+  iconsax: ^0.0.8
   cue:
     path: ..
 
