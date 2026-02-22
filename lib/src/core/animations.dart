@@ -90,3 +90,45 @@ mixin AnimationWithFilterMixin on Animation<double> {
   @override
   AnimationStatus get status => parent.status;
 }
+
+class DrivenAnimation<T> extends Animation<T> with AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
+  T _value;
+  AnimationStatus _status;
+
+  DrivenAnimation({
+    required T value,
+    AnimationStatus status = AnimationStatus.dismissed,
+  }) : _value = value,
+       _status = status;
+
+  @override
+  T get value => _value;
+
+  @override
+  AnimationStatus get status => _status;
+
+  void update(T value, AnimationStatus status) {
+    final valueChanged = _value != value;
+    final statusChanged = _status != status;
+
+    if (!valueChanged && !statusChanged) return;
+
+    _value = value;
+    _status = status;
+
+    if (statusChanged) notifyStatusListeners(status);
+    if (valueChanged) notifyListeners();
+  }
+
+  @override
+  void didRegisterListener() {
+    // NOOP
+    // This animation is driven by an external source, so we don't need to do anything here.
+  }
+
+  @override
+  void didUnregisterListener() {
+    // NOOP
+    // This animation is driven by an external source, so we don't need to do anything here.
+  }
+}

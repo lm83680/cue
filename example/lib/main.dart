@@ -1,5 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/bottom_bar.dart';
+import 'package:example/examples/expanding_cards.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -23,13 +23,36 @@ class MyApp extends StatelessWidget {
         splashFactory: NoSplash.splashFactory,
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: DemoPage(),
+      home: _OnChangeDemo(),
       builder: (context, child) {
         if (kDebugMode) {
           return CueDebugTools(child: child!);
         }
         return child!;
       },
+    );
+  }
+}
+
+class _OnChangeDemo extends StatefulWidget {
+  const _OnChangeDemo({super.key});
+
+  @override
+  State<_OnChangeDemo> createState() => __OnChangeDemoState();
+}
+
+class __OnChangeDemoState extends State<_OnChangeDemo> {
+  int _notificationsCount = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: .center,
+          children: [ExpandingCards()],
+        ),
+      ),
     );
   }
 }
@@ -42,17 +65,50 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin {
+  late final _pageController = CueTabController(length: 5, vsync: this);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.grey.shade50,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(),
-      bottomNavigationBar: SafeArea(top: false, child: BottomBar()),
       body: Padding(
-        padding: const EdgeInsets.only(top: 0),
-        child: Column(
-          mainAxisAlignment: .center,
+        padding: const EdgeInsets.all(16.0),
+        child: SizedBox(
+          height: 300,
+          child: Column(
+            children: [
+              for (int index = 0; index < 5; index++)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Cue.indexed(
+                    controller: _pageController,
+                    targetIndex: index,
+                    child: GestureDetector(
+                      onTap: () {
+                        _pageController.animateTo(
+                          index,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      child: Actor(
+                        effects: [
+                          ScaleEffect(from: .5, to: 1.2),
+                        ],
+                        child: Container(
+                          color: Colors.primaries[index % Colors.primaries.length].shade200,
+                          child: Center(
+                            child: Text(
+                              'Page ${index + 1}',
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

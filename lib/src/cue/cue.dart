@@ -2,6 +2,9 @@ import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+part 'indexed_cue.dart';
+part 'on_change_cue.dart';
+
 abstract class Cue extends StatefulWidget {
   const Cue._({
     super.key,
@@ -67,26 +70,26 @@ abstract class Cue extends StatefulWidget {
     bool skipFirstAnimation,
   }) = _TogglableCue;
 
+  const factory Cue.onChange({
+    Key? key,
+    required Widget child,
+    Curve? curve,
+    String? debugLabel,
+    Duration duration,
+    Duration? reverseDuration,
+    CueSimulation? simulation,
+    bool skipFirstAnimation,
+    required Object? value,
+  }) = _OnChangeCue;
+
   const factory Cue.indexed({
     Key? key,
     required Widget child,
     Curve curve,
     String? debugLabel,
-    required Listenable listenable,
-    required ValueGetter<double> getOffset,
+    required IndexedCueController controller,
     required int targetIndex,
-    IndexDistanceCalculator? calculator,
   }) = _IndexedCue;
-
-  factory Cue.paged({
-    Key? key,
-    required Widget child,
-    Curve curve,
-    String? debugLabel,
-    required PageController controller,
-    required int targetIndex,
-    IndexDistanceCalculator? calculator,
-  }) = _IndexedCue.fromPageController;
 }
 
 class _RouteTransitionStageState extends _CueState<_RouteTransitionStage> {
@@ -220,21 +223,6 @@ class _SelfAnimatedCue extends Cue {
 
 class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   @override
-  Curve? get curve => widget.curve;
-
-  @override
-  Duration get duration => widget.duration;
-
-  @override
-  Duration? get reverseDuration => widget.reverseDuration;
-
-  @override
-  CueSimulation? get simulation => widget.simulation;
-
-  @override
-  bool get isBounded => widget.simulation == null;
-
-  @override
   void onControllerReady() async {
     if (widget.delay case final delay?) {
       await Future.delayed(delay);
@@ -272,6 +260,9 @@ abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<
 
   @override
   bool get isBounded => widget.simulation == null;
+
+  @override
+  Animation<double> getAnimation(BuildContext context) => _animation;
 
   @override
   void initState() {
@@ -487,7 +478,6 @@ class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
   @override
   void didUpdateWidget(covariant _TogglableCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-
     if (widget.toggled != oldWidget.toggled) {
       _animate();
     }
@@ -561,107 +551,3 @@ class CueScope extends InheritedWidget {
 /// Calculates the animation value based on the distance between current and target index.
 /// Returns a value typically between 0.0 and 1.0.
 typedef IndexDistanceCalculator = double Function(double offset, int targetIndex);
-
-class _IndexedCue extends Cue {
-  const _IndexedCue({
-    super.key,
-    super.curve,
-    super.debugLabel,
-    required super.child,
-    required this.listenable,
-    required this.getOffset,
-    required this.targetIndex,
-    this.calculator,
-  }) : super._();
-
-  final Listenable listenable;
-  final ValueGetter<double> getOffset;
-  final int targetIndex;
-  final IndexDistanceCalculator? calculator;
-
-  @override
-  State<StatefulWidget> createState() => _IndexedCueState();
-
-  factory _IndexedCue.fromPageController({
-    Key? key,
-    required Widget child,
-    Curve curve = Curves.linear,
-    String? debugLabel,
-    required PageController controller,
-    required int targetIndex,
-    IndexDistanceCalculator? calculator,
-  }) {
-    return _IndexedCue(
-      key: key,
-      curve: curve,
-      debugLabel: debugLabel,
-      listenable: controller,
-      getOffset: () {
-        if (!controller.hasClients) return 0.0;
-        return controller.page ?? controller.initialPage.toDouble();
-      },
-      targetIndex: targetIndex,
-      calculator: calculator,
-      child: child,
-    );
-  }
-}
-
-class _IndexedCueState extends _CueState<_IndexedCue> {
-  Animation<double> _animation = AlwaysStoppedAnimation(0.0);
-
-  @override
-  bool get isBounded => true;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.listenable.addListener(_updateAnimation);
-    _updateAnimation();
-  }
-
-  /// Default calculator that provides linear fade within 1 index distance.
-  /// Returns 1.0 at exact target index, fades to 0.0 at ±1.0 distance.
-  double _defaultIndexDistanceCalculator(double currentIndex, int targetIndex) {
-    final distance = (currentIndex - targetIndex).abs();
-    // Only animate if within 1 index distance
-    if (distance >= 1.0) return 0.0;
-
-    // Check if this target is the previous, current, or next index
-    final roundedCurrent = currentIndex.round();
-    final isPreviousOrNext =
-        (targetIndex == roundedCurrent - 1) || (targetIndex == roundedCurrent) || (targetIndex == roundedCurrent + 1);
-
-    if (!isPreviousOrNext) return 0.0;
-
-    return 1.0 - distance;
-  }
-
-  void _updateAnimation() {
-    final currentIndex = widget.getOffset();
-    final calculator = widget.calculator ?? _defaultIndexDistanceCalculator;
-    final value = calculator(currentIndex, widget.targetIndex);
-    setState(() {
-      _animation = AlwaysStoppedAnimation(value);
-    });
-  }
-
-  @override
-  void dispose() {
-    widget.listenable.removeListener(_updateAnimation);
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(covariant _IndexedCue oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.listenable != oldWidget.listenable) {
-      oldWidget.listenable.removeListener(_updateAnimation);
-      widget.listenable.addListener(_updateAnimation);
-      _updateAnimation();
-    }
-  }
-
-  @override
-  Animation<double> getAnimation(BuildContext context) => _animation;
-}

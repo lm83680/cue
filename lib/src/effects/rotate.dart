@@ -106,14 +106,23 @@ class RotateActor extends SingleEffectProxy<double> {
 
   const RotateActor({
     super.key,
-    required double super.from,
-    required double super.to,
+    required super.from,
+    required super.to,
     required super.child,
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
     this.axis = RotateAxis.z,
   }) : unit = RotateUnit.radians;
+
+  const RotateActor.keyframes({
+    required super.frames,
+    super.key,
+    required super.child,
+    this.alignment = Alignment.center,
+    this.axis = RotateAxis.z,
+    this.unit = RotateUnit.radians,
+  }) : super.keyframes();
 
   const RotateActor.flipX({
     super.key,
@@ -138,7 +147,7 @@ class RotateActor extends SingleEffectProxy<double> {
   const RotateActor.turns({
     super.key,
     super.from = 0,
-    required double super.to,
+    required super.to,
     required super.child,
     this.alignment = Alignment.center,
     super.curve,
@@ -148,8 +157,8 @@ class RotateActor extends SingleEffectProxy<double> {
 
   const RotateActor.degrees({
     super.key,
-    double super.from = 0,
-    required double super.to,
+    super.from = 0,
+    required super.to,
     required super.child,
     this.alignment = Alignment.center,
     super.curve,
@@ -159,8 +168,8 @@ class RotateActor extends SingleEffectProxy<double> {
 
   @override
   Effect get effect => RotateEffect.internal(
-    from: from as double,
-    to: to as double,
+    from: from,
+    to: to,
     curve: curve,
     timing: timing,
     alignment: alignment,
