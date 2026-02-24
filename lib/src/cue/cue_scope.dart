@@ -17,6 +17,11 @@ class CueScope extends InheritedWidget {
     return cue!;
   }
 
+  bool get isReversing => animation.status == AnimationStatus.reverse;
+  bool get isCompleted => animation.status == AnimationStatus.completed;
+  bool get isDismissed => animation.status == AnimationStatus.dismissed;
+  bool get isAnimating => animation.isAnimating;
+
   @override
   bool updateShouldNotify(covariant CueScope oldWidget) {
     return animation != oldWidget.animation || isBounded != oldWidget.isBounded;

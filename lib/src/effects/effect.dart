@@ -23,6 +23,7 @@ part 'clip_reveal.dart';
 part 'slide.dart';
 part 'position.dart';
 part 'transfrom.dart';
+part 'physcial_modal.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
 

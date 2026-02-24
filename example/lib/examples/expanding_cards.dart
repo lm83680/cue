@@ -36,8 +36,8 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                   final isPrevious = _expandedIndex - 1 == i;
                   final isNext = _expandedIndex + 1 == i;
 
-                  final topRadius = i == 0 || isActive || isNext ? const Radius.circular(24) : Radius.zero;
-                  final bottomRadius = isLast || isActive || isPrevious ? const Radius.circular(24) : Radius.zero;
+                  final fromTopRadius = isActive || i == 0 || isNext ? 24.0 : 0.0;
+                  final fromBottomRadius = isActive || isLast || isPrevious ? 24.0 : 0.0;
 
                   return Actor(
                     effects: [
@@ -46,11 +46,10 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                     ],
                     child: Material(
                       clipBehavior: .hardEdge,
-                      animationDuration: Duration(milliseconds: 300),
                       color: theme.colorScheme.surfaceContainer,
                       borderRadius: .vertical(
-                        top: topRadius,
-                        bottom: bottomRadius,
+                        top: Radius.circular(fromTopRadius),
+                        bottom: Radius.circular(fromBottomRadius),
                       ),
                       child: InkWell(
                         onTap: () {
