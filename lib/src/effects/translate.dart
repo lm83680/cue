@@ -42,7 +42,7 @@ abstract class TranslateEffect extends Effect {
     Offset toLocal,
     Curve? curve,
     Timing? timing,
-  }) = _TranslateFromGlobal;
+  }) = _TranslateFromGlobalEffect.offset;
 
   const factory TranslateEffect.fromGlobalRect(
     Rect rect, {
@@ -50,7 +50,15 @@ abstract class TranslateEffect extends Effect {
     Offset toLocal,
     Curve? curve,
     Timing? timing,
-  }) = _TranslateFromGlobal.fromRect;
+  }) = _TranslateFromGlobalEffect.fromRect;
+
+  const factory TranslateEffect.fromGlobalKey(
+    GlobalKey key, {
+    AlignmentGeometry alignment,
+    Offset toLocal,
+    Curve? curve,
+    Timing? timing,
+  }) = _TranslateFromGlobalEffect.fromKey;
 }
 
 class _TranslateOffset extends TweenEffect<Offset> implements TranslateEffect {
@@ -149,156 +157,160 @@ class _TranslateTransition extends AnimatedWidget {
   }
 }
 
-class _TranslateFromGlobal extends TweenEffect<double> implements TranslateEffect {
+class _TranslateFromGlobalEffect extends TweenEffect<double> implements TranslateEffect {
   final Offset? offset;
   final Rect? rect;
   final AlignmentGeometry? alignment;
+  final GlobalKey? globalKey;
   final Offset toLocal;
-  const _TranslateFromGlobal({
+
+  const _TranslateFromGlobalEffect.internal({
+    this.offset,
+    this.rect,
+    this.alignment,
+    this.globalKey,
+    this.toLocal = Offset.zero,
+  }) : super.internal();
+
+  const _TranslateFromGlobalEffect.offset({
     required Offset this.offset,
     this.toLocal = Offset.zero,
     super.curve,
     super.timing,
   }) : rect = null,
        alignment = null,
+       globalKey = null,
        super(from: 0, to: 1);
 
-  const _TranslateFromGlobal.fromRect(
+  const _TranslateFromGlobalEffect.fromRect(
     this.rect, {
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
   }) : offset = null,
+       globalKey = null,
+       super(from: 0, to: 1);
+
+  const _TranslateFromGlobalEffect.fromKey(
+    GlobalKey this.globalKey, {
+    this.toLocal = Offset.zero,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+  }) : offset = null,
+       rect = null,
        super(from: 0, to: 1);
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
-    return _TranslateFromGlobalTransition(
+    return _TranslateFromGlobalTranstion(
       animation: animation,
       globalOffset: offset,
       globalRect: rect,
+      globalKey: globalKey,
       alignment: alignment,
-      local: toLocal,
+      toLocal: toLocal,
       child: child,
     );
   }
 }
 
-class _TranslateFromGlobalTransition extends StatefulWidget {
-  final Animation<double> animation;
-  final Offset? globalOffset;
-  final Rect? globalRect;
-  final AlignmentGeometry? alignment;
-  final Offset local;
-  final Widget child;
+abstract class TranslateActor extends Widget {
+  const factory TranslateActor({
+    Key? key,
+    Offset from,
+    Offset to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    Curve? reverseCurve,
+    Timing? reverseTiming,
+    ActorRole role,
+  }) = _TranslateActor;
 
-  const _TranslateFromGlobalTransition({
-    required this.animation,
-    required this.globalOffset,
-    required this.globalRect,
-    this.alignment,
-    required this.child,
-    this.local = Offset.zero,
-  }) : assert(globalOffset != null || globalRect != null);
+  const factory TranslateActor.keyframes({
+    Key? key,
+    required List<Keyframe<Offset>> frames,
+    required Widget child,
+    Curve? curve,
+    Curve? reverseCurve,
+    ActorRole role,
+  }) = _TranslateActor.keyframes;
 
-  @override
-  State<_TranslateFromGlobalTransition> createState() => _TranslateFromGlobalTransitionState();
+  const factory TranslateActor.x({
+    Key? key,
+    double from,
+    double to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    Curve? reverseCurve,
+    Timing? reverseTiming,
+    ActorRole role,
+  }) = _TranslateActor.x;
+
+  const factory TranslateActor.xKeyframes({
+    Key? key,
+    required List<Keyframe<double>> frames,
+    required Widget child,
+    Curve? curve,
+    Curve? reverseCurve,
+    ActorRole role,
+  }) = _TranslateActor.xKeyframes;
+
+  const factory TranslateActor.y({
+    Key? key,
+    double from,
+    double to,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    Curve? reverseCurve,
+    Timing? reverseTiming,
+    ActorRole role,
+  }) = _TranslateActor.y;
+
+  const factory TranslateActor.yKeyframes({
+    Key? key,
+    required List<Keyframe<double>> frames,
+    required Widget child,
+    Curve? curve,
+    Curve? reverseCurve,
+    ActorRole role,
+  }) = _TranslateActor.yKeyframes;
+
+  const factory TranslateActor.fromGlobal({
+    required Offset offset,
+    Key? key,
+    Offset toLocal,
+    required Widget child,
+  }) = _TranslateFromGlobalActor.offset;
+
+  const factory TranslateActor.fromGlobalRect({
+    required Rect rect,
+    Key? key,
+    AlignmentGeometry alignment,
+    Offset toLocal,
+    required Widget child,
+  }) = _TranslateFromGlobalActor.fromRect;
+
+  const factory TranslateActor.fromGlobalKey({
+    required GlobalKey globalKey,
+    Key? key,
+    AlignmentGeometry alignment,
+    Offset toLocal,
+    required Widget child,
+  }) = _TranslateFromGlobalActor.fromKey;
 }
 
-class _TranslateFromGlobalTransitionState extends State<_TranslateFromGlobalTransition> {
-  final _key = GlobalKey();
-  Tween<Offset>? _deltaTween;
-  bool _measured = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.animation.addListener(_onAnimationUpdate);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
-  }
-
-  @override
-  void dispose() {
-    widget.animation.removeListener(_onAnimationUpdate);
-    super.dispose();
-  }
-
-  void _onAnimationUpdate() {
-    if (_measured && mounted) {
-      setState(() {});
-    }
-  }
-
-  @override
-  void didUpdateWidget(_TranslateFromGlobalTransition oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.animation != widget.animation) {
-      oldWidget.animation.removeListener(_onAnimationUpdate);
-      widget.animation.addListener(_onAnimationUpdate);
-    }
-    if (oldWidget.globalOffset != widget.globalOffset || oldWidget.globalRect != widget.globalRect) {
-      _measured = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
-    }
-  }
-
-  void _measure() {
-    if (!mounted) return;
-
-    final renderBox = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null || !renderBox.hasSize) return;
-    final targetGlobal = renderBox.localToGlobal(Offset.zero);
-
-    if (widget.globalOffset case final global?) {
-      final newDelta = global - targetGlobal;
-      if (_deltaTween?.begin != newDelta) {
-        setState(() {
-          _deltaTween = Tween(begin: newDelta, end: widget.local);
-          _measured = true;
-        });
-      }
-    } else {
-      final rect = widget.globalRect!;
-      final alignment = widget.alignment!.resolve(Directionality.of(context));
-      final targetRect = alignment.inscribe(renderBox.size, rect);
-      final newDelta = targetRect.topLeft - targetGlobal;
-      if (_deltaTween?.begin != newDelta) {
-        setState(() {
-          _deltaTween = Tween(begin: newDelta, end: widget.local);
-          _measured = true;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final offset = _deltaTween == null ? Offset.zero : widget.animation.drive(_deltaTween!).value;
-    final isInvisible = _deltaTween == null;
-    return Visibility(
-      key: _key,
-      visible: !isInvisible,
-      maintainState: true,
-      maintainAnimation: true,
-      maintainSize: true,
-      child: Transform.translate(
-        offset: offset,
-        child: widget.child,
-      ),
-    );
-  }
-}
-
-class TranslateActor extends SingleEffectProxy<Offset> {
+class _TranslateActor extends SingleEffectProxy<Offset> implements TranslateActor {
   final double? _axisFrom;
   final double? _axisTo;
   final List<Keyframe<double>>? _axisKeyframes;
-  final _TranslateVariant? _variant;
-  final Rect? _rect;
-  final AlignmentGeometry? _alignment;
+  final Axis? _axis;
 
-  const TranslateActor({
+  const _TranslateActor({
     super.key,
     super.from = Offset.zero,
     super.to = Offset.zero,
@@ -308,32 +320,28 @@ class TranslateActor extends SingleEffectProxy<Offset> {
     super.role,
     super.reverseCurve,
     super.reverseTiming,
-  }) : _variant = _TranslateVariant.offset,
+  }) : _axis = null,
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = null,
-       _rect = null,
-       _alignment = null;
+       super();
 
-  const TranslateActor.keyframes({
+  const _TranslateActor.keyframes({
     super.key,
     required super.frames,
     required super.child,
     super.curve,
     super.role,
     super.reverseCurve,
-    super.reverseTiming,
-  }) : _variant = _TranslateVariant.offset,
+  }) : _axis = null,
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = null,
-       _rect = null,
-       _alignment = null,
        super.keyframes();
 
-  const TranslateActor.x({
+  const _TranslateActor.x({
     super.key,
-    required double from,
+    double from = 0,
     double to = 0,
     required super.child,
     super.curve,
@@ -341,33 +349,28 @@ class TranslateActor extends SingleEffectProxy<Offset> {
     super.reverseCurve,
     super.reverseTiming,
     super.role,
-  }) : _variant = _TranslateVariant.horizontal,
+  }) : _axis = Axis.horizontal,
        _axisFrom = from,
        _axisTo = to,
        _axisKeyframes = null,
-       _rect = null,
-       _alignment = null,
        super(from: Offset.zero, to: Offset.zero);
 
-  const TranslateActor.xKeyframes({
+  const _TranslateActor.xKeyframes({
     super.key,
     required List<Keyframe<double>> frames,
     required super.child,
     super.curve,
     super.reverseCurve,
-    super.reverseTiming,
     super.role,
-  }) : _variant = _TranslateVariant.horizontal,
+  }) : _axis = Axis.horizontal,
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = frames,
-       _rect = null,
-       _alignment = null,
        super.keyframes(frames: const []);
 
-  const TranslateActor.y({
+  const _TranslateActor.y({
     super.key,
-    required double from,
+    double from = 0,
     double to = 0,
     required super.child,
     super.curve,
@@ -378,66 +381,24 @@ class TranslateActor extends SingleEffectProxy<Offset> {
   }) : _axisFrom = from,
        _axisTo = to,
        _axisKeyframes = null,
-       _variant = _TranslateVariant.vertical,
-       _rect = null,
-       _alignment = null,
+       _axis = Axis.vertical,
        super(from: Offset.zero, to: Offset.zero);
 
-  const TranslateActor.yKeyframes({
+  const _TranslateActor.yKeyframes({
     super.key,
     required List<Keyframe<double>> frames,
     required super.child,
     super.curve,
     super.reverseCurve,
-    super.reverseTiming,
     super.role,
-  }) : _variant = _TranslateVariant.vertical,
+  }) : _axis = Axis.vertical,
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = frames,
-       _rect = null,
-       _alignment = null,
        super.keyframes(frames: const []);
 
-  const TranslateActor.fromGlobal({
-    super.key,
-    required Offset offset,
-    Offset toLocal = Offset.zero,
-    required super.child,
-    super.curve,
-    super.timing,
-    super.reverseCurve,
-    super.reverseTiming,
-    super.role,
-  }) : _variant = _TranslateVariant.fromGlobal,
-       _axisFrom = null,
-       _axisTo = null,
-       _axisKeyframes = null,
-       _rect = null,
-       _alignment = null,
-       super(from: offset, to: toLocal);
-
-  const TranslateActor.fromGlobalRect({
-    super.key,
-    required Rect rect,
-    AlignmentGeometry alignment = Alignment.center,
-    Offset toLocal = Offset.zero,
-    required super.child,
-    super.curve,
-    super.timing,
-    super.reverseCurve,
-    super.reverseTiming,
-    super.role,
-  }) : _variant = _TranslateVariant.fromGlobalRect,
-       _axisFrom = null,
-       _axisTo = null,
-       _axisKeyframes = null,
-       _rect = rect,
-       _alignment = alignment,
-       super(from: Offset.zero, to: toLocal);
-
   @override
-  Effect get effect => switch (_variant) {
+  Effect get effect => switch (_axis) {
     .horizontal => _AxisTranslate.internal(
       from: _axisFrom!,
       to: _axisTo!,
@@ -450,10 +411,173 @@ class TranslateActor extends SingleEffectProxy<Offset> {
       axis: Axis.vertical,
       keyframes: _axisKeyframes,
     ),
-    .fromGlobal => TranslateEffect.fromGlobal(offset: from!, toLocal: to!),
-    .fromGlobalRect => TranslateEffect.fromGlobalRect(_rect!, alignment: _alignment!, toLocal: to!),
     _ => _TranslateOffset.internal(from: from, to: to, keyframes: frames),
   };
 }
 
-enum _TranslateVariant { offset, vertical, horizontal, fromGlobal, fromGlobalRect }
+class _TranslateFromGlobalActor extends SingleEffectProxy<Offset> implements TranslateActor {
+  final Offset? _globalOffset;
+  final Rect? _globalRect;
+  final AlignmentGeometry? _alignment;
+  final Offset toLocal;
+  final GlobalKey? _globalKey;
+
+  const _TranslateFromGlobalActor.offset({
+    required Offset offset,
+    super.key,
+    this.toLocal = Offset.zero,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
+  }) : _globalOffset = offset,
+       _globalRect = null,
+       _alignment = null,
+       _globalKey = null,
+       super(from: Offset.zero, to: Offset.zero);
+
+  const _TranslateFromGlobalActor.fromRect({
+    required Rect rect,
+    Key? key,
+    AlignmentGeometry alignment = Alignment.center,
+    this.toLocal = Offset.zero,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
+  }) : _globalOffset = null,
+       _globalRect = rect,
+       _alignment = alignment,
+       _globalKey = null,
+       super(from: Offset.zero, to: Offset.zero);
+
+  const _TranslateFromGlobalActor.fromKey({
+    required GlobalKey globalKey,
+    Key? key,
+    AlignmentGeometry alignment = Alignment.center,
+    this.toLocal = Offset.zero,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
+  }) : _globalOffset = null,
+       _globalRect = null,
+       _alignment = alignment,
+       _globalKey = globalKey,
+       super(from: Offset.zero, to: Offset.zero);
+
+  @override
+  Effect get effect => _TranslateFromGlobalEffect.internal(
+    offset: _globalOffset,
+    rect: _globalRect,
+    alignment: _alignment,
+    globalKey: _globalKey,
+    toLocal: toLocal,
+  );
+}
+
+class _TranslateFromGlobalTranstion extends StatefulWidget {
+  final Offset? globalOffset;
+  final Rect? globalRect;
+  final AlignmentGeometry? alignment;
+  final Offset toLocal;
+  final GlobalKey? globalKey;
+  final Widget child;
+  final Animation<double> animation;
+
+  const _TranslateFromGlobalTranstion({
+    this.globalOffset,
+    this.globalRect,
+    this.alignment,
+    this.globalKey,
+    required this.animation,
+    this.toLocal = Offset.zero,
+    required this.child,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _TranslateFromGlobalTranstionState();
+}
+
+class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTranstion> {
+  final _key = GlobalKey();
+  Tween<Offset>? _deltaTween;
+  bool _measured = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
+  }
+
+  @override
+  void didUpdateWidget(_TranslateFromGlobalTranstion oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.globalOffset != widget.globalOffset || oldWidget.globalRect != widget.globalRect) {
+      _measured = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
+    }
+  }
+
+  void _measure() {
+    if (!mounted) return;
+    final renderBox = _key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) return;
+    final targetGlobal = renderBox.localToGlobal(Offset.zero);
+
+    if (widget.globalOffset case final global?) {
+      final newDelta = global - targetGlobal;
+      if (_deltaTween?.begin != newDelta) {
+        setState(() {
+          _deltaTween = Tween(begin: newDelta, end: widget.toLocal);
+          _measured = true;
+        });
+      }
+    } else {
+      final rect = widget.globalRect ?? _rectFor(widget.globalKey!);
+      final alignment = widget.alignment!.resolve(Directionality.of(context));
+      final targetRect = alignment.inscribe(renderBox.size, rect);
+      final newDelta = targetRect.topLeft - targetGlobal;
+      if (_deltaTween?.begin != newDelta) {
+        setState(() {
+          _deltaTween = Tween(begin: newDelta, end: widget.toLocal);
+          _measured = true;
+        });
+      }
+    }
+  }
+
+  Rect _rectFor(GlobalKey key) {
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) {
+      throw FlutterError(
+        'Could not determine global rect for translation. Ensure the target widget has been rendered and has a size.',
+      );
+    }
+    final targetGlobal = renderBox.localToGlobal(Offset.zero);
+    return targetGlobal & renderBox.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = widget.animation;
+    final offsetTween = _deltaTween ?? Tween(begin: Offset.zero, end: widget.toLocal);
+    return Visibility(
+      key: _key,
+      visible: _deltaTween != null && _measured,
+      maintainState: true,
+      maintainAnimation: true,
+      maintainSize: true,
+      child: _TranslateTransition(
+        offset: offsetTween.animate(animation),
+        child: widget.child,
+      ),
+    );
+  }
+}

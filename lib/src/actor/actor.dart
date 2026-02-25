@@ -23,10 +23,10 @@ class Actor extends StatefulWidget {
   });
 
   @override
-  State<Actor> createState() => _ActorState();
+  State<Actor> createState() => ActorState();
 }
 
-class _ActorState extends State<Actor> {
+class ActorState extends State<Actor> {
   final _animations = <Effect, Animation<Object?>>{};
 
   CueScope? _cachedScope;

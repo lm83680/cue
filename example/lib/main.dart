@@ -1,5 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/delete_confirmation.dart';
+import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +54,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
           child: Column(
             mainAxisAlignment: .center,
             crossAxisAlignment: .end,
-            children: [DeleteConfirmationDialog()],
+            children: [ThreeDotsAction()],
           ),
         ),
       ),
