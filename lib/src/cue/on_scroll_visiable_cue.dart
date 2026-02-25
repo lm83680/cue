@@ -4,11 +4,8 @@ class _OnScrollVisibleCue extends _SelfAnimatedCue {
   const _OnScrollVisibleCue({
     required Key super.key,
     required super.child,
-    super.curve,
     super.debugLabel,
-    super.simulation,
-    super.duration = const Duration(milliseconds: 300),
-    super.reverseDuration,
+    super.motion,
     this.enabled = true,
     this.visibilityThreshold = 0.0,
   }) : assert(visibilityThreshold >= 0 && visibilityThreshold <= 1, 'visibilityThreshold must be between 0 and 1');
@@ -42,13 +39,13 @@ class _OnVisibleCueState extends _SelfAnimatedState<_OnScrollVisibleCue> {
 
     // Only animate if going from not visible to invisible.
     if (isVisible) {
-      playForward();
+      controller.playForward();
     } else {
       if (widget.visibilityThreshold == 0) {
         // no need to animate an invisible widget, just jump to the end state.
         controller.value = 0.0;
       } else {
-        playBackward();
+        controller.playReverse();
       }
     }
     _wasVisible = isVisible;

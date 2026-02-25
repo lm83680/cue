@@ -1,10 +1,10 @@
 export 'src/widgets/cue_model_transition.dart';
 export 'src/cue/cue.dart';
 export 'src/core/core.dart';
-export 'src/core/animations.dart';
+export 'src/motion/animations.dart';
 export 'src/core/phase.dart';
 export 'src/cue/cue_debug_provider.dart';
-export 'src/simulation/cue_simulation.dart';
-export 'src/simulation/spring.dart';
+export 'src/motion/simulation/cue_simulation.dart';
+export 'src/motion/simulation/spring.dart';
 export 'src/effects/effect.dart';
 export 'src/actor/actor.dart';

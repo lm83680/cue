@@ -3,7 +3,6 @@ part of 'cue.dart';
 class _ProgressCue extends Cue {
   const _ProgressCue({
     super.key,
-    super.curve,
     super.debugLabel,
     required super.child,
     required this.notifier,

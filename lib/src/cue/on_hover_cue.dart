@@ -4,11 +4,8 @@ class _OnHoverCue extends _SelfAnimatedCue {
   const _OnHoverCue({
     super.key,
     required super.child,
-    super.curve,
     super.debugLabel,
-    super.simulation,
-    super.duration = const Duration(milliseconds: 200),
-    super.reverseDuration,
+    super.motion = const CueMotion.timed(Duration(milliseconds: 200)),
     this.cursor = MouseCursor.defer,
     this.opaque = false,
   }) : super();
@@ -22,15 +19,12 @@ class _OnHoverCue extends _SelfAnimatedCue {
 
 class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
   @override
-  Animation<double> getAnimation(BuildContext context) => animation;
-
-  @override
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: widget.cursor,
       opaque: widget.opaque,
-      onEnter: (_) => controller.forward(),
-      onExit: (_) => controller.reverse(),
+      onEnter: (_) => controller.playForward(),
+      onExit: (_) => controller.playReverse(),
       child: super.build(context),
     );
   }

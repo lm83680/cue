@@ -4,7 +4,6 @@ class _RouteTransitionStage extends Cue {
   const _RouteTransitionStage({
     super.key,
     required super.child,
-    super.curve,
     super.debugLabel,
     this.useSecondaryAnimation = false,
   }) : super._();

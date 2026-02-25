@@ -5,7 +5,6 @@ class _ControlledCue extends Cue {
     super.key,
     required super.child,
     this.isBounded = true,
-    super.curve,
     super.debugLabel,
     required this.animation,
   }) : super._();

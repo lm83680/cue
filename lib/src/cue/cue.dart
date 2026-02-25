@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -18,18 +19,15 @@ abstract class Cue extends StatefulWidget {
   const Cue._({
     super.key,
     required this.child,
-    this.curve,
     this.debugLabel,
   });
 
   final String? debugLabel;
-  final Curve? curve;
   final Widget child;
 
   const factory Cue({
     Key? key,
     required Widget child,
-    Curve curve,
     String? debugLabel,
     bool isBounded,
     required Animation<double> animation,
@@ -38,7 +36,6 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onTransition({
     Key? key,
     required Widget child,
-    Curve curve,
     String? debugLabel,
     bool useSecondaryAnimation,
   }) = _RouteTransitionStage;
@@ -46,11 +43,8 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onMount({
     Key? key,
     required Widget child,
-    Curve curve,
     String? debugLabel,
-    Duration duration,
-    Duration? reverseDuration,
-    CueSimulation? simulation,
+    CueMotion motion,
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
@@ -59,11 +53,8 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onHover({
     Key? key,
     required Widget child,
-    Curve curve,
     String? debugLabel,
-    Duration duration,
-    CueSimulation? simulation,
-    Duration? reverseDuration,
+    CueMotion motion,
     MouseCursor cursor,
     bool opaque,
   }) = _OnHoverCue;
@@ -71,11 +62,8 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onToggle({
     Key? key,
     required Widget child,
-    Curve curve,
     String? debugLabel,
-    Duration duration,
-    Duration? reverseDuration,
-    CueSimulation? simulation,
+    CueMotion motion,
     required bool toggled,
     bool skipFirstAnimation,
   }) = _TogglableCue;
@@ -83,11 +71,8 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onChange({
     Key? key,
     required Widget child,
-    Curve? curve,
+    CueMotion motion,
     String? debugLabel,
-    Duration duration,
-    Duration? reverseDuration,
-    CueSimulation? simulation,
     bool skipFirstAnimation,
     required Object? value,
   }) = _OnChangeCue;
@@ -95,7 +80,6 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.indexed({
     Key? key,
     required Widget child,
-    Curve curve,
     String? debugLabel,
     required IndexedCueController controller,
     required int targetIndex,
@@ -104,7 +88,6 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onProgress({
     Key? key,
     required Widget child,
-    Curve? curve,
     String? debugLabel,
     required Listenable notifier,
     required ValueGetter<double> progress,
@@ -117,11 +100,8 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onScrollVisible({
     required Key key,
     required Widget child,
-    Curve? curve,
     String? debugLabel,
-    Duration duration,
-    Duration? reverseDuration,
-    CueSimulation? simulation,
+    CueMotion motion,
     bool enabled,
     double visibilityThreshold,
   }) = _OnScrollVisibleCue;

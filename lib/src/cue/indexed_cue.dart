@@ -3,7 +3,6 @@ part of 'cue.dart';
 class _IndexedCue extends Cue {
   const _IndexedCue({
     super.key,
-    super.curve,
     super.debugLabel,
     required super.child,
     required this.targetIndex,

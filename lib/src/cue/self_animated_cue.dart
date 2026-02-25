@@ -4,19 +4,14 @@ class _SelfAnimatedCue extends Cue {
   const _SelfAnimatedCue({
     super.key,
     required super.child,
-    super.curve,
+    this.motion = const CueMotion.timed(Duration(milliseconds: 300)),
     super.debugLabel,
-    this.duration = const Duration(milliseconds: 300),
-    this.reverseDuration,
     this.loop = false,
-    this.simulation,
     this.reverseOnLoop = false,
     this.delay,
   }) : super._();
 
-  final CueSimulation? simulation;
-  final Duration duration;
-  final Duration? reverseDuration;
+  final CueMotion motion;
   final Duration? delay;
   final bool loop;
   final bool reverseOnLoop;
@@ -31,7 +26,11 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
     if (widget.delay case final delay?) {
       await Future.delayed(delay);
     }
-    play(loop: widget.loop, reverseOnLoop: widget.reverseOnLoop);
+    if (widget.loop) {
+      controller.playLoop(reverseOnLoop: widget.reverseOnLoop);
+    } else {
+      controller.playForward();
+    }
   }
 
   @override
@@ -42,28 +41,25 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
     super.didUpdateWidget(oldWidget);
     if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop) {
       controller.stop();
-      play(loop: widget.loop, reverseOnLoop: widget.reverseOnLoop);
+      if (widget.loop) {
+        controller.playLoop(reverseOnLoop: widget.reverseOnLoop);
+      } else {
+        controller.playForward();
+      }
     }
   }
 }
 
 abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<T> with TickerProviderStateMixin {
-  late AnimationController controller;
+  late CueAnimationController controller;
   Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
-  AnimationStatusListener? _statusListener;
 
   Animation<double> get animation => _animation;
 
-  Curve? get curve => widget.curve;
-
-  Duration get duration => widget.duration;
-
-  Duration? get reverseDuration => widget.reverseDuration;
-
-  CueSimulation? get simulation => widget.simulation;
+  CueMotion get motion => widget.motion;
 
   @override
-  bool get isBounded => widget.simulation == null;
+  bool get isBounded => controller.isBounded;
 
   @override
   Animation<double> getAnimation(BuildContext context) => _animation;
@@ -77,137 +73,70 @@ abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<
   }
 
   void _createController() {
-    if (simulation == null) {
-      controller = AnimationController(
+    controller = switch (motion) {
+      TimedMotion m => CueAnimationController(
+        duration: m.duration,
+        reverseDuration: m.reverseDuration,
         vsync: this,
-        duration: duration,
-        reverseDuration: reverseDuration,
         debugLabel: 'Cue Controller',
-      );
-    } else {
-      controller = AnimationController.unbounded(
+      ),
+      SimulationMotion m => CueAnimationController.withSimulation(
+        simulation: m.simulation,
+        reverseSimulation: m.reverse,
         vsync: this,
-        duration: duration,
         debugLabel: 'Unbounded Cue Controller',
-      );
-    }
+      ),
+    };
   }
 
   void _buildAnimation() {
-    if (curve case final curve?) {
-      _animation = CurvedAnimation(parent: controller, curve: curve);
-    } else {
-      _animation = controller.view;
-    }
-  }
-
-  Simulation _createSimulation(bool forward) {
-    assert(simulation != null, 'Simulation must be provided to use simulation-based animation.');
-    return simulation!.build(
-      SimulationBuildData(
-        velocity: controller.velocity,
-        forward: forward,
-        progress: controller.value,
-      ),
-    );
+    _animation = switch (motion) {
+      TimedMotion m => m.applyCurve(controller),
+      SimulationMotion() => controller.view,
+    };
   }
 
   @override
   void didUpdateWidget(covariant _SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    bool needsReset = false;
-    if (duration != oldWidget.duration) {
-      controller.duration = duration;
-      needsReset = true;
-    }
-    if (reverseDuration != oldWidget.reverseDuration) {
-      controller.reverseDuration = reverseDuration;
-      needsReset = true;
-    }
-    if (curve != oldWidget.curve) {
-      controller.reset();
-      _buildAnimation();
-      needsReset = true;
-    }
-    if (simulation != oldWidget.simulation) {
-      controller.stop();
-      controller.dispose();
-      _createController();
-      _buildAnimation();
-      needsReset = true;
-    }
 
-    if (needsReset) {
-      onControllerReady();
+    if (oldWidget.motion != motion) {
+      final m = motion;
+      if (m is SimulationMotion) {
+        // old controller is timed, new one is simulation, need to recreate the controller.
+        if (controller.isBounded) {
+          controller.stop();
+          controller.dispose();
+          _createController();
+          _buildAnimation();
+          onControllerReady();
+        } else {
+          // both are simulation, just update the simulation of the controller.
+          controller.simulation = m.simulation;
+          controller.reverseSimulation = m.reverse;
+        }
+      } else if (m is TimedMotion) {
+        // old controller is simulation, new one is timed, need to recreate the controller.
+        if (!controller.isBounded) {
+          controller.stop();
+          controller.dispose();
+          _createController();
+          _buildAnimation();
+          onControllerReady();
+        } else {
+          // both are timed, just update the duration and curve of the controller.
+          controller.duration = m.duration;
+          controller.reverseDuration = m.reverseDuration;
+          _buildAnimation();
+        }
+      }
     }
   }
 
   void onControllerReady() {}
 
-  void playForward() {
-    if (widget.simulation != null) {
-      controller.animateWith(_createSimulation(true));
-    } else {
-      controller.forward();
-    }
-  }
-
-  void playBackward() {
-    if (widget.simulation != null) {
-      controller.animateBackWith(_createSimulation(false));
-    } else {
-      controller.reverse();
-    }
-  }
-
-  void play({bool loop = false, bool reverseOnLoop = false}) {
-    if (mounted) {
-      if (simulation != null) {
-        if (loop) {
-          _loopWithSimulation(simulation!, reverseOnLoop: reverseOnLoop);
-        } else {
-          if (_statusListener != null) {
-            controller.removeStatusListener(_statusListener!);
-          }
-          controller.animateWith(_createSimulation(true));
-        }
-      } else {
-        if (loop) {
-          controller.repeat(reverse: reverseOnLoop);
-        } else {
-          controller.forward();
-        }
-      }
-    }
-  }
-
-  void _loopWithSimulation(
-    CueSimulation simulation, {
-    bool reverseOnLoop = false,
-  }) {
-    if (_statusListener != null) {
-      controller.removeStatusListener(_statusListener!);
-    }
-    _statusListener = (status) {
-      if (status == AnimationStatus.completed) {
-        if (reverseOnLoop) {
-          controller.animateBackWith(_createSimulation(false));
-        } else {
-          controller.animateWith(_createSimulation(true));
-        }
-      } else if (status == AnimationStatus.dismissed && reverseOnLoop) {
-        controller.animateWith(_createSimulation(false));
-      }
-    };
-    controller.addStatusListener(_statusListener!);
-    controller.animateWith(_createSimulation(true));
-  }
-
   @override
   void dispose() {
-    if (_statusListener != null) {
-      controller.removeStatusListener(_statusListener!);
-    }
     controller.dispose();
     super.dispose();
   }
