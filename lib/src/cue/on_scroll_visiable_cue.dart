@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class _OnScrollVisibleCue extends _SelfAnimatedCue {
+class _OnScrollVisibleCue extends SelfAnimatedCue {
   const _OnScrollVisibleCue({
     required Key super.key,
     required super.child,
@@ -17,7 +17,7 @@ class _OnScrollVisibleCue extends _SelfAnimatedCue {
   State<StatefulWidget> createState() => _OnVisibleCueState();
 }
 
-class _OnVisibleCueState extends _SelfAnimatedState<_OnScrollVisibleCue> {
+class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
   bool? _wasVisible;
 
   @override

@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class _OnChangeCue extends _SelfAnimatedCue {
+class _OnChangeCue extends SelfAnimatedCue {
   const _OnChangeCue({
     super.key,
     required super.child,
@@ -17,7 +17,7 @@ class _OnChangeCue extends _SelfAnimatedCue {
   State<StatefulWidget> createState() => _OnChangeCueState();
 }
 
-class _OnChangeCueState extends _SelfAnimatedState<_OnChangeCue> {
+class _OnChangeCueState extends SelfAnimatedState<_OnChangeCue> {
   @override
   void onControllerReady() {
     if (widget.skipFirstAnimation) {

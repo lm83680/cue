@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _SelfAnimatedCue extends Cue {
-  const _SelfAnimatedCue({
+class SelfAnimatedCue extends Cue {
+  const SelfAnimatedCue({
     super.key,
     required super.child,
     this.motion = const CueMotion.timed(Duration(milliseconds: 300)),
@@ -17,10 +17,10 @@ class _SelfAnimatedCue extends Cue {
   final bool reverseOnLoop;
 
   @override
-  State<StatefulWidget> createState() => _SelfAnimatedCueState();
+  State<StatefulWidget> createState() => SelfAnimatedCueState();
 }
 
-class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
+class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   @override
   void onControllerReady() async {
     if (widget.delay case final delay?) {
@@ -37,7 +37,7 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   Animation<double> getAnimation(BuildContext context) => animation;
 
   @override
-  void didUpdateWidget(covariant _SelfAnimatedCue oldWidget) {
+  void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop) {
       controller.stop();
@@ -50,7 +50,7 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   }
 }
 
-abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<T> with TickerProviderStateMixin {
+abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T> with TickerProviderStateMixin {
   late CueAnimationController controller;
   Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
 
@@ -97,7 +97,7 @@ abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<
   }
 
   @override
-  void didUpdateWidget(covariant _SelfAnimatedCue oldWidget) {
+  void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.motion != motion) {

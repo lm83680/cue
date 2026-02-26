@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class _TogglableCue extends _SelfAnimatedCue {
+class _TogglableCue extends SelfAnimatedCue {
   const _TogglableCue({
     super.key,
     required super.child,
@@ -17,7 +17,7 @@ class _TogglableCue extends _SelfAnimatedCue {
   State<StatefulWidget> createState() => _ToggledStageState();
 }
 
-class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
+class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
 

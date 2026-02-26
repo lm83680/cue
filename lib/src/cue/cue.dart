@@ -48,7 +48,7 @@ abstract class Cue extends StatefulWidget {
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
-  }) = _SelfAnimatedCue;
+  }) = SelfAnimatedCue;
 
   const factory Cue.onHover({
     Key? key,

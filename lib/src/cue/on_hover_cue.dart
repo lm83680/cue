@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class _OnHoverCue extends _SelfAnimatedCue {
+class _OnHoverCue extends SelfAnimatedCue {
   const _OnHoverCue({
     super.key,
     required super.child,
@@ -17,7 +17,7 @@ class _OnHoverCue extends _SelfAnimatedCue {
   State<StatefulWidget> createState() => _OnHoverStageState();
 }
 
-class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
+class _OnHoverStageState extends SelfAnimatedState<_OnHoverCue> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
