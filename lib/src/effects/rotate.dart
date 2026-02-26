@@ -99,7 +99,7 @@ enum RotateAxis { x, y, z }
 
 enum RotateUnit { degrees, radians, quarterTurns }
 
-class RotateActor extends SingleEffectProxy<double> {
+class RotateActor extends SingleEffectBase<double> {
   final AlignmentGeometry alignment;
   final RotateUnit unit;
   final RotateAxis axis;

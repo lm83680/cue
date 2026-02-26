@@ -39,7 +39,7 @@ class ScaleEffect extends TweenEffect<double> {
   }
 }
 
-class ScaleActor extends SingleEffectProxy<double> {
+class ScaleActor extends SingleEffectBase<double> {
   final AlignmentGeometry? alignment;
 
   const ScaleActor({

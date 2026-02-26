@@ -88,7 +88,7 @@ class _IconThemeDataTween extends Tween<IconThemeData> {
   }
 }
 
-class TextStyleActor extends SingleEffectProxy<TextStyle> {
+class TextStyleActor extends SingleEffectBase<TextStyle> {
   const TextStyleActor({
     super.key,
     required super.from,
@@ -119,7 +119,7 @@ class TextStyleActor extends SingleEffectProxy<TextStyle> {
   );
 }
 
-class IconThemeActor extends SingleEffectProxy<IconThemeData> {
+class IconThemeActor extends SingleEffectBase<IconThemeData> {
   const IconThemeActor({
     super.key,
     required super.from,

@@ -95,7 +95,7 @@ class ActorState extends State<Actor> {
   }
 }
 
-abstract class SingleEffectProxy<T> extends StatelessWidget {
+abstract class SingleEffectBase<T> extends StatelessWidget {
   final Widget child;
   final Curve? curve;
   final Curve? reverseCurve;
@@ -109,7 +109,7 @@ abstract class SingleEffectProxy<T> extends StatelessWidget {
   T? get from => _from;
   T? get to => _to;
 
-  const SingleEffectProxy({
+  const SingleEffectBase({
     super.key,
     required this.child,
     required T from,
@@ -123,7 +123,7 @@ abstract class SingleEffectProxy<T> extends StatelessWidget {
        _from = from,
        _to = to;
 
-  const SingleEffectProxy.keyframes({
+  const SingleEffectBase.keyframes({
     required List<Keyframe<T>> this.frames,
     super.key,
     required this.child,

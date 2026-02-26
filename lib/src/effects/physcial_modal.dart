@@ -92,7 +92,7 @@ class _ModalPropsTween extends Tween<ModalProps> {
   ModalProps lerp(double t) => ModalProps.lerp(begin!, end!, t);
 }
 
-class PhyscialModalActor extends SingleEffectProxy<ModalProps> {
+class PhyscialModalActor extends SingleEffectBase<ModalProps> {
   const PhyscialModalActor({
     super.key,
     super.from = const ModalProps(),

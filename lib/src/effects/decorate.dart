@@ -82,7 +82,7 @@ class ColorEffect extends TweenEffect<Color?> {
   }
 }
 
-class DecorationActor extends SingleEffectProxy<Decoration> {
+class DecorationActor extends SingleEffectBase<Decoration> {
   const DecorationActor({
     super.key,
     required super.from,
@@ -103,7 +103,7 @@ class DecorationActor extends SingleEffectProxy<Decoration> {
   );
 }
 
-class ColorActor extends SingleEffectProxy<Color?> {
+class ColorActor extends SingleEffectBase<Color?> {
   const ColorActor({
     super.key,
     required super.from,

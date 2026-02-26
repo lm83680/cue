@@ -150,7 +150,7 @@ class _RenderRotateLayout extends RenderProxyBox {
   }
 }
 
-class RotateLayoutActor extends SingleEffectProxy<double> {
+class RotateLayoutActor extends SingleEffectBase<double> {
   final RotateUnit unit;
 
   const RotateLayoutActor({

@@ -126,7 +126,7 @@ class _AxisSlideEffect extends TweenEffectBase<double, Offset> implements SlideE
   }
 }
 
-class SlideActor extends SingleEffectProxy<Offset> {
+class SlideActor extends SingleEffectBase<Offset> {
   final double? _axisFrom;
   final double? _axisTo;
   final Axis? _axis;

@@ -53,7 +53,7 @@ class TransformEffect extends TweenEffect<Matrix4> {
   }
 }
 
-class TransformActor extends SingleEffectProxy<Matrix4> {
+class TransformActor extends SingleEffectBase<Matrix4> {
   final AlignmentGeometry? alignment;
   final Offset? origin;
 

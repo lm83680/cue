@@ -195,7 +195,7 @@ class ExpandingPathClipper extends CustomClipper<Path> {
   }
 }
 
-class ClipActor extends SingleEffectProxy<Size> {
+class ClipActor extends SingleEffectBase<Size> {
   final double? _fromAxisSize;
   final double? _toAxisSize;
   final BorderRadiusGeometry? borderRadius;

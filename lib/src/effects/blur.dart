@@ -83,7 +83,7 @@ class BackdropBlurEffect extends TweenEffect<double> {
   }
 }
 
-class BlurActor extends SingleEffectProxy<double> {
+class BlurActor extends SingleEffectBase<double> {
   const BlurActor({
     super.key,
     required super.from,
@@ -110,7 +110,7 @@ class BlurActor extends SingleEffectProxy<double> {
   Effect get effect => BlurEffect.internal(from: from, to: to, keyframes: frames);
 }
 
-class BackdropBlurActor extends SingleEffectProxy<double> {
+class BackdropBlurActor extends SingleEffectBase<double> {
   final BlendMode blendMode;
 
   const BackdropBlurActor({

@@ -44,7 +44,7 @@ class AlignEffect extends TweenEffect<AlignmentGeometry?> {
   }
 }
 
-class AlignActor extends SingleEffectProxy<AlignmentGeometry?> {
+class AlignActor extends SingleEffectBase<AlignmentGeometry?> {
   const AlignActor({
     required super.child,
     super.key,

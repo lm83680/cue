@@ -27,7 +27,7 @@ class FadeEffect extends TweenEffect<double> {
   }
 }
 
-class FadeActor extends SingleEffectProxy<double> {
+class FadeActor extends SingleEffectBase<double> {
   const FadeActor({
     super.key,
     super.from = 1,

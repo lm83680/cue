@@ -43,7 +43,7 @@ class FractionalSizeEffect extends TweenEffect<Size> {
   }
 }
 
-class FractionalSizeActor extends SingleEffectProxy<Size> {
+class FractionalSizeActor extends SingleEffectBase<Size> {
   final Axis? _axis;
   final double? _axisFrom;
   final double? _axisTo;

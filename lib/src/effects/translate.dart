@@ -304,7 +304,7 @@ abstract class TranslateActor extends Widget {
   }) = _TranslateFromGlobalActor.fromKey;
 }
 
-class _TranslateActor extends SingleEffectProxy<Offset> implements TranslateActor {
+class _TranslateActor extends SingleEffectBase<Offset> implements TranslateActor {
   final double? _axisFrom;
   final double? _axisTo;
   final List<Keyframe<double>>? _axisKeyframes;
@@ -415,7 +415,7 @@ class _TranslateActor extends SingleEffectProxy<Offset> implements TranslateActo
   };
 }
 
-class _TranslateFromGlobalActor extends SingleEffectProxy<Offset> implements TranslateActor {
+class _TranslateFromGlobalActor extends SingleEffectBase<Offset> implements TranslateActor {
   final Offset? _globalOffset;
   final Rect? _globalRect;
   final AlignmentGeometry? _alignment;

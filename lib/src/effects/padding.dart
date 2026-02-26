@@ -47,7 +47,7 @@ class PaddingEffect extends TweenEffect<EdgeInsetsGeometry> {
   }
 }
 
-class PaddingActor extends SingleEffectProxy<EdgeInsetsGeometry> {
+class PaddingActor extends SingleEffectBase<EdgeInsetsGeometry> {
   const PaddingActor({
     super.key,
     super.from = EdgeInsets.zero,

@@ -124,7 +124,7 @@ class _PositionTween extends Tween<Position> {
   Position lerp(double t) => Position.lerp(begin!, end!, t);
 }
 
-class PositionActor extends SingleEffectProxy<Position> {
+class PositionActor extends SingleEffectBase<Position> {
   final Size? _relativeTo;
 
   const PositionActor({

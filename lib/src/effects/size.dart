@@ -573,7 +573,7 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   }
 }
 
-class SizeActor extends SingleEffectProxy<NSize> {
+class SizeActor extends SingleEffectBase<NSize> {
   final AlignmentGeometry alignment;
   final bool allowOverflow;
   final Clip clipBehavior;
