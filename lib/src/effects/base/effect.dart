@@ -26,7 +26,7 @@ part '../clip_reveal.dart';
 part '../slide.dart';
 part '../position.dart';
 part '../transfrom.dart';
-part '../physcial_modal.dart';
+part '../card.dart';
 part '../paint.dart';
 part '../path_motion.dart';
 

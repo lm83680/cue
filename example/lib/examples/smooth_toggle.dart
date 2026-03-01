@@ -33,10 +33,10 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
         },
         child: ScaleActor.keyframes(
           frames: [
-            .key(1, at: .0),
-            .key(.90, at: .45),
-            .key(.99, at: .65),
-            .key(1.0, at: 1.0),
+            Keyframe(1, at: .0),
+            Keyframe(.90, at: .45),
+            Keyframe(.99, at: .65),
+            Keyframe(1.0, at: 1.0),
           ],
           child: Container(
             width: width,
@@ -57,10 +57,10 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
               children: [
                 PositionActor.keyframes(
                   frames: [
-                    .key(Position.fill(end: .5), at: .0),
-                    .key(Position.fill(end: 0, top: .15, bottom: .15), at: .45),
-                    .key(Position.fill(end: 0, top: .15, bottom: .15), at: .55),
-                    .key(Position.fill(start: .5), at: 1.0),
+                    Keyframe(.fill(end: .5), at: .0),
+                    Keyframe(.fill(end: 0, top: .15, bottom: .15), at: .45),
+                    Keyframe(.fill(end: 0, top: .15, bottom: .15), at: .55),
+                    Keyframe(.fill(start: .5), at: 1.0),
                   ],
                   relativeTo: Size(width, height),
                   child: DecoratedBox(
@@ -75,7 +75,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                     Expanded(
                       child: DecoratedBoxActor(
                         shape: .circle,
-                        color: .from(trackColor, to: thumbColor),
+                        color: .tween(from: trackColor, to: thumbColor),
                         timing: .endAt(.5),
                         child: SizedBox.square(dimension: width * .16),
                       ),
@@ -83,8 +83,8 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                     Expanded(
                       child: Center(
                         child: DecoratedBoxActor(
-                          color: .from(trackColor, to: thumbColor),
-                          borderRadius: .fixed(.circular(width * .2)),
+                          color: .tween(from: trackColor, to: thumbColor),
+                          borderRadius: .tween(from: .circular(width * .2), to: .circular(width * .2)),
                           timing: .startAt(.5),
                           child: SizedBox(width: width * .08, height: width * .22),
                         ),

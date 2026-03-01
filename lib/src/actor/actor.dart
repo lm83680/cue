@@ -45,7 +45,7 @@ class ActorState extends State<Actor> {
         _animations[act] = act.buildAnimation(
           scope.animation,
           ActorContext(
-            textDirection: Directionality.of(context),
+            textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
             curve: widget.curve,
             timing: widget.timing,
             isBounded: scope.isBounded,

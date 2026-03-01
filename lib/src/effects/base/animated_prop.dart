@@ -1,7 +1,7 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/effects/base/utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
   const AnimatablePropBase({
@@ -12,7 +12,8 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
     this.curve,
   });
 
-  const AnimatablePropBase.from(T this.from, {required T this.to, this.timing, this.curve}) : keyframes = null;
+  const AnimatablePropBase.tween({required T this.from, required T this.to, this.timing, this.curve})
+    : keyframes = null;
   const AnimatablePropBase.fixed(T value) : from = value, to = value, keyframes = null, timing = null, curve = null;
   const AnimatablePropBase.keyframes(List<Keyframe<T>> this.keyframes, {this.curve})
     : from = null,
@@ -92,7 +93,7 @@ abstract class AnimatableProp<T> extends AnimatablePropBase<T, T> {
   @override
   T transform(_, T value) => value;
 
-  const AnimatableProp.from(super.from, {required super.to, super.timing, super.curve}) : super.from();
+  const AnimatableProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
   const AnimatableProp.fixed(super.value) : super.fixed();
   const AnimatableProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 }
@@ -109,7 +110,8 @@ class _LerpFnTween<T> extends Animatable<T> {
 }
 
 class ColorProp extends AnimatableProp<Color?> {
-  const ColorProp.from(Color super.from, {required Color super.to, super.timing, super.curve}) : super.from();
+  const ColorProp.tween({required Color super.from, required Color super.to, super.timing, super.curve})
+    : super.tween();
   const ColorProp.fixed(Color super.value) : super.fixed();
   const ColorProp.keyframes(List<Keyframe<Color>> super.keyframes, {super.curve}) : super.keyframes();
 
@@ -123,12 +125,12 @@ class ColorProp extends AnimatableProp<Color?> {
 }
 
 class BorderRadiusProp extends AnimatablePropBase<BorderRadiusGeometry?, BorderRadius?> {
-  const BorderRadiusProp.from(
-    BorderRadiusGeometry super.from, {
+  const BorderRadiusProp.tween({
+    required BorderRadiusGeometry super.from,
     required BorderRadiusGeometry super.to,
     super.timing,
     super.curve,
-  }) : super.from();
+  }) : super.tween();
   const BorderRadiusProp.fixed(BorderRadiusGeometry super.value) : super.fixed();
   const BorderRadiusProp.keyframes(List<Keyframe<BorderRadiusGeometry>> super.keyframes, {super.curve})
     : super.keyframes();
@@ -148,12 +150,7 @@ class BorderRadiusProp extends AnimatablePropBase<BorderRadiusGeometry?, BorderR
 }
 
 class DecorationImageProp extends AnimatableProp<DecorationImage?> {
-  const DecorationImageProp.from(
-    super.from, {
-    required super.to,
-    super.timing,
-    super.curve,
-  }) : super.from();
+  const DecorationImageProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
 
   const DecorationImageProp.fixed(super.value) : super.fixed();
   const DecorationImageProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
@@ -168,12 +165,7 @@ class DecorationImageProp extends AnimatableProp<DecorationImage?> {
 }
 
 class BoxBorderProp extends AnimatableProp<BoxBorder?> {
-  const BoxBorderProp.from(
-    super.from, {
-    required super.to,
-    super.timing,
-    super.curve,
-  }) : super.from();
+  const BoxBorderProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
 
   const BoxBorderProp.fixed(super.value) : super.fixed();
   const BoxBorderProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
@@ -188,12 +180,7 @@ class BoxBorderProp extends AnimatableProp<BoxBorder?> {
 }
 
 class BoxShadowProp extends AnimatableProp<List<BoxShadow>?> {
-  const BoxShadowProp.from(
-    super.from, {
-    required super.to,
-    super.timing,
-    super.curve,
-  }) : super.from();
+  const BoxShadowProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
 
   const BoxShadowProp.fixed(super.value) : super.fixed();
   const BoxShadowProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
@@ -208,12 +195,7 @@ class BoxShadowProp extends AnimatableProp<List<BoxShadow>?> {
 }
 
 class GradientProp extends AnimatableProp<Gradient?> {
-  const GradientProp.from(
-    super.from, {
-    required super.to,
-    super.timing,
-    super.curve,
-  }) : super.from();
+  const GradientProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
 
   const GradientProp.fixed(super.value) : super.fixed();
   const GradientProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
@@ -224,5 +206,45 @@ class GradientProp extends AnimatableProp<Gradient?> {
       return ConstantTween<Gradient?>(from);
     }
     return _LerpFnTween<Gradient?>(from, to, Gradient.lerp);
+  }
+}
+
+class DoubleProp extends AnimatableProp<double> {
+  const DoubleProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+
+  const DoubleProp.fixed(super.value) : super.fixed();
+  const DoubleProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+}
+
+class ShapeBorderProp extends AnimatableProp<ShapeBorder?> {
+  const ShapeBorderProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+
+  const ShapeBorderProp.fixed(super.value) : super.fixed();
+  const ShapeBorderProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+
+  @override
+  Animatable<ShapeBorder?> createSingleTween(ShapeBorder? from, ShapeBorder? to) {
+    if (isConstant) return ConstantTween<ShapeBorder?>(from);
+    return ShapeBorderTween(begin: from, end: to);
+  }
+}
+
+class EdgeInsetsProp extends AnimatablePropBase<EdgeInsetsGeometry?, EdgeInsets?> {
+  const EdgeInsetsProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+
+  const EdgeInsetsProp.fixed(super.value) : super.fixed();
+  const EdgeInsetsProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+
+  @override
+  EdgeInsets? transform(ActorContext context, EdgeInsetsGeometry? value) {
+    return value?.resolve(context.textDirection);
+  }
+
+  @override
+  Animatable<EdgeInsets?> createSingleTween(EdgeInsets? from, EdgeInsets? to) {
+    if (isConstant) {
+      return ConstantTween<EdgeInsets?>(from);
+    }
+    return EdgeInsetsTween(begin: from, end: to);
   }
 }

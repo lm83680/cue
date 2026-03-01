@@ -1,11 +1,5 @@
-import 'dart:math';
-
 import 'package:cue/cue.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/expanding_cards.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
-import 'package:example/examples/indicator_to_button.dart';
-import 'package:example/examples/three_dots_action.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -73,14 +67,19 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
                   },
                   child: SizedBox.square(
                     dimension: 44,
-                    child: DecoratedBoxActor(
-                      color: .keyframes([
-                        Keyframe(Colors.red, at: .0),
-                        Keyframe(Colors.green, at: .4),
-                        Keyframe(Colors.blue, at: 7.0),
-                        Keyframe(Colors.yellow, at: 1),
-                      ]),
-                      borderRadius: .from(.circular(0), to: .circular(32)),
+                    child: CardActor(
+                      color: .tween(
+                        from: theme.colorScheme.primary,
+                        to: theme.colorScheme.secondary,
+                      ),
+                      elevation: .tween(from: .1, to: 2),
+                      shape: .tween(
+                        from: CircleBorder(),
+                        to: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          side: BorderSide(color: Colors.white, width: 2),
+                        ),
+                      ),
                     ),
                   ),
                 ),
