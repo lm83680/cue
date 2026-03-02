@@ -23,7 +23,7 @@ class _OnChangeCueState extends SelfAnimatedState<_OnChangeCue> {
     if (widget.skipFirstAnimation) {
       controller.value = 1.0;
     } else {
-      controller.playForward(from: 0.0);
+      controller.forward(from: 0.0);
     }
   }
 
@@ -31,7 +31,7 @@ class _OnChangeCueState extends SelfAnimatedState<_OnChangeCue> {
   void didUpdateWidget(covariant _OnChangeCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != oldWidget.value) {
-      controller.playForward(from: 0.0);
+      controller.forward(from: 0.0);
     }
   }
 }

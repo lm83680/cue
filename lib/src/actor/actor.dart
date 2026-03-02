@@ -40,9 +40,9 @@ class RawActorState extends State<RawActor> {
   void _setupAnimations(CueScope scope) {
     _cachedScope = scope;
     _animations.removeWhere((effect, _) => !widget.effects.contains(effect));
-    for (final act in widget.effects) {
-      if (!_animations.containsKey(act)) {
-        _animations[act] = act.buildAnimation(
+    for (final effect in widget.effects) {
+      if (!_animations.containsKey(effect)) {
+        _animations[effect] = effect.buildAnimation(
           scope.animation,
           ActorContext(
             textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
@@ -67,14 +67,14 @@ class RawActorState extends State<RawActor> {
         oldWidget.reverseCurve != widget.reverseCurve ||
         oldWidget.reverseTiming != widget.reverseTiming ||
         oldWidget.role != widget.role) {
-      _setupAnimations(CueScope.of(context));
+      _setupAnimations(widget._externalDrive ?? CueScope.of(context));
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = CueScope.of(context);
+    final scope = widget._externalDrive ?? CueScope.of(context);
     if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
       _setupAnimations(scope);
     }
@@ -84,12 +84,12 @@ class RawActorState extends State<RawActor> {
   Widget build(BuildContext context) {
     if (widget.effects.isEmpty) return widget.child;
     Widget current = widget.child;
-    for (final act in widget.effects.reversed) {
-      if (_animations[act] case final animation?) {
-        current = act.build(context, animation, current);
+    for (final effect in widget.effects.reversed) {
+      if (_animations[effect] case final animation?) {
+        current = effect.build(context, animation, current);
       } else {
         throw StateError(
-          'Animation for act $act not found. This should not happen as animations are set up in initState and didUpdateWidget.',
+          'Animation for effect $effect not found. This should not happen as animations are set up in initState and didUpdateWidget.',
         );
       }
     }

@@ -41,9 +41,9 @@ class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
 
   void _toggle() {
     if (widget.toggled) {
-      controller.playForward();
+      controller.forward();
     } else {
-      controller.playReverse();
+      controller.reverse();
     }
   }
 }

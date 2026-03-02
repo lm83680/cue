@@ -178,7 +178,7 @@ class _TranslateFromGlobalEffect extends TweenEffect<double> implements Translat
     this.alignment,
     this.globalKey,
     this.toLocal = Offset.zero,
-  }) : super.internal();
+  }) : super.internal(from: 0, to: 1);
 
   const _TranslateFromGlobalEffect.offset({
     required Offset this.offset,

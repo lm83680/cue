@@ -56,9 +56,9 @@ class Actor extends StatelessWidget {
       reverseCurve: reverseCurve,
       reverseTiming: reverseTiming,
       effects: [
+        ?padding,
         ?size, // outermost — establishes animated bounds
         ?clip, // shapes within those bounds
-        ?padding,
         ?align,
         ?slide,
         ?translate,

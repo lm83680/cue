@@ -79,8 +79,8 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                                 ],
                               ),
                               Actor(
-                                opacity: .fadeOut(),
                                 clip: .vertical(),
+                                opacity: .fadeIn(),
                                 blur: .focus(from: 8),
                                 slide: .tweenY(from: .5),
                                 child: Padding(

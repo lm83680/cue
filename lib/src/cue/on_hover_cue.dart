@@ -23,8 +23,8 @@ class _OnHoverStageState extends SelfAnimatedState<_OnHoverCue> {
     return MouseRegion(
       cursor: widget.cursor,
       opaque: widget.opaque,
-      onEnter: (_) => controller.playForward(),
-      onExit: (_) => controller.playReverse(),
+      onEnter: (_) => controller.forward(),
+      onExit: (_) => controller.reverse(),
       child: super.build(context),
     );
   }

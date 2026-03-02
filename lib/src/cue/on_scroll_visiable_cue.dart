@@ -39,13 +39,13 @@ class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
 
     // Only animate if going from not visible to invisible.
     if (isVisible) {
-      controller.playForward();
+      controller.forward();
     } else {
       if (widget.visibilityThreshold == 0) {
         // no need to animate an invisible widget, just jump to the end state.
         controller.value = 0.0;
       } else {
-        controller.playReverse();
+        controller.reverse();
       }
     }
     _wasVisible = isVisible;

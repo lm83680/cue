@@ -4,7 +4,7 @@ class SelfAnimatedCue extends Cue {
   const SelfAnimatedCue({
     super.key,
     required super.child,
-    this.motion = const CueMotion.timed(Duration(milliseconds: 300)),
+    this.motion = CueMotion.defaultDuration,
     super.debugLabel,
     this.loop = false,
     this.reverseOnLoop = false,
@@ -29,7 +29,7 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
     if (widget.loop) {
       controller.playLoop(reverseOnLoop: widget.reverseOnLoop);
     } else {
-      controller.playForward();
+      controller.forward();
     }
   }
 
@@ -44,14 +44,14 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
       if (widget.loop) {
         controller.playLoop(reverseOnLoop: widget.reverseOnLoop);
       } else {
-        controller.playForward();
+        controller.forward();
       }
     }
   }
 }
 
-abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T> with TickerProviderStateMixin {
-  late CueAnimationController controller;
+abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T> with SingleTickerProviderStateMixin {
+  late final CueAnimationController controller;
   Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
 
   Animation<double> get animation => _animation;
@@ -59,7 +59,7 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   CueMotion get motion => widget.motion;
 
   @override
-  bool get isBounded => controller.isBounded;
+  bool get isBounded => controller.usesSimulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => _animation;
@@ -73,20 +73,11 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   }
 
   void _createController() {
-    controller = switch (motion) {
-      TimedMotion m => CueAnimationController(
-        duration: m.duration,
-        reverseDuration: m.reverseDuration,
-        vsync: this,
-        debugLabel: 'Cue Controller',
-      ),
-      SimulationMotion m => CueAnimationController.withSimulation(
-        simulation: m.simulation,
-        reverseSimulation: m.reverse,
-        vsync: this,
-        debugLabel: 'Unbounded Cue Controller',
-      ),
-    };
+    controller = CueAnimationController(
+      motion: motion,
+      vsync: this,
+      debugLabel: 'Cue Controller',
+    );
   }
 
   void _buildAnimation() {
@@ -99,37 +90,9 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-
     if (oldWidget.motion != motion) {
-      final m = motion;
-      if (m is SimulationMotion) {
-        // old controller is timed, new one is simulation, need to recreate the controller.
-        if (controller.isBounded) {
-          controller.stop();
-          controller.dispose();
-          _createController();
-          _buildAnimation();
-          onControllerReady();
-        } else {
-          // both are simulation, just update the simulation of the controller.
-          controller.simulation = m.simulation;
-          controller.reverseSimulation = m.reverse;
-        }
-      } else if (m is TimedMotion) {
-        // old controller is simulation, new one is timed, need to recreate the controller.
-        if (!controller.isBounded) {
-          controller.stop();
-          controller.dispose();
-          _createController();
-          _buildAnimation();
-          onControllerReady();
-        } else {
-          // both are timed, just update the duration and curve of the controller.
-          controller.duration = m.duration;
-          controller.reverseDuration = m.reverseDuration;
-          _buildAnimation();
-        }
-      }
+      controller.motion = motion;
+      _buildAnimation();
     }
   }
 

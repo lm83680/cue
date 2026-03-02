@@ -132,16 +132,22 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   @override
   void dispose() {
     _deattachDebugOverlay?.call();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget child = RepaintBoundary(
-      child: CueScope(
-        animation: getAnimation(context),
-        isBounded: isBounded,
-        child: widget.child,
+    final animation = getAnimation(context);
+
+    Widget child = _RebuildOnAnimationStatus(
+      animation: animation,
+      child: RepaintBoundary(
+        child: CueScope(
+          animation: animation,
+          isBounded: isBounded,
+          child: widget.child,
+        ),
       ),
     );
 
@@ -187,4 +193,16 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   }
 
   Animation<double> getAnimation(BuildContext context);
+}
+
+class _RebuildOnAnimationStatus extends StatusTransitionWidget {
+  const _RebuildOnAnimationStatus({
+    required super.animation,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => child;
 }

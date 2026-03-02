@@ -606,7 +606,7 @@ class SizeActor extends SingleEffectBase<NSize> {
   const SizeActor({
     super.key,
     required super.from,
-    required super.to,
+    super.to = NSize.childSize,
     this.alignment = Alignment.center,
     this.allowOverflow = false,
     this.clipBehavior = Clip.hardEdge,

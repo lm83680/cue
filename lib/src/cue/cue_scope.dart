@@ -27,7 +27,3 @@ class CueScope extends InheritedWidget {
     return animation != oldWidget.animation || isBounded != oldWidget.isBounded;
   }
 }
-
-/// Calculates the animation value based on the distance between current and target index.
-/// Returns a value typically between 0.0 and 1.0.
-typedef IndexDistanceCalculator = double Function(double offset, int targetIndex);

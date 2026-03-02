@@ -2,32 +2,48 @@ import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 
 class CueAnimationController extends AnimationController {
-  CueSimulation? simulation;
-  CueSimulation? reverseSimulation;
+  CueMotion _motion;
+  final double _lowerBound;
+  final double _upperBound;
+
+  @override
+  double get lowerBound {
+    return _motion.isSimulation ? double.negativeInfinity : _lowerBound;
+  }
+
+  @override
+  double get upperBound {
+    return _motion.isSimulation ? double.infinity : _upperBound;
+  }
+
+  set motion(CueMotion newValue) {
+    if (_motion != newValue) {
+      _motion = newValue;
+      if (newValue is TimedMotion) {
+        duration = newValue.duration;
+        reverseDuration = newValue.reverseDuration;
+      }
+    }
+  }
 
   CueAnimationController({
-    required Duration super.duration,
-    super.reverseDuration,
+    required CueMotion motion,
     super.debugLabel,
     super.value = 0.0,
-    super.lowerBound,
-    super.upperBound,
+    double lowerBound = 0.0,
+    double upperBound = 1.0,
     super.animationBehavior,
     required super.vsync,
-  }) : simulation = null,
-       reverseSimulation = null;
+  }) : _motion = motion,
+       _lowerBound = lowerBound,
+       _upperBound = upperBound {
+    if (motion is TimedMotion) {
+      duration = motion.duration;
+      reverseDuration = motion.reverseDuration;
+    }
+  }
 
-  bool get isBounded => lowerBound != double.negativeInfinity && upperBound != double.infinity;
-
-  CueAnimationController.withSimulation({
-    required CueSimulation this.simulation,
-    this.reverseSimulation,
-    super.duration,
-    super.debugLabel,
-    super.animationBehavior,
-    super.value,
-    required super.vsync,
-  }) : super.unbounded();
+  bool get usesSimulation => _motion.isSimulation;
 
   AnimationStatusListener? _statusListener;
 
@@ -49,30 +65,35 @@ class CueAnimationController extends AnimationController {
     );
   }
 
-  TickerFuture playForward({double? from}) {
-    if (isCompleted) reset();
-    if (simulation case final simulation?) {
-      if (from != null) {
-        value = from;
-      }
-      return animateWith(_createSimulation(simulation, true));
-    } else {
-      return super.forward(from: from);
+  @override
+  TickerFuture forward({double? from}) {
+    if (from != null) {
+      value = from;
+    }
+    switch (_motion) {
+      case TimedMotion():
+        return super.animateTo(_upperBound);
+      case SimulationMotion(simulation: final simulation):
+        return animateWith(_createSimulation(simulation, true));
     }
   }
 
-  TickerFuture playReverse() {
-    if (isDismissed) value = 1.0;
-    final effectiveSim = reverseSimulation ?? simulation;
-    if (effectiveSim case final effectiveSim?) {
-      return animateWith(_createSimulation(effectiveSim, false));
-    } else {
-      return super.reverse();
+  @override
+  TickerFuture reverse({double? from}) {
+    if (from != null) {
+      value = from;
+    }
+    switch (_motion) {
+      case TimedMotion():
+        return super.animateBack(_lowerBound);
+      case SimulationMotion(reverse: final reverse, simulation: final simulation):
+        final effectiveSim = reverse ?? simulation;
+        return animateWith(_createSimulation(effectiveSim, false));
     }
   }
 
   void playLoop({bool reverseOnLoop = false, int? count}) {
-    if (simulation == null) {
+    if (_motion.isTimed) {
       super.repeat(reverse: reverseOnLoop, count: count);
     } else {
       if (_statusListener != null) {
@@ -86,16 +107,16 @@ class CueAnimationController extends AnimationController {
             return;
           }
           if (reverseOnLoop) {
-            playReverse();
+            reverse();
           } else {
-            playForward();
+            forward();
           }
         } else if (status == AnimationStatus.dismissed && reverseOnLoop) {
-          playForward();
+          forward();
         }
       };
       addStatusListener(_statusListener!);
-      playForward();
+      forward();
     }
   }
 }
@@ -108,6 +129,11 @@ sealed class CueMotion {
     Curve? curve,
     Curve? reverseCurve,
   }) = TimedMotion;
+
+  static const CueMotion defaultDuration = CueMotion.timed(
+    Duration(milliseconds: 300),
+  );
+
   const factory CueMotion.simulation(
     CueSimulation simulation, {
     CueSimulation? reverse,
