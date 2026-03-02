@@ -177,13 +177,10 @@ class _AxisSlideEffect extends TweenEffectBase<double, Offset> implements SlideE
   }
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<Offset> animation,
-    Widget child,
-  ) {
+  Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
     return SlideTransition(
       position: animation,
+      transformHitTests: true,
       child: child,
     );
   }

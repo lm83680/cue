@@ -48,6 +48,7 @@ class ActorContext {
   final bool isBounded;
   final ActorRole role;
   final TextDirection textDirection;
+  final Object? implicitFrom;
 
   const ActorContext({
     this.timing,
@@ -57,6 +58,7 @@ class ActorContext {
     this.reverseCurve,
     required this.textDirection,
     this.role = ActorRole.both,
+    this.implicitFrom,
   });
 
   ActorContext copyWith({
@@ -67,6 +69,7 @@ class ActorContext {
     bool? isBounded,
     ActorRole? role,
     TextDirection? textDirection,
+    Object? implicitFrom,
   }) {
     return ActorContext(
       timing: timing ?? this.timing,
@@ -76,6 +79,7 @@ class ActorContext {
       isBounded: isBounded ?? this.isBounded,
       role: role ?? this.role,
       textDirection: textDirection ?? this.textDirection,
+      implicitFrom: implicitFrom ?? this.implicitFrom,
     );
   }
 }

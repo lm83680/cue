@@ -44,15 +44,19 @@ class CardEffect extends MulitTweenEffect<CardProps> {
 
   @override
   Animatable<CardProps> buildTween(ActorContext context) {
-    final ctx = context.copyWith(timing: timing, curve: curve);
+    final implicitFrom = context.implicitFrom as CardProps?;
+    ActorContext overrideCtx(Object? from) {
+      return context.copyWith(implicitFrom: from, timing: timing, curve: curve);
+    }
+
     return _CardPropsProxyTween(
-      elevation: elevation?.asAnimtable(ctx),
-      color: color?.asAnimtable(ctx),
-      shadowColor: shadowColor.asAnimtable(ctx),
-      surfaceTintColor: surfaceTintColor?.asAnimtable(ctx),
-      borderRadius: borderRadius?.asAnimtable(ctx),
-      shape: shape?.asAnimtable(ctx),
-      margin: margin?.asAnimtable(ctx),
+      elevation: elevation?.asAnimtable(overrideCtx(implicitFrom?.elevation)),
+      color: color?.asAnimtable(overrideCtx(implicitFrom?.color)),
+      shadowColor: shadowColor.asAnimtable(overrideCtx(implicitFrom?.shadowColor)),
+      surfaceTintColor: surfaceTintColor?.asAnimtable(overrideCtx(implicitFrom?.surfaceTintColor)),
+      borderRadius: borderRadius?.asAnimtable(overrideCtx(implicitFrom?.borderRadius)),
+      shape: shape?.asAnimtable(overrideCtx(implicitFrom?.shape)),
+      margin: margin?.asAnimtable(overrideCtx(implicitFrom?.margin)),
     );
   }
 

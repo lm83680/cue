@@ -92,6 +92,11 @@ class CueAnimationController extends AnimationController {
     }
   }
 
+  @override
+  void reset() {
+    value = _lowerBound;
+  }
+
   void playLoop({bool reverseOnLoop = false, int? count}) {
     if (_motion.isTimed) {
       super.repeat(reverse: reverseOnLoop, count: count);

@@ -46,7 +46,7 @@ abstract class MulitTweenEffect<T extends Object?> extends Effect {
 
   Widget apply(BuildContext context, covariant Animation<T> animation, Widget child);
 
-  Animatable<T> buildTween(ActorContext data);
+  Animatable<T> buildTween(ActorContext context);
 
   //equality
   @override

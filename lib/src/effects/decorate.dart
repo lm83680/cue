@@ -23,13 +23,17 @@ class DecoratedBoxEffect extends MulitTweenEffect<BoxDecoration> {
 
   @override
   Animatable<BoxDecoration> buildTween(ActorContext context) {
-    final ctx = context.copyWith(timing: timing, curve: curve);
+    final implicitFrom = context.implicitFrom as BoxDecoration?;
+    ActorContext overrideCtx(Object? from) {
+      return context.copyWith(implicitFrom: from, timing: timing, curve: curve);
+    }
+
     return _DecorationProxyTween(
-      color: color?.asAnimtable(ctx),
-      borderRadius: borderRadius?.asAnimtable(ctx),
-      border: border?.asAnimtable(ctx),
-      boxShadow: boxShadow?.asAnimtable(ctx),
-      gradient: gradient?.asAnimtable(ctx),
+      color: color?.asAnimtable(overrideCtx(implicitFrom?.color)),
+      borderRadius: borderRadius?.asAnimtable(overrideCtx(implicitFrom?.borderRadius)),
+      border: border?.asAnimtable(overrideCtx(implicitFrom?.border)),
+      boxShadow: boxShadow?.asAnimtable(overrideCtx(implicitFrom?.boxShadow)),
+      gradient: gradient?.asAnimtable(overrideCtx(implicitFrom?.gradient)),
       shape: shape,
     );
   }

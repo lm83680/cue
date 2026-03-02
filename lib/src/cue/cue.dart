@@ -27,70 +27,71 @@ abstract class Cue extends StatefulWidget {
 
   const factory Cue({
     Key? key,
-    required Widget child,
     String? debugLabel,
     bool isBounded,
     required Animation<double> animation,
+    required Widget child,
   }) = _ControlledCue;
 
   const factory Cue.onTransition({
     Key? key,
-    required Widget child,
     String? debugLabel,
     bool useSecondaryAnimation,
+    required Widget child,
   }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
     Key? key,
-    required Widget child,
     String? debugLabel,
     CueMotion motion,
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
+    required Widget child,
   }) = SelfAnimatedCue;
 
   const factory Cue.onHover({
     Key? key,
-    required Widget child,
     String? debugLabel,
     CueMotion motion,
     MouseCursor cursor,
     bool opaque,
+    required Widget child,
   }) = _OnHoverCue;
 
   const factory Cue.onToggle({
     Key? key,
-    required Widget child,
     String? debugLabel,
     CueMotion motion,
     required bool toggled,
     bool skipFirstAnimation,
+    required Widget child,
   }) = _TogglableCue;
 
   const factory Cue.onChange({
     Key? key,
-    required Widget child,
     CueMotion motion,
     String? debugLabel,
     bool skipFirstAnimation,
+    bool fromCurrentValue,
     required Object? value,
+    required Widget child,
   }) = _OnChangeCue;
 
   const factory Cue.indexed({
     Key? key,
-    required Widget child,
     String? debugLabel,
     required IndexedCueController controller,
     required int index,
+    required Widget child,
   }) = _IndexedCue;
 
   const factory Cue.onProgress({
     Key? key,
-    required Widget child,
     String? debugLabel,
     required Listenable notifier,
     required ValueGetter<double> progress,
+    required Widget child,
   }) = _ProgressCue;
 
   // This only works within the nearest scrollable ancestor and is not meant to be used as a general purpose visibility detector.
@@ -99,11 +100,11 @@ abstract class Cue extends StatefulWidget {
   // if you need a general purpose visibility detector, use the VisibilityDetector package. an trigger Cue animations based on visibility changes using that package and Cue's imperative API.
   const factory Cue.onScrollVisible({
     required Key key,
-    required Widget child,
     String? debugLabel,
     CueMotion motion,
     bool enabled,
     double visibilityThreshold,
+    required Widget child,
   }) = _OnScrollVisibleCue;
 }
 
@@ -114,6 +115,10 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   VoidCallback? _deattachDebugOverlay;
 
   bool get isBounded;
+
+  EventNotifier<bool>? get willReanimateNotifier => null;
+
+  bool get reanimateFromCurrent => false;
 
   late final _debugId = 'Cue#${widget.debugLabel ?? ''}-${identityHashCode(widget)}';
 
@@ -140,14 +145,13 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   Widget build(BuildContext context) {
     final animation = getAnimation(context);
 
-    Widget child = _RebuildOnAnimationStatus(
-      animation: animation,
-      child: RepaintBoundary(
-        child: CueScope(
-          animation: animation,
-          isBounded: isBounded,
-          child: widget.child,
-        ),
+    Widget child = RepaintBoundary(
+      child: CueScope(
+        animation: animation,
+        isBounded: isBounded,
+        willReanimateNotifier: willReanimateNotifier,
+        reanimateFromCurrent: reanimateFromCurrent,
+        child: widget.child,
       ),
     );
 
@@ -182,6 +186,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
         }
         if (!scope.isMinimized && scope.activeTargetId == _debugId) {
           return CueScope(
+            reanimateFromCurrent: false,
             animation: scope.animation,
             isBounded: isBounded,
             child: widget.child,
@@ -193,16 +198,4 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   }
 
   Animation<double> getAnimation(BuildContext context);
-}
-
-class _RebuildOnAnimationStatus extends StatusTransitionWidget {
-  const _RebuildOnAnimationStatus({
-    required super.animation,
-    required this.child,
-  });
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => child;
 }

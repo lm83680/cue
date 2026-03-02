@@ -47,11 +47,12 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
         timing = res.timing;
       }
     } else {
-      assert(from != null && to != null, 'From and to values must be provided when not using keyframes');
-      if (isConstant) {
-        tween = ConstantTween<R>(transform(context, from as T));
+      final effectiveFrom = context.implicitFrom ?? from;
+      assert(effectiveFrom != null && to != null, 'From and to values must be provided when not using keyframes');
+      if (effectiveFrom == to) {
+        tween = ConstantTween<R>(transform(context, to as T));
       } else {
-        tween = createSingleTween(transform(context, from as T), transform(context, to as T));
+        tween = createSingleTween(transform(context, effectiveFrom as T), transform(context, to as T));
       }
     }
     return (tween: tween, timing: timing);

@@ -28,21 +28,36 @@ class RawActor extends StatefulWidget {
 }
 
 class RawActorState extends State<RawActor> {
-  final _animations = <Effect, Animation<Object?>>{};
+  final _animations = <Type, Animation<Object?>>{};
+  final _cachedAnimations = <Effect, Animation<Object?>>{};
+  final _animationSnapshots = <Type, Object?>{};
+
+  void _onWillReAnimate(bool forward) {
+    for (final entry in _animations.entries) {
+      _animationSnapshots[entry.key] = entry.value.value;
+    }
+  }
 
   CueScope? _cachedScope;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void _setupAnimations(CueScope scope) {
     _cachedScope = scope;
-    _animations.removeWhere((effect, _) => !widget.effects.contains(effect));
+
+    assert(() {
+      if (widget.effects.map((e) => e.runtimeType).toSet().length != widget.effects.length) {
+        throw StateError(
+          'Multiple effects of the same type are not supported. Please ensure all effects in the list are of different types.',
+        );
+      }
+      return true;
+    }());
+
+    _animations.removeWhere((effect, _) => !widget.effects.map((e) => e.runtimeType).contains(effect));
+    _cachedAnimations.removeWhere((effect, _) => !widget.effects.contains(effect));
     for (final effect in widget.effects) {
-      if (!_animations.containsKey(effect)) {
-        _animations[effect] = effect.buildAnimation(
+      if (!_cachedAnimations.containsKey(effect)) {
+        final implicitFrom = scope.reanimateFromCurrent ? _animationSnapshots[effect.runtimeType] : null;
+        final animation = effect.buildAnimation(
           scope.animation,
           ActorContext(
             textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
@@ -52,8 +67,11 @@ class RawActorState extends State<RawActor> {
             reverseCurve: widget.reverseCurve,
             reverseTiming: widget.reverseTiming,
             role: widget.role,
+            implicitFrom: implicitFrom,
           ),
         );
+        _animations[effect.runtimeType] = animation;
+        _cachedAnimations[effect] = animation;
       }
     }
   }
@@ -67,14 +85,24 @@ class RawActorState extends State<RawActor> {
         oldWidget.reverseCurve != widget.reverseCurve ||
         oldWidget.reverseTiming != widget.reverseTiming ||
         oldWidget.role != widget.role) {
-      _setupAnimations(widget._externalDrive ?? CueScope.of(context));
+      if (oldWidget.role != widget.role) {
+        // If the role has changed, we need to clear all cached animations
+        //to ensure they are rebuilt with the correct role.
+        _animations.clear();
+        _cachedAnimations.clear();
+      }
+      _setupAnimations(CueScope.of(context));
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = widget._externalDrive ?? CueScope.of(context);
+    final scope = CueScope.of(context);
+    if (_cachedScope?.willReanimateNotifier != scope.willReanimateNotifier) {
+      _cachedScope?.willReanimateNotifier?.removeEventListener(_onWillReAnimate);
+      scope.willReanimateNotifier?.addEventListener(_onWillReAnimate);
+    }
     if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
       _setupAnimations(scope);
     }
@@ -85,7 +113,7 @@ class RawActorState extends State<RawActor> {
     if (widget.effects.isEmpty) return widget.child;
     Widget current = widget.child;
     for (final effect in widget.effects.reversed) {
-      if (_animations[effect] case final animation?) {
+      if (_animations[effect.runtimeType] case final animation?) {
         current = effect.build(context, animation, current);
       } else {
         throw StateError(
@@ -94,6 +122,12 @@ class RawActorState extends State<RawActor> {
       }
     }
     return current;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _cachedScope?.willReanimateNotifier?.removeEventListener(_onWillReAnimate);
   }
 }
 
@@ -186,7 +220,7 @@ class TweenActor<T> extends StatefulWidget {
        timing = null;
 
   @override
-  State<StatefulWidget> createState() => _TweenActorState<T>();
+  State<StatefulWidget> createState() => _ProgressActorState<T>();
 }
 
 class ProgressActor extends TweenActor<double> {
@@ -199,10 +233,10 @@ class ProgressActor extends TweenActor<double> {
   }) : super(tween: Tween<double>(begin: 0.0, end: 1.0));
 
   @override
-  State<StatefulWidget> createState() => _TweenActorState<double>();
+  State<StatefulWidget> createState() => _ProgressActorState<double>();
 }
 
-class _TweenActorState<T> extends State<TweenActor<T>> {
+class _ProgressActorState<T> extends State<TweenActor<T>> {
   late Animation<T> animation;
 
   Animation<double>? _cachedDriver;
@@ -221,7 +255,7 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
     if (oldWidget._tween != widget._tween ||
         oldWidget.curve != widget.curve ||
         oldWidget.timing != widget.timing ||
-        listEquals(widget._keyframes, oldWidget._keyframes)) {
+        !listEquals(widget._keyframes, oldWidget._keyframes)) {
       _setupAnimation(CueScope.of(context).animation);
     }
   }

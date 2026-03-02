@@ -37,15 +37,20 @@ class _BottomBarState extends State<BottomBar> {
 
                   return Stack(
                     children: [
-                      AnimatedSlide(
-                        offset: Offset(slideStep * _activeTab, 0),
-                        duration: Duration(milliseconds: 300),
-                        child: Container(
-                          width: expandedWidth,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(32),
+                      Cue.onChange(
+                        value: _activeTab,
+                        fromCurrentValue: true,
+                        motion: .simulation(Spring.smooth(damping: 30)),
+                        child: SlideActor(
+                          from: .zero,
+                          to: Offset(slideStep * _activeTab, 0),
+                          child: Container(
+                            width: expandedWidth,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(32),
+                            ),
                           ),
                         ),
                       ),
