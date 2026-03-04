@@ -254,7 +254,7 @@ class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTrans
       }
     } else {
       final rect = widget.globalRect ?? _rectFor(widget.globalKey!);
-      final alignment = widget.alignment!.resolve(Directionality.of(context));
+      final alignment = widget.alignment!.resolve(Directionality.maybeOf(context));
       final targetRect = alignment.inscribe(renderBox.size, rect);
       final newDelta = targetRect.topLeft - targetGlobal;
       if (_deltaTween?.begin != newDelta) {
@@ -279,7 +279,6 @@ class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTrans
 
   @override
   Widget build(BuildContext context) {
-    final animation = widget.animation;
     final offsetTween = _deltaTween ?? Tween(begin: Offset.zero, end: widget.toLocal);
     return Visibility(
       key: _key,
@@ -288,7 +287,7 @@ class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTrans
       maintainAnimation: true,
       maintainSize: true,
       child: TranslateTransition(
-        offset: offsetTween.animate(animation),
+        offset: offsetTween.animate(widget.animation),
         child: widget.child,
       ),
     );

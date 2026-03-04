@@ -9,7 +9,7 @@ class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
   final BoxShape shape;
   final DecorationPosition position;
 
-  DecoratedBoxAct({
+  const DecoratedBoxAct({
     this.color,
     this.borderRadius,
     this.border,

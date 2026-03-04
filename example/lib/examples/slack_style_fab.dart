@@ -1,0 +1,206 @@
+import 'package:cue/cue.dart';
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+class SlackStyleFab extends StatelessWidget {
+  const SlackStyleFab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CueModalTransition(
+      barrierColor: Colors.transparent,
+      alignment: .bottomRight,
+      barrierDismissible: true,
+      motion: const .simulation(Spring.smooth(damping: 18), reverse: Spring.smooth()),
+      hideTriggerOnTransition: true,
+      triggerBuilder: (_, showModal) {
+        return CueModalTransition(
+          alignment: .bottomCenter,
+          barrierColor: Colors.black87,
+          hideTriggerOnTransition: true,
+          barrierDismissible: true,
+          motion: const .simulation(Spring.smooth()),
+          triggerBuilder: (context, showModal2) {
+            return GestureDetector(
+              onLongPress: showModal2,
+              child: FloatingActionButton(
+                onPressed: showModal,
+                heroTag: 'btn1',
+                shape: CircleBorder(),
+                elevation: 1,
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                child: Icon(Icons.add),
+              ),
+            );
+          },
+          builder: (context, rect) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < 3; i++)
+                  Actor(
+                    act: .compose([
+                      .translateFromGlobal(
+                        offset: Offset(rect.left - 64, rect.top),
+                        toLocal: Offset(-40, 0),
+                      ),
+                      .fadeIn(timing: .startAt(.2)),
+                      .focus(from: 6),
+                    ]),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Jhon Doe',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              'https://i.pravatar.cc/150?img=${i + 60}',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                SizedBox(height: 12),
+                FloatingActionButton(
+                  shape: CircleBorder(),
+                  elevation: 0,
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  child: Actor(
+                    act: .rotate(to: .5, unit: .quarterTurns),
+                    child: Icon(Icons.add),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+      builder: (context, rect) {
+        return Card(
+          margin: .zero,
+          color: theme.colorScheme.surfaceContainer,
+          elevation: 0,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(32),
+            side: BorderSide(color: theme.primaryColor.withValues(alpha: .2), width: .4),
+          ),
+          child: Actor(
+            act: .resize(
+              from: .size(rect.size),
+              allowOverflow: true,
+              alignment: .bottomRight,
+            ),
+            child: FractionallySizedBox(
+              widthFactor: .8,
+              child: Padding(
+                padding: .symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .end,
+                  spacing: 4,
+                  children: [
+                    Actor(
+                      act: .compose([
+                        .slide(from: Offset(.8, .8)),
+                        .fadeIn(timing: .startAt(.5)),
+                        .focus(),
+                      ]),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        visualDensity: VisualDensity(vertical: -4),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Iconsax.headphone,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                        ),
+                        title: Text('Huddle', style: theme.textTheme.titleMedium?.copyWith(height: 1.2)),
+                        subtitle: Text('Start an audio or video chat', style: theme.textTheme.bodySmall),
+                      ),
+                    ),
+
+                    Actor(
+                      act: .translate(from: Offset(16, 12)),
+                      child: TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          minimumSize: .zero,
+                        ),
+                        child: Actor(
+                          act: .resize(
+                            from: .size(rect.size),
+                            to: NSize(w: .infinity, h: 44),
+                            allowOverflow: true,
+                          ),
+                          child: Row(
+                            mainAxisSize: .min,
+                            mainAxisAlignment: .center,
+                            children: [
+                              Actor(
+                                act: .compose([
+                                  .focus(),
+                                  .fadeIn(),
+                                  .clipWidth(timing: .endAt(.8)),
+                                ]),
+                                child: Row(
+                                  mainAxisSize: .min,
+                                  mainAxisAlignment: .center,
+                                  children: [
+                                    Icon(Iconsax.edit),
+                                    SizedBox(width: 8),
+                                    Text('Message'),
+                                  ],
+                                ),
+                              ),
+                              Actor(
+                                timing: .startAt(.2),
+                                act: .compose([
+                                  .unfocus(),
+                                  .fadeOut(),
+                                  .slideX(to: -2, from: 0),
+                                  .rotate(to: 90),
+                                ]),
+                                child: Icon(Icons.add, size: 24),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

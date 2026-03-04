@@ -8,6 +8,7 @@ class _TogglableCue extends SelfAnimatedCue {
     super.motion,
     required this.toggled,
     this.skipFirstAnimation = true,
+    super.act,
   }) : super();
 
   final bool toggled;

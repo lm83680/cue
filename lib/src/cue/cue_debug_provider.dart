@@ -107,11 +107,10 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     _controller.duration = duration;
 
     void deattachCallback() {
-      final updatedTargets = Map<String, _DebugTarget>.from(_overlayData.value.targets)..remove(id);
-      _overlayData.value = _overlayData.value.copyWith(targets: updatedTargets);
-
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _controller.value = 0;
+        final updatedTargets = Map<String, _DebugTarget>.from(_overlayData.value.targets)..remove(id);
+        _overlayData.value = _overlayData.value.copyWith(targets: updatedTargets);
       });
     }
 

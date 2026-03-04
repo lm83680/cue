@@ -113,14 +113,14 @@ abstract class Act {
   }) = TranslateAct.fromGlobalKey;
 
   const factory Act.slide({
-    required Offset from,
-    required Offset to,
+    Offset from,
+    Offset to,
     Curve? curve,
     Timing? timing,
   }) = SlideAct;
 
   const factory Act.slideX({
-    required double from,
+    double from,
     double to,
     Curve? curve,
     Timing? timing,
@@ -228,6 +228,7 @@ abstract class Act {
     Size fromSize,
     BorderRadiusGeometry borderRadius,
     AlignmentGeometry alignment,
+    bool useSuperellipse,
     Curve? curve,
     Timing? timing,
   }) = ClipAct;
@@ -235,6 +236,7 @@ abstract class Act {
   const factory Act.clipHeight({
     double from,
     double to,
+    AlignmentGeometry alignment,
     Curve? curve,
     Timing? timing,
   }) = ClipAct.height;
@@ -242,6 +244,7 @@ abstract class Act {
   const factory Act.clipWidth({
     double from,
     double to,
+    AlignmentGeometry alignment,
     Curve? curve,
     Timing? timing,
   }) = ClipAct.width;
@@ -300,6 +303,18 @@ abstract class Act {
     Curve? curve,
     Timing? timing,
   }) = TransformAct;
+
+  const factory Act.decorate({
+    ColorProp? color,
+    BorderRadiusProp borderRadius,
+    BoxBorderProp? border,
+    BoxShadowProp? boxShadow,
+    GradientProp? gradient,
+    BoxShape shape,
+    DecorationPosition position,
+    Curve? curve,
+    Timing? timing,
+  }) = DecoratedBoxAct;
 
   Animation<Object?> buildAnimation(Animation<double> driver, ActorContext data);
 

@@ -7,6 +7,7 @@ class _ControlledCue extends Cue {
     this.isBounded = true,
     super.debugLabel,
     required this.animation,
+    super.act,
   }) : super._();
 
   final Animation<double> animation;

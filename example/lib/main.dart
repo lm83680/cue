@@ -5,6 +5,7 @@ import 'package:example/examples/smooth_toggle.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cue Demo',
       // showPerformanceOverlay: true,
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+      ),
       theme: ThemeData(
         splashFactory: NoSplash.splashFactory,
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
@@ -43,7 +46,7 @@ class _OnChangeDemo extends StatefulWidget {
 }
 
 class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProviderStateMixin {
-  double offset = 0.0;
+  double scale = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -53,37 +56,31 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
       // backgroundColor: theme.colorScheme.surfaceContainer,
       appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.only(top: 48, bottom: 65),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: .center,
-            children: [
-              Cue.onChange(
-                value: offset,
-                fromCurrentValue: true,
-                child: DecoratedBoxActor(
-                  color: .tween(from: Colors.redAccent, to: Colors.accents[offset.toInt() % Colors.accents.length]),
-                  child: Container(
-                    width: 100,
-                    height: 44,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
+        padding: const EdgeInsets.only(top: 48, bottom: 0),
+        child: Column(
+          children: [
+            BottomBar(),
+            Cue.onChange(
+              value: scale,
+              fromCurrentValue: true,
+              child: Actor(
+                act: .slideX(to: scale),
+                child: Container(
+                  width: 100,
+                  height: 50,
+                  color: Colors.red,
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    offset = offset + 1;
-                  });
-                },
-                child: Text('Slide'),
-              ),
-            ],
-          ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  scale = scale + .3;
+                });
+              },
+              child: Text('Slide'),
+            ),
+          ],
         ),
       ),
     );

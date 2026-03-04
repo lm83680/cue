@@ -41,15 +41,13 @@ class _BottomBarState extends State<BottomBar> {
                         value: _activeTab,
                         fromCurrentValue: true,
                         motion: .simulation(Spring.smooth(damping: 30)),
-                        child: Actor(
-                          act: .translate(from: .zero, to: Offset(slideStep * _activeTab, 0)),
-                          child: Container(
-                            width: expandedWidth,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
+                        act: .slideX(to: slideStep * _activeTab),
+                        child: Container(
+                          width: expandedWidth,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(32),
                           ),
                         ),
                       ),

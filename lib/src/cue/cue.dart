@@ -20,10 +20,12 @@ abstract class Cue extends StatefulWidget {
     super.key,
     required this.child,
     this.debugLabel,
+    this.act,
   });
 
   final String? debugLabel;
   final Widget child;
+  final Act? act;
 
   const factory Cue({
     Key? key,
@@ -36,8 +38,8 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onTransition({
     Key? key,
     String? debugLabel,
-    bool useSecondaryAnimation,
     required Widget child,
+    Act? act,
   }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
@@ -47,6 +49,7 @@ abstract class Cue extends StatefulWidget {
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
+    Act? act,
     required Widget child,
   }) = SelfAnimatedCue;
 
@@ -56,6 +59,7 @@ abstract class Cue extends StatefulWidget {
     CueMotion motion,
     MouseCursor cursor,
     bool opaque,
+    Act? act,
     required Widget child,
   }) = _OnHoverCue;
 
@@ -66,6 +70,7 @@ abstract class Cue extends StatefulWidget {
     required bool toggled,
     bool skipFirstAnimation,
     required Widget child,
+    Act? act,
   }) = _TogglableCue;
 
   const factory Cue.onChange({
@@ -74,6 +79,7 @@ abstract class Cue extends StatefulWidget {
     String? debugLabel,
     bool skipFirstAnimation,
     bool fromCurrentValue,
+    Act? act,
     required Object? value,
     required Widget child,
   }) = _OnChangeCue;
@@ -81,6 +87,7 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.indexed({
     Key? key,
     String? debugLabel,
+    Act? act,
     required IndexedCueController controller,
     required int index,
     required Widget child,
@@ -89,6 +96,7 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onProgress({
     Key? key,
     String? debugLabel,
+    Act? act,
     required Listenable notifier,
     required ValueGetter<double> progress,
     required Widget child,
@@ -104,6 +112,7 @@ abstract class Cue extends StatefulWidget {
     CueMotion motion,
     bool enabled,
     double visibilityThreshold,
+    Act? act,
     required Widget child,
   }) = _OnScrollVisibleCue;
 }
@@ -127,11 +136,6 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-  }
-
-  @override
-  void initState() {
-    super.initState();
     if (kDebugMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (CueDebugTools.isWrappedByDebugProvider(context)) {
@@ -155,6 +159,14 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = widget.child;
+    if (widget.act != null) {
+      child = Actor(
+        act: widget.act!,
+        child: child,
+      );
+    }
+
     final animation = getAnimation(context);
     if (kDebugMode) {
       final debugToolsScope = CueDebugTools.maybeOf(context);
@@ -176,7 +188,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             animation: useDebugAnimation ? debugToolsScope.animation : animation,
             willReanimateNotifier: willReanimateNotifier,
             isBounded: isBounded,
-            child: widget.child,
+            child: child,
           ),
         );
       }
@@ -186,7 +198,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
       isBounded: isBounded,
       willReanimateNotifier: willReanimateNotifier,
       reanimateFromCurrent: reanimateFromCurrent,
-      child: widget.child,
+      child: child,
     );
   }
 

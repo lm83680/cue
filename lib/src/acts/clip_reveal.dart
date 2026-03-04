@@ -5,6 +5,7 @@ abstract class ClipAct extends Act {
     Size fromSize,
     BorderRadiusGeometry borderRadius,
     AlignmentGeometry alignment,
+    bool useSuperellipse,
     Curve? curve,
     Timing? timing,
   }) = _ClipEffect;
@@ -80,6 +81,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
   final Size fromSize;
   final BorderRadiusGeometry? borderRadius;
   final AlignmentGeometry? alignment;
+  final bool useSuperellipse;
 
   const _ClipEffect({
     this.fromSize = Size.zero,
@@ -87,6 +89,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     this.alignment,
     super.curve,
     super.timing,
+    this.useSuperellipse = false,
   }) : super(from: 0, to: 1);
 
   const _ClipEffect.circular({
@@ -95,6 +98,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     super.curve,
     super.timing,
   }) : borderRadius = null,
+       useSuperellipse = false,
        super(from: 0, to: 1);
 
   @override
@@ -126,6 +130,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
                   minSize: fromSize,
                   borderRadius: effectiveBorderRadius,
                   alignment: effectiveAlignment,
+                  useSuperellipse: useSuperellipse,
                 ),
                 child: child,
               ),
@@ -143,12 +148,14 @@ class ExpandingPathClipper extends CustomClipper<Path> {
   final Size minSize;
   final BorderRadius? borderRadius;
   final Alignment alignment;
+  final bool useSuperellipse;
 
   ExpandingPathClipper({
     required this.progress,
     required this.minSize,
     this.borderRadius,
     required this.alignment,
+    this.useSuperellipse = false,
   });
 
   @override
@@ -185,12 +192,18 @@ class ExpandingPathClipper extends CustomClipper<Path> {
       // optimize for zero border radius case
       return Path()..addRect(rect);
     } else {
+      if (useSuperellipse) {
+        return Path()..addRSuperellipse(borderRadius!.toRSuperellipse(rect));
+      }
       return Path()..addRRect(borderRadius!.toRRect(rect));
     }
   }
 
   @override
   bool shouldReclip(covariant ExpandingPathClipper oldClipper) {
-    return oldClipper.progress != progress || oldClipper.minSize != minSize;
+    return oldClipper.progress != progress ||
+        oldClipper.minSize != minSize ||
+        oldClipper.borderRadius != borderRadius ||
+        oldClipper.alignment != alignment;
   }
 }

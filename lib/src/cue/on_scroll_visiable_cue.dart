@@ -7,6 +7,7 @@ class _OnScrollVisibleCue extends SelfAnimatedCue {
     super.debugLabel,
     super.motion,
     this.enabled = true,
+    super.act,
     this.visibilityThreshold = 0.0,
   }) : assert(visibilityThreshold >= 0 && visibilityThreshold <= 1, 'visibilityThreshold must be between 0 and 1');
 

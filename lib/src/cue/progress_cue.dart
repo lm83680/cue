@@ -7,6 +7,7 @@ class _ProgressCue extends Cue {
     required super.child,
     required this.notifier,
     required this.progress,
+    super.act,
   }) : super._();
 
   final Listenable notifier;

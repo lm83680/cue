@@ -9,8 +9,8 @@ class SizeAct extends TweenAct<double> {
   final List<Keyframe<NSize?>>? _sizeKeyframes;
 
   const SizeAct({
-    NSize? from,
-    NSize? to,
+    NSize? from = NSize.childSize,
+    NSize? to = NSize.childSize,
     super.curve,
     super.timing,
     this.alignment,
@@ -299,6 +299,9 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   /// - any other value → use as-is
   Size _resolveSize(NSize nsize, Size maxConstraint, Size childSize) {
     double resolveAxis(double? value, double max, double child) {
+      if (value?.isInfinite == true) {
+        print('Value: $value, Max: $max, Child: $child'); // --- IGNORE ---
+      }
       if (value == null) return child;
       if (value.isInfinite) return max;
       return value;

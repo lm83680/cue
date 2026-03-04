@@ -2,8 +2,8 @@ part of 'base/act.dart';
 
 abstract class SlideAct extends Act {
   const factory SlideAct({
-    required Offset from,
-    required Offset to,
+    Offset from,
+    Offset to,
     Curve? curve,
     Timing? timing,
   }) = _SlideEffect;
@@ -34,7 +34,7 @@ abstract class SlideAct extends Act {
   }) = _SlideEffect.keyframes;
 
   const factory SlideAct.fromY({
-    required double from,
+    double from,
     double to,
     Curve? curve,
     Timing? timing,
@@ -46,7 +46,7 @@ abstract class SlideAct extends Act {
   }) = _AxisSlideEffect.keyframesY;
 
   const factory SlideAct.fromX({
-    required double from,
+    double from,
     double to,
     Curve? curve,
     Timing? timing,
@@ -113,14 +113,14 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
   final Axis _axis;
 
   const _AxisSlideEffect.tweenX({
-    required super.from,
+    super.from = 0,
     super.to = 0,
     super.curve,
     super.timing,
   }) : _axis = Axis.horizontal;
 
   const _AxisSlideEffect.tweenY({
-    required super.from,
+    super.from = 0,
     super.to = 0,
     super.curve,
     super.timing,
@@ -150,10 +150,6 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
 
   @override
   Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
-    return SlideTransition(
-      position: animation,
-      transformHitTests: true,
-      child: child,
-    );
+    return SlideTransition(position: animation, child: child);
   }
 }
