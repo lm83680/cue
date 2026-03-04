@@ -31,14 +31,11 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
       await Future.delayed(delay);
     }
     if (widget.loop) {
-      controller.playLoop(reverseOnLoop: widget.reverseOnLoop);
+      controller.repeat(reverse: widget.reverseOnLoop);
     } else {
       controller.forward();
     }
   }
-
-  @override
-  Animation<double> getAnimation(BuildContext context) => animation;
 
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
@@ -46,7 +43,7 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
     if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop) {
       controller.stop();
       if (widget.loop) {
-        controller.playLoop(reverseOnLoop: widget.reverseOnLoop);
+        controller.repeat(reverse: widget.reverseOnLoop);
       } else {
         controller.forward();
       }
@@ -56,9 +53,6 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
 
 abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T> with SingleTickerProviderStateMixin {
   late final CueAnimationController controller;
-  Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
-
-  Animation<double> get animation => _animation;
 
   CueMotion get motion => widget.motion;
 
@@ -66,13 +60,12 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   bool get isBounded => controller.usesSimulation;
 
   @override
-  Animation<double> getAnimation(BuildContext context) => _animation;
+  Animation<double> getAnimation(BuildContext context) => controller.view;
 
   @override
   void initState() {
     super.initState();
     _createController();
-    _buildAnimation();
     onControllerReady();
   }
 
@@ -84,19 +77,11 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
     );
   }
 
-  void _buildAnimation() {
-    _animation = switch (motion) {
-      TimedMotion m => m.applyCurve(controller),
-      SimulationMotion() => controller.view,
-    };
-  }
-
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.motion != motion) {
       controller.motion = motion;
-      _buildAnimation();
     }
   }
 

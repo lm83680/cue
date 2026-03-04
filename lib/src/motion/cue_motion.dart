@@ -71,8 +71,8 @@ class CueAnimationController extends AnimationController {
       value = from;
     }
     switch (_motion) {
-      case TimedMotion():
-        return super.animateTo(_upperBound);
+      case TimedMotion m:
+        return super.animateTo(_upperBound, curve: m.curve ?? Curves.linear);
       case SimulationMotion(simulation: final simulation):
         return animateWith(_createSimulation(simulation, true));
     }
@@ -84,8 +84,8 @@ class CueAnimationController extends AnimationController {
       value = from;
     }
     switch (_motion) {
-      case TimedMotion():
-        return super.animateBack(_lowerBound);
+      case TimedMotion(curve: final curve, reverseCurve: final reverseCurve):
+        return super.animateBack(_lowerBound, curve: reverseCurve ?? curve ?? Curves.linear);
       case SimulationMotion(reverse: final reverse, simulation: final simulation):
         final effectiveSim = reverse ?? simulation;
         return animateWith(_createSimulation(effectiveSim, false));
@@ -97,9 +97,24 @@ class CueAnimationController extends AnimationController {
     value = _lowerBound;
   }
 
-  void playLoop({bool reverseOnLoop = false, int? count}) {
+  @override
+  void stop({bool canceled = true}) {
+    if (_statusListener != null) {
+      removeStatusListener(_statusListener!);
+    }
+    super.stop(canceled: canceled);
+  }
+
+  @override
+  TickerFuture repeat({double? min, double? max, bool reverse = false, int? count, Duration? period}) {
     if (_motion.isTimed) {
-      super.repeat(reverse: reverseOnLoop, count: count);
+      return super.repeat(
+        reverse: reverse,
+        count: count,
+        min: min?.clamp(_lowerBound, _upperBound) ?? _lowerBound,
+        max: max?.clamp(_lowerBound, _upperBound) ?? _upperBound,
+        period: period,
+      );
     } else {
       if (_statusListener != null) {
         removeStatusListener(_statusListener!);
@@ -111,17 +126,18 @@ class CueAnimationController extends AnimationController {
           if (count != null && loopCount >= count) {
             return;
           }
-          if (reverseOnLoop) {
-            reverse();
+          if (reverse) {
+            this.reverse();
           } else {
             forward();
           }
-        } else if (status == AnimationStatus.dismissed && reverseOnLoop) {
+        } else if (status == AnimationStatus.dismissed && reverse) {
           forward();
         }
       };
       addStatusListener(_statusListener!);
       forward();
+      return TickerFuture.complete();
     }
   }
 }
