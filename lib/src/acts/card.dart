@@ -17,7 +17,7 @@ class CardAct extends MulitTweenAct<CardProps> {
   final ColorProp? color;
   final ColorProp shadowColor;
   final ColorProp? surfaceTintColor;
-  final DoubleProp? elevation;
+  final AnimatableValue<double>? elevation;
   final BorderRadiusProp? borderRadius;
   final EdgeInsetsProp? margin;
   final ShapeBorderProp? shape;
@@ -231,7 +231,7 @@ class CardActor extends StatelessWidget {
   final ColorProp? color;
   final ColorProp? shadowColor;
   final ColorProp? surfaceTintColor;
-  final DoubleProp? elevation;
+  final AnimatableValue<double>? elevation;
   final BorderRadiusProp? borderRadius;
   final ShapeBorderProp? shape;
   final EdgeInsetsProp? margin;

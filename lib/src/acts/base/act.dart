@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/multi_tween_act.dart';
-import 'package:cue/src/acts/base/nullable_size.dart';
 import 'package:cue/src/acts/base/tween_act.dart';
 import 'package:cue/src/acts/base/utils.dart';
 import 'package:flutter/foundation.dart';
@@ -66,8 +65,8 @@ abstract class Act {
   }) = ScaleAct.zoomOut;
 
   const factory Act.fractionalSize({
-    DoubleProp? widthFactor,
-    DoubleProp? heightFactor,
+    AnimatableValue<double>? widthFactor,
+    AnimatableValue<double>? heightFactor,
     AlignmentProp alignment,
     Curve? curve,
     Timing? timing,

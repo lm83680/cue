@@ -1,8 +1,8 @@
 part of 'base/act.dart';
 
 class FractionalSizeAct extends MulitTweenAct<FractionaSizeProps> {
-  final DoubleProp? widthFactor;
-  final DoubleProp? heightFactor;
+  final AnimatableValue<double>? widthFactor;
+  final AnimatableValue<double>? heightFactor;
   final AlignmentProp alignment;
 
   const FractionalSizeAct({

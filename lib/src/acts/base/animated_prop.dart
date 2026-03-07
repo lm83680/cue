@@ -234,11 +234,11 @@ class GradientProp extends AnimatableProp<Gradient?> {
   }
 }
 
-class DoubleProp extends AnimatableProp<double> {
-  const DoubleProp.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+class AnimatableValue<T> extends AnimatableProp<T> {
+  const AnimatableValue.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
 
-  const DoubleProp.fixed(super.value) : super.fixed();
-  const DoubleProp.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimatableValue.fixed(super.value) : super.fixed();
+  const AnimatableValue.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 }
 
 class ShapeBorderProp extends AnimatableProp<ShapeBorder?> {
