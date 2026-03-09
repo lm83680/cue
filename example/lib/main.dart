@@ -47,7 +47,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
   double size = 100.0;
   bool checked = false;
   final _sheetController = DraggableScrollableController();
-  final _pageController = CuePageController(viewportFraction: .85);
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +79,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                       act: .compose([
                         .slideY(from: -.8 * i,),
                         .scale(to: .5 + i * (.5/5), from: 0),
-                      
                     ]),
                     child: Card(
                       elevation: i * .5,
