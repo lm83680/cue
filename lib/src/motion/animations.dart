@@ -1,48 +1,7 @@
 import 'package:cue/cue.dart';
 import 'package:flutter/widgets.dart';
 
-class CueProgressAnimation<T> extends Animation<T>
-    with AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
-  T _value;
-  AnimationStatus _status;
 
-  CueProgressAnimation({
-    required T value,
-    AnimationStatus status = AnimationStatus.dismissed,
-  }) : _value = value,
-       _status = status;
-
-  @override
-  T get value => _value;
-
-  @override
-  AnimationStatus get status => _status;
-
-  void update(T value, {AnimationStatus status = AnimationStatus.forward}) {
-    final valueChanged = _value != value;
-    final statusChanged = _status != status;
-
-    if (!valueChanged && !statusChanged) return;
-
-    _value = value;
-    _status = status;
-
-    if (statusChanged) notifyStatusListeners(status);
-    if (valueChanged) notifyListeners();
-  }
-
-  @override
-  void didRegisterListener() {
-    // NOOP
-    // This animation is driven by an external source, so we don't need to do anything here.
-  }
-
-  @override
-  void didUnregisterListener() {
-    // NOOP
-    // This animation is driven by an external source, so we don't need to do anything here.
-  }
-}
 
 abstract class CueAnimation<T> extends Animation<T> {
   final Animation<double> parent;
@@ -61,6 +20,7 @@ abstract class CueAnimation<T> extends Animation<T> {
 
   @override
   void addListener(VoidCallback listener) {
+    
     parent.addListener(
       _wrappers[listener] ??= () {
         if (animtable.shouldNotify(parent.status)) listener();

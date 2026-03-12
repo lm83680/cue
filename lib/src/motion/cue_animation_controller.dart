@@ -7,9 +7,9 @@ class CueAnimationController extends AnimationController {
   CueMotion? _reverseMotion;
   final double _lowerBound;
   final double _upperBound;
-  final TimlineImpl _timline;
+  final CueTimelineImpl _timline;
 
-  Timeline get timline => _timline;
+  CueTimeline get timline => _timline;
 
   @override
   double get lowerBound {
@@ -44,8 +44,8 @@ class CueAnimationController extends AnimationController {
        _reverseMotion = reverseMotion,
        _lowerBound = lowerBound,
        _upperBound = upperBound,
-       _timline = TimlineImpl(
-         SimulationAnimationImpl(
+       _timline = CueTimelineImpl(
+         CueSimulationAnimationImpl(
            motion,
            reverseMotion: reverseMotion,
          ),

@@ -22,7 +22,7 @@ class _ProgressCue extends Cue {
 }
 
 class _ProgressCueState extends _CueState<_ProgressCue> {
-  final _progresstimeline = ProgressAnimations(0.0);
+  final _progresstimeline = CueProgressAnimations(0.0);
 
   @override
   String get debugName => 'ProgressCue';
@@ -67,5 +67,5 @@ class _ProgressCueState extends _CueState<_ProgressCue> {
   }
 
   @override
-  Timeline get timeline => _progresstimeline;
+  CueTimeline get timeline => _progresstimeline;
 }

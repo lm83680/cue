@@ -10,7 +10,7 @@ class _ControlledCue extends Cue {
     super.act,
   }) : super._();
 
-  final Timeline timeline;
+  final CueTimeline timeline;
   final bool isBounded;
 
   @override
@@ -25,5 +25,5 @@ class _ControlledCueState extends _CueState<_ControlledCue> {
   String get debugName => 'ControlledCue';
 
   @override
-  Timeline get timeline => widget.timeline;
+  CueTimeline get timeline => widget.timeline;
 }

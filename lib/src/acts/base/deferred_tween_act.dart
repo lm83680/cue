@@ -33,7 +33,7 @@ abstract class DeferredTweenAct<T extends Object?> extends Act {
   }
 
   @override
-  DeferredCueAnimation<T> buildAnimation(Timeline timline, ActContext context) {
+  DeferredCueAnimation<T> buildAnimation(CueTimeline timline, ActContext context) {
     final driver = timline.animationFor(
       AnimationConfig(
         motion: motion ?? context.motion,

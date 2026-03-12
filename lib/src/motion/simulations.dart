@@ -3,43 +3,48 @@ import 'dart:ui';
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 
-abstract class Timeline {
-  SimulationAnimation animationFor(AnimationConfig config);
+abstract class CueTimeline {
+  CueSimulationAnimation animationFor(AnimationConfig config);
   void prepare({required bool forward, double velocity = 0.0});
-  void release(SimulationAnimation anim);
+  void release(CueSimulationAnimation anim);
 }
 
-class TimlineImpl extends Simulation implements Timeline {
-  final Map<AnimationConfig, SimulationAnimation> _animations;
+class CueTimelineImpl extends Simulation implements CueTimeline {
+  final Map<AnimationConfig, CueSimulationAnimation> _animations;
 
-  TimlineImpl(SimulationAnimationImpl main)
+  CueTimelineImpl(CueSimulationAnimationImpl main)
     : _animations = {
         AnimationConfig(motion: main.motion, reverseMotion: main.reverseMotion): main,
       };
 
   double _lastT = 0.0;
 
-  SimulationAnimation get mainAnimation => _animations.values.first;
+  CueSimulationAnimation get mainAnimation => _animations.values.first;
 
   @override
-  SimulationAnimation animationFor(AnimationConfig config) {
+  CueSimulationAnimation animationFor(AnimationConfig config) {
     final mainConfig = _animations.keys.first;
     final forwardMotion = config.motion ?? mainConfig.motion!;
     final reverseMotion = config.reverseMotion ?? mainConfig.reverseMotion;
     final key = config.copyWith(motion: forwardMotion, reverseMotion: reverseMotion);
-    return _animations.putIfAbsent(
+    final animation = _animations.putIfAbsent(
       key,
-      () => SimulationAnimationImpl(
+      () => CueSimulationAnimationImpl(
         forwardMotion,
         reverseMotion: reverseMotion,
         delay: config.delay ?? Duration.zero,
         reverseDelay: config.reverseDelay ?? Duration.zero,
       ),
     );
+    animation.prepare(
+      forward: mainAnimation.status.isForwardOrCompleted,
+      velocity: mainAnimation.velocity,
+    );
+    return animation;
   }
 
   @override
-  void release(SimulationAnimation anim) {
+  void release(CueSimulationAnimation anim) {
     assert(_animations.values.first != anim, "Cannot remove main animation from ProxySimulation");
   }
 
@@ -70,7 +75,7 @@ class TimlineImpl extends Simulation implements Timeline {
   bool isDone(double time) => _animations.values.every((anim) => anim.isDone);
 }
 
-abstract class SimulationAnimation extends Animation<double> with AnimationLocalStatusListenersMixin {
+abstract class CueSimulationAnimation extends Animation<double> with AnimationLocalStatusListenersMixin {
   void prepare({required bool forward, double velocity = 0.0});
 
   void advance(double progress);
@@ -86,7 +91,7 @@ abstract class SimulationAnimation extends Animation<double> with AnimationLocal
   void didUnregisterListener() {}
 }
 
-class SimulationAnimationImpl extends SimulationAnimation with AnimationLocalListenersMixin {
+class CueSimulationAnimationImpl extends CueSimulationAnimation with AnimationLocalListenersMixin {
   final CueMotion motion;
   final CueMotion? reverseMotion;
   final Duration delay;
@@ -98,14 +103,12 @@ class SimulationAnimationImpl extends SimulationAnimation with AnimationLocalLis
   double _delaySeconds = 0.0;
   bool _done = true; // idle until prepared
 
-  SimulationAnimationImpl(
+   CueSimulationAnimationImpl(
     this.motion, {
     this.reverseMotion,
     this.delay = Duration.zero,
     this.reverseDelay = Duration.zero,
   });
-
-  // ── public ─────────────────────────────────────────────────────────────────
 
   @override
   double get value => _value;
@@ -122,8 +125,6 @@ class SimulationAnimationImpl extends SimulationAnimation with AnimationLocalLis
 
   bool _forward = true;
 
-  // ── lifecycle ──────────────────────────────────────────────────────────────
-
   @override
   void prepare({required bool forward, double velocity = 0.0}) {
     _forward = forward;
@@ -132,14 +133,12 @@ class SimulationAnimationImpl extends SimulationAnimation with AnimationLocalLis
     _delaySeconds = (forward ? delay : (reverseDelay)).inMicroseconds / Duration.microsecondsPerSecond;
     _localT = 0.0;
     _done = false;
+    notifyStatusListeners(status);
   }
-
-  // ── tick ───────────────────────────────────────────────────────────────────
 
   @override
   void advance(double progress) {
     if (_done || _sim == null) return;
-
     _localT += progress;
     final t = _localT - _delaySeconds;
     if (t < 0) return; // still in delay
@@ -166,18 +165,18 @@ class SimulationAnimationImpl extends SimulationAnimation with AnimationLocalLis
   }
 }
 
-class ProgressAnimations extends SimulationAnimation with AnimationLocalListenersMixin implements Timeline {
+class CueProgressAnimations extends CueSimulationAnimation with AnimationLocalListenersMixin implements CueTimeline {
   double _value;
   AnimationStatus _status;
 
-  ProgressAnimations(this._value, {AnimationStatus status = AnimationStatus.completed}) : _status = status;
+  CueProgressAnimations(this._value, {AnimationStatus status = AnimationStatus.completed}) : _status = status;
 
   final Map<AnimationConfig, BakedSimulationAnimation> _animations = {};
 
   final _linearMotion = const LinearSimulationMotion();
 
   @override
-  SimulationAnimation animationFor(AnimationConfig config) {
+  CueSimulationAnimation animationFor(AnimationConfig config) {
     if (config.motion == null && config.reverseMotion == null) {
       return this;
     }
@@ -203,7 +202,7 @@ class ProgressAnimations extends SimulationAnimation with AnimationLocalListener
   }
 
   @override
-  void release(SimulationAnimation anim) {
+  void release(CueSimulationAnimation anim) {
     // TODO: implement release
   }
 
@@ -235,7 +234,7 @@ class ProgressAnimations extends SimulationAnimation with AnimationLocalListener
   double get velocity => 0.0;
 }
 
-class BakedSimulationAnimation extends SimulationAnimation with AnimationLocalListenersMixin {
+class BakedSimulationAnimation extends CueSimulationAnimation with AnimationLocalListenersMixin {
   final BakedMotion motion;
   final BakedMotion? reverseMotion;
 

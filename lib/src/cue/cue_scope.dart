@@ -11,7 +11,7 @@ class CueScope extends InheritedWidget {
   });
 
   final EventNotifier<bool>? willReanimateNotifier;
-  final Timeline timeline;
+  final CueTimeline timeline;
   final bool isBounded;
   final bool reanimateFromCurrent;
 

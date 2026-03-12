@@ -1,6 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/utils.dart';
-import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -120,7 +119,6 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
               transform: transform ?? this.transform,
             );
           }
-          Animatable<R>? reverseAnimatable;
           // final effectiveReverseCurve = reverse.curve ?? context.reverseCurve;
           // final effectiveReverseTiming = reverse.timing ?? context.reverseTiming;
           // if (hasReverse || effectiveReverseCurve != null || effectiveReverseTiming != null) {
@@ -131,9 +129,10 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
           //     isBounded: context.isBounded,
           //   );
           // }
+          print(hasReverse);
           return DualAnimatable(
             forward: tween,
-            reverse: reverseAnimatable,
+            reverse: reverseTweenRes.tween,
             flipTimeOnReverse: hasReverse,
           );
         }

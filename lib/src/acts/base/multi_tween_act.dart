@@ -34,7 +34,7 @@ abstract class MulitTweenAct<T extends Object?> extends Act {
   CueAnimtable<T> buildTween(ActContext context);
 
   @override
-  CueAnimation<T> buildAnimation(Timeline timline, ActContext context) {
+  CueAnimation<T> buildAnimation(CueTimeline timline, ActContext context) {
     //TODO: track what motion should be used? from context?
     final driver = timline.animationFor(AnimationConfig(
       motion: context.motion ?? motion,

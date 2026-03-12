@@ -40,18 +40,18 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animat
 
   @nonVirtual
   @override
-  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child) {
+  Widget build(BuildContext context, covariant CueAnimation<Object?> animation, Widget child) {
     assert(
-      animation is Animation<R>,
-      'Expected animation of type Animation<$T>, but got ${animation.runtimeType}',
+      animation is CueAnimation<R>,
+      'Expected animation of type CueAnimation<$T>, but got ${animation.runtimeType}',
     );
-    return apply(context, animation as Animation<R>, child);
+    return apply(context, animation as CueAnimation<R>, child);
   }
 
-  Widget apply(BuildContext context, Animation<R> animation, Widget child);
+  Widget apply(BuildContext context, CueAnimation<R> animation, Widget child);
 
   @override
-  CueAnimation<R> buildAnimation(Timeline timline, ActContext context) {
+  CueAnimation<R> buildAnimation(CueTimeline timline, ActContext context) {
     final driver = timline.animationFor(AnimationConfig(
       motion: motion ?? context.motion,
       delay: delay ?? context.delay,

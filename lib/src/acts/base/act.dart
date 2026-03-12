@@ -301,7 +301,7 @@ abstract class Act {
     CueMotion? motion,
   }) = DecoratedBoxAct;
 
-  CueAnimation<Object?> buildAnimation(Timeline timline, ActContext context);
+  CueAnimation<Object?> buildAnimation(CueTimeline timline, ActContext context);
 
   Widget build(BuildContext context, covariant CueAnimation<Object?> animation, Widget child);
 
@@ -323,7 +323,7 @@ class ComposeAct extends Act {
   });
 
   @override
-  CueAnimationImpl<Object?> buildAnimation(Timeline timline, ActContext context) {
+  CueAnimationImpl<Object?> buildAnimation(CueTimeline timline, ActContext context) {
     throw StateError('ComposeAct should not be used directly');
   }
 

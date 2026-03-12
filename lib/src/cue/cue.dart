@@ -34,7 +34,7 @@ abstract class Cue extends StatefulWidget {
     String? debugLabel,
     bool isBounded,
     Act? act,
-    required Timeline timeline,
+    required CueTimeline timeline,
     required Widget child,
   }) = _ControlledCue;
 
@@ -203,5 +203,5 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     );
   }
 
-  Timeline get timeline;
+  CueTimeline get timeline;
 }

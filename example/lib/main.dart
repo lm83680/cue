@@ -56,57 +56,60 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
       // backgroundColor: Colors.blue,
       appBar: AppBar(),
       body: SizedBox.expand(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // SlackStyleFab(),
-            DeleteConfirmationDialog(),
-
-            SizedBox(
-              height: 100,
-              child: Row(
-                crossAxisAlignment: .stretch,
-                children: [
-                  // Expanded(child: ColoredBox(color: Colors.red)),
-                  Cue.onToggle(
-                    toggled: checked,
-                    motion: Spring.bouncy(),
-                    // reverseMotion: Spring.smooth(),
-                    
-                    child: Row(
-                      crossAxisAlignment: .stretch,
-                      children: [
-                        Actor(
-                          act: .sizedBox(
-                            width: .tween(from: 50, to: 100),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // SlackStyleFab(),
+              DeleteConfirmationDialog(),
+          
+              SizedBox(
+                height: 100,
+                child: Row(
+                  crossAxisAlignment: .stretch,
+                  children: [
+                    // Expanded(child: ColoredBox(color: Colors.red)),
+                    Cue.onToggle(
+                      toggled: checked,
+                      motion: Spring.bouncy(),
+                      // reverseMotion: Spring.smooth(),
+                      
+                      child: Row(
+                        crossAxisAlignment: .stretch,
+                        children: [
+                          Actor(
+                            act: .sizedBox(
+                              width: .tween(from: 50, to: 100),
+                            ),
+                            child: ColoredBox(color: Colors.blue),
                           ),
-                          child: ColoredBox(color: Colors.blue),
-                        ),
-                         Actor(
-                          act: .sizedBox(
-                            width: .tween(from: 50, to: 100),
+                           Actor(
+                            act: .sizedBox(
+                              width: .tween(from: 50, to: 100),
+                            ),
+                            child: ColoredBox(color: Colors.yellow),
                           ),
-                          child: ColoredBox(color: Colors.yellow),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  // Expanded(child: ColoredBox(color: Colors.green)),
-                ],
+                    // Expanded(child: ColoredBox(color: Colors.green)),
+                  ],
+                ),
               ),
-            ),
-     
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  checked = !checked;
-                });
-              },
-              child: Text('Toggle'),
-            ),
-          ],
+               
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    checked = !checked;
+                  });
+                },
+                child: Text('Toggle'),
+              ),
+            ],
+          ),
         ),
       ),
     );

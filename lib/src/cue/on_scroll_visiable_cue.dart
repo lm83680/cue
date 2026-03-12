@@ -20,9 +20,9 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> {
   String get debugName => 'OnScrollVisibleCue';
 
   @override
-  Timeline get timeline => _progressAnimation;
+  CueTimeline get timeline => _progressAnimation;
 
-  late final _progressAnimation = ProgressAnimations(1.0, status: AnimationStatus.completed);
+  late final _progressAnimation = CueProgressAnimations(1.0, status: AnimationStatus.completed);
 
   @override
   bool get isBounded => true;

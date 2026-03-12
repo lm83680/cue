@@ -42,7 +42,7 @@ class PathMotionAct extends Act {
   }
 
   @override
-  CueAnimation<Matrix4> buildAnimation(Timeline timline, ActContext context) {
+  CueAnimation<Matrix4> buildAnimation(CueTimeline timline, ActContext context) {
     final driver = timline.animationFor(AnimationConfig(motion: motion ?? context.motion));
     final metrics = path.computeMetrics().toList();
     if (metrics.isEmpty) {

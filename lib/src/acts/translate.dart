@@ -10,20 +10,20 @@ abstract class TranslateAct extends Act {
 
   const factory TranslateAct.keyframes(
     List<Keyframe<Offset>> keyframes, {
-     CueMotion? motion,
+    CueMotion? motion,
     ReverseBehavior<Offset> reverse,
   }) = _TranslateOffset.keyframes;
 
   const factory TranslateAct.fromX({
     double from,
     double to,
-     CueMotion? motion,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.horizontal;
 
   const factory TranslateAct.keyframesX(
     List<Keyframe<double>> keyframes, {
-     CueMotion? motion,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.keyframesX;
 
@@ -36,7 +36,7 @@ abstract class TranslateAct extends Act {
 
   const factory TranslateAct.keyframesY(
     List<Keyframe<double>> keyframes, {
-     CueMotion? motion,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.keyframesY;
 
@@ -50,14 +50,14 @@ abstract class TranslateAct extends Act {
     Rect rect, {
     AlignmentGeometry alignment,
     Offset toLocal,
-     CueMotion? motion,
+    CueMotion? motion,
   }) = _TranslateFromGlobalEffect.fromRect;
 
   const factory TranslateAct.fromGlobalKey(
     GlobalKey key, {
     AlignmentGeometry alignment,
     Offset toLocal,
-     CueMotion? motion,
+    CueMotion? motion,
   }) = _TranslateFromGlobalEffect.fromKey;
 }
 
@@ -76,12 +76,8 @@ class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
   }) : super.keyframes();
 
   @override
-  Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
-    return TranslateTransition(
-      offset: animation,
-      transformHitTests: true,
-      child: child,
-    );
+  Widget apply(BuildContext context, CueAnimation<Offset> animation, Widget child) {
+    return TranslateTransition(offset: animation, child: child);
   }
 }
 
@@ -127,12 +123,8 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
   }
 
   @override
-  Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
-    return TranslateTransition(
-      offset: animation,
-      transformHitTests: true,
-      child: child,
-    );
+  Widget apply(BuildContext context, CueAnimation<Offset> animation, Widget child) {
+    return TranslateTransition(offset: animation, child: child);
   }
 }
 
@@ -291,12 +283,9 @@ class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTrans
   @override
   Widget build(BuildContext context) {
     final offsetTween = _deltaTween ?? Tween(begin: Offset.zero, end: widget.toLocal);
-    return Visibility(
+    return Visibility.maintain(
       key: _key,
       visible: _deltaTween != null && _measured,
-      maintainState: true,
-      maintainAnimation: true,
-      maintainSize: true,
       child: TranslateTransition(
         offset: offsetTween.animate(widget.animation),
         child: widget.child,
