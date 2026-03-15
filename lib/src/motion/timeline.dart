@@ -1,7 +1,6 @@
 import 'dart:ui';
 
-import 'package:cue/src/acts/base/tween_act.dart';
-import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 
 abstract class CueTimeline {
@@ -9,11 +8,19 @@ abstract class CueTimeline {
   void prepare({required bool forward});
   void release(CueAnimationDriver anim);
 
+  void addOnPrepareListener(ValueChanged<bool> listener);
   CueMotion get mainMotion;
 }
 
 class CueTimelineImpl extends Simulation implements CueTimeline {
   final Map<DriverConfig, CueAnimationDriver> _animations;
+
+  @override
+  void addOnPrepareListener(ValueChanged<bool> listener) {
+    _onPrapaerNotifier.addEventListener(listener);
+  }
+
+  final _onPrapaerNotifier = EventNotifier<bool>();
 
   CueTimelineImpl(CueAnimationDriverImpl main)
     : _animations = {
@@ -45,6 +52,7 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
         forward: mainAnimation.isForwardOrCompleted,
         velocity: mainAnimation.velocity,
       );
+      _onPrapaerNotifier.fireEvent(mainAnimation.isForwardOrCompleted);
     }
     return animation;
   }
@@ -56,6 +64,7 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
 
   @override
   void prepare({required bool forward}) {
+    _onPrapaerNotifier.fireEvent(forward);
     _lastT = 0.0;
     for (final anim in _animations.values) {
       anim.prepare(forward: forward);
@@ -82,13 +91,6 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
 
   @override
   CueMotion get mainMotion => _animations.keys.first.motion;
-
-  @override
-  void seek(double progress, bool forward) {
-    for (final anim in _animations.values) {
-      anim.advance(progress);
-    }
-  }
 }
 
 abstract class CueAnimationDriver extends Animation<double> with AnimationLocalStatusListenersMixin {
@@ -220,6 +222,13 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
 
   final ValueChanged<CueProgressAnimations>? onUpdate;
 
+  @override
+  void addOnPrepareListener(ValueChanged<bool> listener) {
+    _willAnimateNotifer.addEventListener(listener);
+  }
+
+  final _willAnimateNotifer = EventNotifier<bool>();
+
   CueProgressAnimations(
     this._value, {
     AnimationStatus status = AnimationStatus.completed,
@@ -272,6 +281,7 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
 
   @override
   void prepare({required bool forward, double? velocity}) {
+    _willAnimateNotifer.fireEvent(forward);
     // no-op
   }
 

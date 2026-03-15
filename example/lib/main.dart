@@ -1,6 +1,7 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/delete_confirmation.dart';
 import 'package:example/examples/expanding_cards.dart';
+import 'package:example/examples/horizinally_expanding_cards.dart';
 import 'package:example/examples/slack_style_fab.dart';
 
 import 'package:flutter/foundation.dart';
@@ -59,12 +60,14 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.end,
-            // crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               // ExpandingCards(),
-              // SlackStyleFab(),
-              // DeleteConfirmationDialog(),
+              SlackStyleFab(),
+              DeleteConfirmationDialog(),
+              HorizontallyExpandingCards(),
+              if(false)
               Cue.onMount(
                 // toggled: checked,
                 motion: .wobbly(),
@@ -120,18 +123,3 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
     );
   }
 }
-
-// class SpringCurve extends Curve {
-//   final SimulationBuildData buildData;
-//   final Simulation _sim;
-
-//   SpringCurve([this.buildData = const SimulationBuildData()]) : _sim = Spring.wobbly(damping: 8).build(buildData);
-
-//   @override
-//   double transformInternal(double t) {
-//     if(!buildData.forward){
-//        t = 1.0 - t;
-//     }
-//     return _sim.x(t * 0.7833333333333341);
-//   }
-// }

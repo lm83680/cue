@@ -6,6 +6,7 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
     super.to = EdgeInsets.zero,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const PaddingAct.keyframed({

@@ -176,6 +176,8 @@ abstract class Act {
     EdgeInsetsGeometry from,
     EdgeInsetsGeometry to,
     CueMotion? motion,
+    Duration? delay,
+    ReverseBehavior<EdgeInsetsGeometry> reverse,
   }) = PaddingAct;
 
   const factory Act.blur({

@@ -60,6 +60,7 @@ class SlackStyleFab extends StatelessWidget {
             child: Actor(
               act: .padding(
                 to: .symmetric(horizontal: 16, vertical: 12),
+                delay: 100.ms,
               ),
               child: Column(
                 mainAxisSize: .min,

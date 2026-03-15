@@ -1,5 +1,4 @@
 import 'package:cue/src/motion/timeline.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CueDebugTools extends StatefulWidget {
@@ -14,13 +13,9 @@ class CueDebugTools extends StatefulWidget {
     return context.findAncestorWidgetOfExactType<CueDebugTools>() != null;
   }
 
-  static VoidCallback? attachDebugTarget(
-    BuildContext context, {
-    required String id,
-    required CueTimeline timeline,
-  }) {
+  static VoidCallback? attachDebugTarget(BuildContext context, {required String id}) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
-    return provider?.attachDebugTarget(context, id: id, timeline: timeline);
+    return provider?.attachDebugTarget(context, id: id);
   }
 
   static DebugDataProvider of(BuildContext context) {
@@ -39,19 +34,19 @@ class CueDebugTools extends StatefulWidget {
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  late final _timeline = CueProgressAnimations(0.0,onUpdate: (timeline){
-       _controller.duration = timeline.totalDuration;
-     print('Timeline updated: value=${timeline.totalDuration.inMilliseconds}');
-  });
+  late final _timeline = CueProgressAnimations(
+    0.0,
+    onUpdate: (timeline) {
+      _controller.duration = timeline.totalDuration;
+    },
+  );
   final _overlayData = ValueNotifier<_OverlayData>(
     _OverlayData(
       speedMultiplier: 1,
       isLooping: false,
       isMinimized: true,
       verticalOffset: 0,
-      isSelectMode: false,
       activeTargetId: null,
-      targets: const {},
     ),
   );
 
@@ -66,7 +61,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       upperBound: 1.0,
       duration: const Duration(milliseconds: 500),
     );
-    _controller.addListener((){
+    _controller.addListener(() {
       _timeline.advance(_controller.value);
     });
   }
@@ -86,23 +81,15 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   VoidCallback attachDebugTarget(
     BuildContext context, {
     required String id,
-    required CueTimeline timeline,
   }) {
-    final target = _DebugTarget(id: id, timeline: timeline);
-    _overlayData.value = _overlayData.value.copyWith(
-      targets: {
-        ..._overlayData.value.targets,
-        id: target,
-      },
-      activeTargetId: _overlayData.value.activeTargetId ?? id,
-    );
-
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+       _overlayData.value = _overlayData.value.copyWith(activeTargetId: id);
+     });
 
     void deattachCallback() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _controller.value = 0;
-        final updatedTargets = Map<String, _DebugTarget>.from(_overlayData.value.targets)..remove(id);
-        _overlayData.value = _overlayData.value.copyWith(targets: updatedTargets);
+        _overlayData.value = _overlayData.value.copyWith(activeTargetId: '');
       });
     }
 
@@ -142,7 +129,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
           activeTargetId: _overlayData.value.activeTargetId,
           timeline: _timeline,
           isMinimized: _overlayData.value.isMinimized,
-          isSelectMode: _overlayData.value.isSelectMode,
           child: widget.child,
         );
       },
@@ -276,7 +262,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                     ),
                                     icon: Icon(Icons.play_circle),
                                     onPressed: () {
-                                      _dataNotifier.value = _data.copyWith(isMinimized: false, isSelectMode: false);
+                                      _dataNotifier.value = _data.copyWith(isMinimized: false);
                                     },
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
@@ -344,112 +330,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                               ],
                                             ),
                                           ),
-                                          IconButton(
-                                            padding: EdgeInsets.zero,
-                                            style: IconButton.styleFrom(tapTargetSize: .shrinkWrap),
-                                            constraints: const BoxConstraints(),
-                                            onPressed: _data.isSelectMode
-                                                ? null
-                                                : () async {
-                                                    _dataNotifier.value = _data.copyWith(isSelectMode: true);
-                                                    final RenderBox button = context.findRenderObject() as RenderBox;
-                                                    final Offset position = button.localToGlobal(Offset.zero);
-                                                    final rect = position & button.size;
-                                                    showGeneralDialog(
-                                                      context: context,
-                                                      barrierDismissible: true,
-                                                      barrierLabel: 'Select Target',
-                                                      barrierColor: Colors.black.withValues(alpha: 0.05),
-                                                      pageBuilder: (context, animation, secondaryAnimation) {
-                                                        return Material(
-                                                          color: Colors.transparent,
-                                                          child: Align(
-                                                            alignment: Alignment.topLeft,
-                                                            child: Transform.translate(
-                                                              offset: Offset(rect.right - 220, rect.bottom + 8),
-                                                              child: Container(
-                                                                width: 220,
-                                                                constraints: BoxConstraints(
-                                                                  maxHeight: 400,
-                                                                ),
-                                                                decoration: BoxDecoration(
-                                                                  color: theme.colorScheme.surface,
-                                                                  borderRadius: BorderRadius.circular(16),
-                                                                ),
-                                                                child: ListenableBuilder(
-                                                                  listenable: _dataNotifier,
-                                                                  builder: (context, _) {
-                                                                    return Column(
-                                                                      mainAxisSize: MainAxisSize.min,
-                                                                      children: [
-                                                                        ListView(
-                                                                          padding: EdgeInsets.only(top: 8, bottom: 8),
-                                                                          shrinkWrap: true,
-                                                                          children: [
-                                                                            for (final target in _data.targets.values)
-                                                                              GestureDetector(
-                                                                                child: Container(
-                                                                                  alignment: Alignment.centerLeft,
-                                                                                  color:
-                                                                                      _data.activeTargetId == target.id
-                                                                                      ? Colors.orange.withValues(
-                                                                                          alpha: .1,
-                                                                                        )
-                                                                                      : null,
-                                                                                  padding: const EdgeInsets.symmetric(
-                                                                                    horizontal: 12,
-                                                                                    vertical: 4,
-                                                                                  ),
-                                                                                  child: Text(
-                                                                                    target.id,
-                                                                                    style: TextStyle(fontSize: 13),
-                                                                                    maxLines: 1,
-                                                                                    overflow: TextOverflow.ellipsis,
-                                                                                  ),
-                                                                                ),
-                                                                                onTap: () {
-                                                                                  _dataNotifier.value = _data.copyWith(
-                                                                                    activeTargetId: target.id,
-                                                                                  );
-                                                                                },
-                                                                              ),
-                                                                          ],
-                                                                        ),
-                                                                        OutlinedButton(
-                                                                          onPressed: () {
-                                                                            Navigator.of(context).pop();
-                                                                            _dataNotifier.value = _data.copyWith(
-                                                                              isSelectMode: false,
-                                                                            );
-                                                                          },
-                                                                          style: OutlinedButton.styleFrom(
-                                                                            tapTargetSize: .shrinkWrap,
-                                                                            minimumSize: Size(180, 32),
-                                                                          ),
-                                                                          child: Text('Done'),
-                                                                        ),
-                                                                        SizedBox(height: 12),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ).whenComplete(
-                                                      () => _dataNotifier.value = _data.copyWith(isSelectMode: false),
-                                                    );
-                                                  },
 
-                                            icon: Icon(
-                                              Icons.ads_click,
-                                              color: _data.isSelectMode
-                                                  ? Colors.blue
-                                                  : IconTheme.of(context).color?.withValues(alpha: .4),
-                                            ),
-                                          ),
                                           IconButton(
                                             padding: EdgeInsets.zero,
                                             style: IconButton.styleFrom(tapTargetSize: .shrinkWrap),
@@ -525,7 +406,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             activeColor: Colors.transparent,
                                             thumbColor: theme.colorScheme.primary,
                                             overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                                            onChanged: _data.isSelectMode ? null : _onSliderChanged,
+                                            onChanged: _onSliderChanged,
                                           ),
                                         ),
                                       ),
@@ -700,18 +581,14 @@ class _OverlayData {
   final bool isLooping;
   final bool isMinimized;
   final double verticalOffset;
-  final bool isSelectMode;
   final String? activeTargetId;
-  final Map<String, _DebugTarget> targets;
 
   _OverlayData({
     required this.speedMultiplier,
     required this.isLooping,
     required this.isMinimized,
     required this.verticalOffset,
-    required this.isSelectMode,
     required this.activeTargetId,
-    required this.targets,
   });
 
   @override
@@ -722,10 +599,8 @@ class _OverlayData {
           speedMultiplier == other.speedMultiplier &&
           isLooping == other.isLooping &&
           isMinimized == other.isMinimized &&
-          isSelectMode == other.isSelectMode &&
           verticalOffset == other.verticalOffset &&
-          activeTargetId == other.activeTargetId &&
-          mapEquals(targets, other.targets);
+          activeTargetId == other.activeTargetId;
 
   @override
   int get hashCode => Object.hash(
@@ -733,9 +608,7 @@ class _OverlayData {
     isLooping,
     isMinimized,
     verticalOffset,
-    isSelectMode,
     activeTargetId,
-    Object.hashAll(targets.values),
   );
 
   bool get isSlowMode => speedMultiplier > 1;
@@ -745,18 +618,14 @@ class _OverlayData {
     bool? isLooping,
     bool? isMinimized,
     double? verticalOffset,
-    bool? isSelectMode,
     String? activeTargetId,
-    Map<String, _DebugTarget>? targets,
   }) {
     return _OverlayData(
       speedMultiplier: speedMultiplier ?? this.speedMultiplier,
       isLooping: isLooping ?? this.isLooping,
       isMinimized: isMinimized ?? this.isMinimized,
       verticalOffset: verticalOffset ?? this.verticalOffset,
-      isSelectMode: isSelectMode ?? this.isSelectMode,
       activeTargetId: activeTargetId ?? this.activeTargetId,
-      targets: targets ?? this.targets,
     );
   }
 }
@@ -766,31 +635,18 @@ class DebugDataProvider extends InheritedWidget {
     super.key,
     required this.timeline,
     required this.isMinimized,
-    required this.isSelectMode,
     required this.activeTargetId,
     required super.child,
   });
 
   final CueProgressAnimations timeline;
   final bool isMinimized;
-  final bool isSelectMode;
   final String? activeTargetId;
 
   @override
   bool updateShouldNotify(covariant DebugDataProvider oldWidget) {
     return timeline != oldWidget.timeline ||
         isMinimized != oldWidget.isMinimized ||
-        isSelectMode != oldWidget.isSelectMode ||
         activeTargetId != oldWidget.activeTargetId;
   }
-}
-
-class _DebugTarget {
-  final String id;
-  final CueTimeline timeline;
-
-  _DebugTarget({
-    required this.id,
-    required this.timeline,
-  });
 }

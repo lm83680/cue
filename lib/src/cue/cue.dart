@@ -1,6 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/motion/cue_animation_controller.dart';
-import 'package:cue/src/motion/cue_motion.dart';
 import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -142,15 +141,16 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (kDebugMode) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (CueDebugTools.isWrappedByDebugProvider(context)) {
-          _deattachDebugOverlay = CueDebugTools.attachDebugTarget(
-            context,
-            id: _debugId,
-            timeline: timeline,
-          );
-        }
-      });
+      if (CueDebugTools.isWrappedByDebugProvider(context)) {
+          // _deattachDebugOverlay = CueDebugTools.attachDebugTarget(context, id: _debugId);
+        timeline.addOnPrepareListener((forward) {
+          if (forward) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _deattachDebugOverlay = CueDebugTools.attachDebugTarget(context, id: _debugId);
+            });
+          }
+        });
+      }
     }
   }
 
@@ -166,30 +166,17 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     if (widget.act != null) {
       child = Actor(act: widget.act!, child: child);
     }
-
- 
     if (kDebugMode) {
       final debugToolsScope = CueDebugTools.maybeOf(context);
       if (debugToolsScope != null) {
         final isActive = debugToolsScope.activeTargetId == _debugId;
         final useDebugAnimation = !debugToolsScope.isMinimized && isActive;
-        return DecoratedBox(
-          position: DecorationPosition.foreground,
-          decoration: isActive && debugToolsScope.isSelectMode
-              ? BoxDecoration(
-                  color: Colors.amber.withValues(alpha: .2),
-                  border: Border.all(
-                    color: Colors.amber.withValues(alpha: .8),
-                  ),
-                )
-              : const BoxDecoration(),
-          child: CueScope(
-            reanimateFromCurrent: reanimateFromCurrent,
-            timeline: useDebugAnimation ? debugToolsScope.timeline : timeline,
-            willReanimateNotifier: willReanimateNotifier,
-            isBounded: isBounded,
-            child: child,
-          ),
+        return CueScope(
+          reanimateFromCurrent: reanimateFromCurrent,
+          timeline: useDebugAnimation ? debugToolsScope.timeline : timeline,
+          willReanimateNotifier: willReanimateNotifier,
+          isBounded: isBounded,
+          child: child,
         );
       }
     }
