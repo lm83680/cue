@@ -52,6 +52,7 @@ abstract class SlideAct extends Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
+    Duration? delay,
   }) = _AxisSlideEffect.tweenX;
 
   const factory SlideAct.keyframedX({
@@ -72,6 +73,7 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromBottom({
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween(
          from: const Offset(0, 1),
          to: Offset.zero,
@@ -80,6 +82,7 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromTop({
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween(
          from: const Offset(0, -1),
          to: Offset.zero,
@@ -88,6 +91,7 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromLeading({
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween(
          from: const Offset(-1, 0),
          to: Offset.zero,
@@ -96,6 +100,7 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromTrailing({
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween(
          from: const Offset(1, 0),
          to: Offset.zero,
@@ -121,6 +126,7 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
     super.to = 0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : _axis = Axis.horizontal,
        super.tween();
 
@@ -129,6 +135,7 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
     super.to = 0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : _axis = Axis.vertical,
        super.tween();
 

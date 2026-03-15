@@ -147,8 +147,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
           _deattachDebugOverlay = CueDebugTools.attachDebugTarget(
             context,
             id: _debugId,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeOut,
+            timeline: timeline,
           );
         }
       });
@@ -169,31 +168,31 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     }
 
  
-    // if (kDebugMode) {
-    //   final debugToolsScope = CueDebugTools.maybeOf(context);
-    //   if (debugToolsScope != null) {
-    //     final isActive = debugToolsScope.activeTargetId == _debugId;
-    //     final useDebugAnimation = !debugToolsScope.isMinimized && isActive;
-    //     return DecoratedBox(
-    //       position: DecorationPosition.foreground,
-    //       decoration: isActive && debugToolsScope.isSelectMode
-    //           ? BoxDecoration(
-    //               color: Colors.amber.withValues(alpha: .2),
-    //               border: Border.all(
-    //                 color: Colors.amber.withValues(alpha: .8),
-    //               ),
-    //             )
-    //           : const BoxDecoration(),
-    //       child: CueScope(
-    //         reanimateFromCurrent: reanimateFromCurrent,
-    //         timeline: useDebugAnimation ? debugToolsScope.timeline : timeline,
-    //         willReanimateNotifier: willReanimateNotifier,
-    //         isBounded: isBounded,
-    //         child: child,
-    //       ),
-    //     );
-    //   }
-    // }
+    if (kDebugMode) {
+      final debugToolsScope = CueDebugTools.maybeOf(context);
+      if (debugToolsScope != null) {
+        final isActive = debugToolsScope.activeTargetId == _debugId;
+        final useDebugAnimation = !debugToolsScope.isMinimized && isActive;
+        return DecoratedBox(
+          position: DecorationPosition.foreground,
+          decoration: isActive && debugToolsScope.isSelectMode
+              ? BoxDecoration(
+                  color: Colors.amber.withValues(alpha: .2),
+                  border: Border.all(
+                    color: Colors.amber.withValues(alpha: .8),
+                  ),
+                )
+              : const BoxDecoration(),
+          child: CueScope(
+            reanimateFromCurrent: reanimateFromCurrent,
+            timeline: useDebugAnimation ? debugToolsScope.timeline : timeline,
+            willReanimateNotifier: willReanimateNotifier,
+            isBounded: isBounded,
+            child: child,
+          ),
+        );
+      }
+    }
     return CueScope(
       timeline: timeline,
       isBounded: isBounded,

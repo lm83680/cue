@@ -65,17 +65,14 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               // ExpandingCards(),
               // SlackStyleFab(),
               // DeleteConfirmationDialog(),
-              Cue.onToggle(
-                skipFirstAnimation: false,
-                toggled: checked,
-                motion: .linear(500.ms),
-
-                // reverseMotion: Spring.linear(300.ms),
+              Cue.onMount(
+                // toggled: checked,
+                motion: .wobbly(),
                 child: Column(
                   children: [
                     Actor(
                       act: .compose([
-                        .slideX(to: 0,from: 1,  reverse: .to(-1)),
+                        .slideX(to: 0, from: -1, delay: 100.ms),
                       ]),
                       child: Actor(
                         act: .compose([
@@ -95,16 +92,14 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                         child: SizedBox(width: 100, height: 100, child: ColoredBox(color: Colors.blue)),
                       ),
                     ),
-                    // Actor(
-                    //   act: .slide(
-                    //      to: const Offset(2, 0),
-                    //   ),
-                    //   child: SizedBox(
-                    //     width: 50,
-                    //     height: 50,
-                    //     child: ColoredBox(color: Colors.yellow),
-                    //   ),
-                    // ),
+                    Actor(
+                      act: .slide(to: const Offset(2, 0)),
+                      child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: ColoredBox(color: Colors.yellow),
+                      ),
+                    ),
                   ],
                 ),
               ),

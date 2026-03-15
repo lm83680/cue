@@ -1,3 +1,4 @@
+import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -16,16 +17,10 @@ class CueDebugTools extends StatefulWidget {
   static VoidCallback? attachDebugTarget(
     BuildContext context, {
     required String id,
-    required Duration duration,
-    Curve? curve,
+    required CueTimeline timeline,
   }) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
-    return provider?.attachDebugTarget(
-      context,
-      id: id,
-      curve: curve,
-      duration: duration,
-    );
+    return provider?.attachDebugTarget(context, id: id, timeline: timeline);
   }
 
   static DebugDataProvider of(BuildContext context) {
@@ -43,6 +38,11 @@ class CueDebugTools extends StatefulWidget {
 
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+
+  late final _timeline = CueProgressAnimations(0.0,onUpdate: (timeline){
+       _controller.duration = timeline.totalDuration;
+     print('Timeline updated: value=${timeline.totalDuration.inMilliseconds}');
+  });
   final _overlayData = ValueNotifier<_OverlayData>(
     _OverlayData(
       speedMultiplier: 1,
@@ -66,6 +66,9 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       upperBound: 1.0,
       duration: const Duration(milliseconds: 500),
     );
+    _controller.addListener((){
+      _timeline.advance(_controller.value);
+    });
   }
 
   void _startAutoPlay() {
@@ -83,14 +86,9 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   VoidCallback attachDebugTarget(
     BuildContext context, {
     required String id,
-    required Duration duration,
-    Curve? curve,
+    required CueTimeline timeline,
   }) {
-    final target = _DebugTarget(
-      id: id,
-      curve: curve,
-      duration: duration,
-    );
+    final target = _DebugTarget(id: id, timeline: timeline);
     _overlayData.value = _overlayData.value.copyWith(
       targets: {
         ..._overlayData.value.targets,
@@ -99,7 +97,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       activeTargetId: _overlayData.value.activeTargetId ?? id,
     );
 
-    _controller.duration = duration;
 
     void deattachCallback() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -143,7 +140,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       builder: (context, _) {
         return DebugDataProvider(
           activeTargetId: _overlayData.value.activeTargetId,
-          animation: _controller.view,
+          timeline: _timeline,
           isMinimized: _overlayData.value.isMinimized,
           isSelectMode: _overlayData.value.isSelectMode,
           child: widget.child,
@@ -767,21 +764,21 @@ class _OverlayData {
 class DebugDataProvider extends InheritedWidget {
   const DebugDataProvider({
     super.key,
-    required this.animation,
+    required this.timeline,
     required this.isMinimized,
     required this.isSelectMode,
     required this.activeTargetId,
     required super.child,
   });
 
-  final Animation<double> animation;
+  final CueProgressAnimations timeline;
   final bool isMinimized;
   final bool isSelectMode;
   final String? activeTargetId;
 
   @override
   bool updateShouldNotify(covariant DebugDataProvider oldWidget) {
-    return animation != oldWidget.animation ||
+    return timeline != oldWidget.timeline ||
         isMinimized != oldWidget.isMinimized ||
         isSelectMode != oldWidget.isSelectMode ||
         activeTargetId != oldWidget.activeTargetId;
@@ -790,12 +787,10 @@ class DebugDataProvider extends InheritedWidget {
 
 class _DebugTarget {
   final String id;
-  final Duration duration;
-  final Curve? curve;
+  final CueTimeline timeline;
 
   _DebugTarget({
     required this.id,
-    required this.duration,
-    this.curve,
+    required this.timeline,
   });
 }

@@ -27,20 +27,18 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
   @override
   CueAnimationDriver driverFor(DriverConfig config) {
     final mainConfig = _animations.keys.first;
-    final forwardMotion = config.motion ?? mainConfig.motion!;
     final reverseMotion = config.reverseMotion ?? mainConfig.reverseMotion;
-    final key = config.copyWith(motion: forwardMotion, reverseMotion: reverseMotion);
+    final key = config.copyWith(motion: config.motion, reverseMotion: reverseMotion);
     final animation = _animations.putIfAbsent(
       key,
       () => CueAnimationDriverImpl(
-        forwardMotion,
+        config.motion,
         reverseMotion: reverseMotion,
         delay: config.delay ?? Duration.zero,
         reverseDelay: config.reverseDelay ?? Duration.zero,
         reverseType: config.reverseType,
       ),
     );
-
     // if already animating eagerly prepare the new animation to match the current progress and velocity
     if (mainAnimation.isAnimating) {
       animation.prepare(
@@ -83,7 +81,14 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
   bool isDone(double time) => _animations.values.every((anim) => anim.isDone);
 
   @override
-  CueMotion get mainMotion => _animations.keys.first.motion!;
+  CueMotion get mainMotion => _animations.keys.first.motion;
+
+  @override
+  void seek(double progress, bool forward) {
+    for (final anim in _animations.values) {
+      anim.advance(progress);
+    }
+  }
 }
 
 abstract class CueAnimationDriver extends Animation<double> with AnimationLocalStatusListenersMixin {
@@ -144,7 +149,6 @@ class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListe
 
   @override
   void prepare({required bool forward, double? velocity}) {
-
     if (forward && reverseType.isExclusive) {
       // this drive should only drive reverse animation
       _done = true;
@@ -214,28 +218,53 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
   double _value;
   AnimationStatus _status;
 
-  CueProgressAnimations(this._value, {AnimationStatus status = AnimationStatus.completed}) : _status = status;
+  final ValueChanged<CueProgressAnimations>? onUpdate;
+
+  CueProgressAnimations(
+    this._value, {
+    AnimationStatus status = AnimationStatus.completed,
+    this.onUpdate,
+  }) : _status = status;
 
   final Map<DriverConfig, BakedSimulationAnimation> _animations = {};
 
-  final _linearMotion = const LinearSimulationMotion();
+  final _mainConfig = const DriverConfig(motion: LinearSimulationMotion());
+
+  Duration get totalDuration {
+    Duration maxDuration = _mainConfig.motion.duration;
+    for (final animation in _animations.values) {
+      final duration = Duration(
+        microseconds: (animation.motion.durationSeconds * Duration.microsecondsPerSecond).round(),
+      );
+      if (duration > maxDuration) {
+        maxDuration = duration;
+      }
+    }
+    return maxDuration;
+  }
 
   @override
   CueAnimationDriver driverFor(DriverConfig config) {
-    if (config.motion == null && config.reverseMotion == null) {
+    final key = config.copyWith(
+      reverseMotion: config.reverseMotion ?? _mainConfig.motion,
+      // ignore delay for progress-based animations since the progress itself determines the timing
+      // delay: .zero,
+      // reverseDelay: .zero,
+    );
+    if (key == _mainConfig) {
       return this;
     }
-    final key = config.copyWith(
-      motion: config.motion ?? _linearMotion,
-      reverseMotion: config.reverseMotion ?? _linearMotion,
-      // ignore delay for progress-based animations since the progress itself determines the timing
-      delay: .zero,
-      reverseDelay: .zero,
-    );
-    return _animations.putIfAbsent(
+    final animation = _animations.putIfAbsent(
       key,
-      () => BakedSimulationAnimation(key.motion!, reverseMotion: key.reverseMotion),
+      () => BakedSimulationAnimation(
+        key.motion,
+        reverseMotion: key.reverseMotion,
+        delay: key.delay ?? Duration.zero,
+        reverseDelay: key.reverseDelay ?? Duration.zero,
+      ),
     );
+    onUpdate?.call(this);
+    return animation;
   }
 
   @override
@@ -282,18 +311,24 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
   int get phase => 0;
 
   @override
-  CueMotion get mainMotion => const LinearSimulationMotion();
+  CueMotion get mainMotion => _mainConfig.motion;
 }
 
 class BakedSimulationAnimation extends CueAnimationDriver with AnimationLocalListenersMixin {
   final BakedMotion motion;
   final BakedMotion? reverseMotion;
+  final Duration delay;
+  final Duration reverseDelay;
 
   double _value = 0.0;
 
-  BakedSimulationAnimation(CueMotion motion, {CueMotion? reverseMotion})
-    : motion = motion.bake(),
-      reverseMotion = reverseMotion?.bake();
+  BakedSimulationAnimation(
+    CueMotion motion, {
+    CueMotion? reverseMotion,
+    this.delay = Duration.zero,
+    this.reverseDelay = Duration.zero,
+  }) : motion = motion.bake(),
+       reverseMotion = reverseMotion?.bake();
 
   @override
   double get value => _value;
@@ -355,14 +390,14 @@ class BakedMotion {
 }
 
 class DriverConfig {
-  final CueMotion? motion;
+  final CueMotion motion;
   final CueMotion? reverseMotion;
   final Duration? delay;
   final Duration? reverseDelay;
   final ReverseBehaviorType reverseType;
 
   const DriverConfig({
-    this.motion,
+    required this.motion,
     this.reverseMotion,
     this.delay = Duration.zero,
     this.reverseDelay = Duration.zero,
