@@ -1,4 +1,5 @@
 import 'package:cue/src/motion/cue_motion.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class KeyframeBase<T extends Object?> {
@@ -54,13 +55,65 @@ class Keyframe<T> extends KeyframeBase<T> {
   @override
   int get hashCode => Object.hash(value, motion);
 
-
   Keyframe<T> copyWith({T? value, CueMotion? motion}) {
     return Keyframe<T>(
       value ?? this.value,
       motion: motion ?? this.motion,
     );
   }
+}
+
+sealed class Keyframes<T> {
+  const factory Keyframes(List<Keyframe<T>> frames) = MotionKeyframes<T>;
+
+  const factory Keyframes.fractional(
+    List<FractionalKeyframe<T>> frames, {
+    required Duration duration,
+  }) = FractionalKeyframes<T>;
+
+  T get lastTarget;
+}
+
+final class MotionKeyframes<T> implements Keyframes<T> {
+  final List<Keyframe<T>> frames;
+  const MotionKeyframes(this.frames);
+
+  @override
+  T get lastTarget {
+    assert(frames.isNotEmpty, 'Keyframes must have at least one frame to determine last target');
+    return frames.last.value;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MotionKeyframes && runtimeType == other.runtimeType && listEquals(frames, other.frames);
+
+  @override
+  int get hashCode => Object.hashAll(frames);
+}
+
+final class FractionalKeyframes<T> implements Keyframes<T> {
+  final List<FractionalKeyframe<T>> frames;
+  final Duration? duration;
+  const FractionalKeyframes(this.frames, {required this.duration});
+
+  @override
+  T get lastTarget {
+    assert(frames.isNotEmpty, 'Keyframes must have at least one frame to determine last target');
+    return frames.last.value;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FractionalKeyframes &&
+          runtimeType == other.runtimeType &&
+          listEquals(frames, other.frames) &&
+          duration == other.duration;
+
+  @override
+  int get hashCode => Object.hash(Object.hashAll(frames), duration);
 }
 
 class Phase<T extends Object?> {
@@ -89,10 +142,10 @@ class Phase<T extends Object?> {
   bool get isAlwaysStopped => begin == end;
 
   static List<Phase<R>> resolveFractionalFrames<T extends Object?, R extends Object?>(
-    List<FractionalKeyframe<T>> frames,
-    Duration duration,
-    R Function(T value) transform,
-  ) {
+    List<FractionalKeyframe<T>> frames, {
+    required Duration duration,
+    required R Function(T value) transform,
+  }) {
     if (frames.isEmpty) {
       return [];
     }
@@ -100,7 +153,15 @@ class Phase<T extends Object?> {
     // Remove duplicates (keep last) and track curves
     final Map<double, T> uniqueFrames = {};
     final Map<double, Curve?> frameCurves = {};
-    for (final frame in frames) {
+
+    // First frame is the starting point at t=0
+    if (frames.isNotEmpty) {
+      uniqueFrames[0.0] = frames[0].value;
+      frameCurves[0.0] = null;
+    }
+
+    for (int i = 1; i < frames.length; i++) {
+      final frame = frames[i];
       final clampedTime = frame.at.clamp(0.0, 1.0);
       uniqueFrames[clampedTime] = frame.value;
       frameCurves[clampedTime] = frame.curve;
@@ -145,29 +206,18 @@ class Phase<T extends Object?> {
     return phases;
   }
 
-  static List<Phase<R>> resolveAbsoluteFrames<T extends Object?, R extends Object?>(
-    List<Keyframe<T>> frames,
-    R Function(T value) transform,
-  ) {
+  static List<Phase<R>> resolveMotionFrames<T extends Object?, R extends Object?>(
+    List<Keyframe<T>> frames, {
+    required R Function(T value) transform,
+  }) {
     if (frames.isEmpty) {
       return [];
     }
 
-    // Handle single keyframe case - return constant phase
-    if (frames.length < 2) {
-      final frame = frames.first;
-      final value = transform(frame.value);
-      return [
-        Phase(
-          begin: value,
-          end: value,
-          motion: frame.motion,
-        ),
-      ];
-    }
-
-    // Create phases for each transition using standalone motions
     final List<Phase<R>> phases = [];
+
+    // First frame is the starting point, its motion is ignored (it's where we start)
+    // Create phases for transitions from first frame onward
     for (int i = 0; i < frames.length - 1; i++) {
       final currentFrame = frames[i];
       final nextFrame = frames[i + 1];

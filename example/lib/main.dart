@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/expanding_cards.dart';
 import 'package:example/examples/slack_style_fab.dart';
 
 import 'package:flutter/foundation.dart';
@@ -60,6 +61,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             // mainAxisAlignment: MainAxisAlignment.end,
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              // ExpandingCards(),
               // SlackStyleFab(),
               // DeleteConfirmationDialog(),
               Cue.onToggle(
@@ -72,9 +74,9 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     Actor(
                       act: SizedBoxAct.keyframes([
                         .key(Size(100, 100), motion: .linear(300.ms)),
-                        .key(Size(50, 50), motion: .linear(300.ms)),
+                        .key(Size(50, 50), motion: .wobbly()),
                         .key(Size(150, 150), motion: .linear(300.ms)),
-                      ]),
+                      ], reverse: .to(  Size(100, 100))),
                       // act: SlideAct.fractionalKeyframes([
                       //   .key(Offset(0, 0), at: 0.0),
                       //   .key(Offset(1, .2), at: 0.5, curve: Curves.elasticOut),

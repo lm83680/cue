@@ -9,52 +9,26 @@ typedef ValueTransformer<R, T> = R Function(ActContext context, T value);
 abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImpl<R, T> {
   final T? from;
   final T? to;
-  final List<Keyframe<T>>? keyframes;
-  final List<FractionalKeyframe<T>>? fractionalKeyframes;
-  final Duration? _fractionalKeyframesDuration;
+  final Keyframes<T>? frames;
 
   @internal
-  const TweenActBase({
-    this.from,
-    this.to,
-    this.keyframes,
-    this.fractionalKeyframes,
-    super.motion,
-    super.delay,
-    super.reverse = const ReverseBehavior.mirror(),
-    Duration? fractionalKeyframesDuration,
-  }) : _fractionalKeyframesDuration = fractionalKeyframesDuration;
+  const TweenActBase({this.from, this.to, this.frames, super.motion, super.delay, required super.reverse});
 
   const TweenActBase.tween({
     required T this.from,
     required T this.to,
     super.motion,
     super.delay,
-    super.reverse = const ReverseBehavior.mirror(),
-  }) : keyframes = null,
-       fractionalKeyframes = null,
-       _fractionalKeyframesDuration = null;
+    ReverseBehavior<T> super.reverse = const ReverseBehavior.mirror(),
+  }) : frames = null;
 
-  const TweenActBase.keyframes(
-    List<Keyframe<T>> this.keyframes, {
-    super.motion,
+  const TweenActBase.keyframed({
+    required Keyframes<T> this.frames,
     super.delay,
-    super.reverse = const ReverseBehavior.mirror(),
-  }) : from = null,
-       to = null,
-       fractionalKeyframes = null,
-       _fractionalKeyframesDuration = null;
-
-  const TweenActBase.fractionalKeyframes(
-    List<FractionalKeyframe<T>> this.fractionalKeyframes, {
-    Duration? duration,
-    super.motion,
-    super.delay,
-    super.reverse = const ReverseBehavior.mirror(),
-  }) : _fractionalKeyframesDuration = duration,
+    KFReverseBehavior<T> reverse = const KFReverseBehavior.mirror(),
+  }) : to = null,
        from = null,
-       to = null,
-       keyframes = null;
+       super(reverse: reverse);
 
   bool get isConstant => from != null && to != null && from == to;
 
@@ -69,29 +43,21 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
     T? from,
     T? to,
     R? implicitFrom,
-    List<Keyframe<T>>? keyframes,
-    List<FractionalKeyframe<T>>? fractionalKeyframes,
-    Duration? fractionalKeyframesDuration,
+    Keyframes<T>? keyframes,
     required CueMotion motion,
   }) {
     if (keyframes != null) {
-      assert(keyframes.isNotEmpty, 'Keyframes list cannot be empty');
-      final phases = Phase.resolveAbsoluteFrames<T, R>(keyframes, (v) => transform(context, v));
-      return SegmentedAnimtable([
-        for (final phase in phases)
-          AnimatableSegment(
-            animatable: createSingleTween(phase.begin, phase.end),
-            motion: phase.motion,
-          ),
-      ]);
-    } else if (fractionalKeyframes != null) {
-      assert(fractionalKeyframes.isNotEmpty, 'Fractional keyframes list cannot be empty');
-      final totalDuration = fractionalKeyframesDuration ?? motion.duration;
-      final phases = Phase.resolveFractionalFrames<T, R>(
-        fractionalKeyframes,
-        totalDuration,
-        (v) => transform(context, v),
-      );
+      final phases = switch (keyframes) {
+        MotionKeyframes<T>(:final frames) => Phase.resolveMotionFrames<T, R>(
+          frames,
+          transform: (v) => transform(context, v),
+        ),
+        FractionalKeyframes<T>(:final frames, :final duration) => Phase.resolveFractionalFrames<T, R>(
+          frames,
+          duration: duration ?? motion.duration,
+          transform: (v) => transform(context, v),
+        ),
+      };
       return SegmentedAnimtable([
         for (final phase in phases)
           AnimatableSegment(
@@ -100,13 +66,13 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
           ),
       ]);
     } else {
-      final effectiveFrom = implicitFrom ?? transform(context, from as T);
+      final effectiveFrom = implicitFrom ?? (from != null ? transform(context, from as T) : null);
       assert(effectiveFrom != null && to != null, 'From and to values must be provided when not using keyframes');
       if (effectiveFrom == to) {
-        return AlwaysStoppedAnimatable<R>(effectiveFrom);
+        return AlwaysStoppedAnimatable<R>(effectiveFrom as R);
       } else {
         return TweenAnimtable<R>(
-          createSingleTween(effectiveFrom, transform(context, to as T)),
+          createSingleTween(effectiveFrom as R, transform(context, to as T)),
           motion: motion,
         );
       }
@@ -117,27 +83,21 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
   (CueAnimtable<R> animtable, CueAnimtable<R>? reverseAnimtable) buildTweens(ActContext context) {
     final animtable = resolveTween(
       context,
-      from: from,
       to: to,
-      keyframes: keyframes,
-      fractionalKeyframes: fractionalKeyframes,
-      fractionalKeyframesDuration: _fractionalKeyframesDuration,
+      keyframes: frames,
       implicitFrom: context.implicitFrom as R?,
       motion: motion ?? context.motion,
     );
 
     switch (reverse.type) {
-      case ReverseBehaviorType.none:
       case ReverseBehaviorType.to:
-      case ReverseBehaviorType.keyframes:
         {
+          final reverseTo = reverse.to ?? reverse.frames?.lastTarget;
           final reverseAnimtable = resolveTween(
             context,
             from: to,
-            to: reverse.to,
-            keyframes: reverse.keyframes,
-            fractionalKeyframes: reverse.fractionalKeyframes,
-            fractionalKeyframesDuration: reverse.fractionalKeyframesDuration,
+            to: reverseTo,
+            keyframes: reverse.frames,
             motion: reverse.motion ?? context.reverseMotion ?? context.motion,
           );
           return (animtable, reverseAnimtable);
@@ -155,130 +115,96 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
         other.from == from &&
         other.to == to &&
         other.reverse == reverse &&
-        listEquals(keyframes, other.keyframes);
+        frames == other.frames;
   }
 
   @override
-  int get hashCode => Object.hash(from, to, Object.hashAll(keyframes ?? []));
+  int get hashCode => Object.hash(from, to, frames);
 }
 
-enum ReverseBehaviorType { mirror, exclusive, none, to, keyframes }
+enum ReverseBehaviorType { mirror, exclusive, none, to }
 
-class ReverseBehavior<T> {
+class KFReverseBehavior<T> extends ReverseBehaviorBase<T> {
+  const KFReverseBehavior.mirror({super.delay}) : super._(type: ReverseBehaviorType.mirror);
+
+  const KFReverseBehavior.exclusive() : super._(type: ReverseBehaviorType.mirror);
+
+  const KFReverseBehavior.none() : super._(type: ReverseBehaviorType.none);
+
+  const KFReverseBehavior.to(Keyframes<T> frames, {super.delay})
+    : super._(type: ReverseBehaviorType.to, frames: frames);
+}
+
+class ReverseBehavior<T> extends ReverseBehaviorBase<T> {
+  const ReverseBehavior.mirror({super.motion, super.delay}) : super._(type: ReverseBehaviorType.mirror);
+
+  const ReverseBehavior.exclusive() : super._(type: ReverseBehaviorType.exclusive);
+
+  const ReverseBehavior.none() : super._(type: ReverseBehaviorType.none);
+
+  const ReverseBehavior.to({required T super.to, super.motion, super.delay}) : super._(type: ReverseBehaviorType.to);
+}
+
+class ReverseBehaviorBase<T> {
   final ReverseBehaviorType type;
   final T? to;
-  final List<Keyframe<T>>? keyframes;
-  final List<FractionalKeyframe<T>>? fractionalKeyframes;
-  final Duration? fractionalKeyframesDuration;
+  final Keyframes<T>? frames;
   final CueMotion? motion;
   final Duration? delay;
 
-  bool get needsReverseTween {
-    switch (type) {
-      case ReverseBehaviorType.to:
-      case ReverseBehaviorType.keyframes:
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  const ReverseBehavior.mirror({this.motion, this.delay})
-    : type = ReverseBehaviorType.mirror,
-      to = null,
-      keyframes = null,
-      fractionalKeyframes = null,
-      fractionalKeyframesDuration = null;
-  const ReverseBehavior.exclusive()
-    : type = ReverseBehaviorType.exclusive,
-      to = null,
-      keyframes = null,
-      fractionalKeyframes = null,
-      fractionalKeyframesDuration = null,
-      motion = null,
-      delay = null;
-
-  const ReverseBehavior.none()
-    : type = ReverseBehaviorType.none,
-      to = null,
-      keyframes = null,
-      motion = null,
-      fractionalKeyframes = null,
-      fractionalKeyframesDuration = null,
-      delay = null;
-
-  const ReverseBehavior.to(T this.to, {this.motion, this.delay})
-    : type = ReverseBehaviorType.to,
-      keyframes = null,
-      fractionalKeyframes = null,
-      fractionalKeyframesDuration = null;
-
-  const ReverseBehavior.keyframes(List<Keyframe<T>> this.keyframes, {this.motion, this.delay})
-    : type = ReverseBehaviorType.keyframes,
-      fractionalKeyframes = null,
-      fractionalKeyframesDuration = null,
-      to = null;
-
-  const ReverseBehavior.fractionalKeyframes(
-    List<FractionalKeyframe<T>> this.fractionalKeyframes, {
-    Duration? duration,
+  const ReverseBehaviorBase._({
+    required this.type,
+    this.to,
+    this.frames,
     this.motion,
     this.delay,
-  }) : type = ReverseBehaviorType.keyframes,
-       keyframes = null,
-       fractionalKeyframesDuration = duration,
-       to = null;
+  });
+
+  bool get needsReverseTween => type == ReverseBehaviorType.to;
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is ReverseBehavior<T> &&
+    return other is ReverseBehaviorBase<T> &&
         other.type == type &&
         other.to == to &&
-        listEquals(keyframes, other.keyframes) &&
+        frames == other.frames &&
         other.motion == motion &&
         other.delay == delay;
   }
 
   @override
-  int get hashCode => Object.hash(type, to, Object.hashAll(keyframes ?? []), motion, delay);
+  int get hashCode => Object.hash(type, to, frames, motion, delay);
 }
 
 abstract class TweenAct<T> extends TweenActBase<T, T> {
+  @internal
   const TweenAct({
     super.from,
     super.to,
-    super.keyframes,
+    super.frames,
     super.motion,
     super.delay,
     super.reverse = const ReverseBehavior.mirror(),
   });
 
-  @override
-  T transform(_, T value) => value;
-
-  const TweenAct.keyframes(super.keyframes, {super.motion, super.delay, super.reverse}) : super.keyframes();
-
-  const TweenAct.fractionalKeyframes(
-    super.fractionalKeyframes, {
-    super.duration,
-    super.motion,
-    super.delay,
-    super.reverse = const ReverseBehavior.mirror(),
-  }) : super.fractionalKeyframes();
-
-  @internal
-  const TweenAct.internal({
-    super.from,
-    super.to,
+  const TweenAct.tween({
+    required super.from,
+    required super.to,
     super.motion,
     super.delay,
     super.reverse,
-    super.keyframes,
-    super.fractionalKeyframes,
-    super.fractionalKeyframesDuration,
-  });
+  }) : super.tween();
+
+  const TweenAct.keyframed({
+    required super.frames,
+    super.delay,
+    super.reverse,
+  }) : super.keyframed();
+
+  @override
+  T transform(_, T value) => value;
 }
 
 class AnimatableValue<T> {

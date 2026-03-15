@@ -25,7 +25,7 @@ class PositionAct extends TweenAct<Position> {
     super.motion,
     super.reverse,
     Size? relativeTo,
-    super.keyframes,
+    super.frames,
   }) : _relativeTo = relativeTo,
        super.internal();
 
@@ -161,7 +161,7 @@ class PositionActor extends SingleActorBase<Position> {
   Act get effect => PositionAct.internal(
     from: from,
     to: to,
-    keyframes: frames,
+    frames: frames,
     relativeTo: _relativeTo,
     motion: motion,
     reverse: reverse,

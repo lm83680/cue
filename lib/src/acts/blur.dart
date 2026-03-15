@@ -6,9 +6,13 @@ class BlurAct extends TweenAct<double> {
     super.to = 0.0,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
-  const BlurAct.keyframes(super.keyframes, {super.motion, super.reverse}) : super.keyframes();
+  const BlurAct.keyframed({
+    required super.frames,
+    super.reverse,
+    super.delay,
+  }) : super.keyframed();
 
   const BlurAct.focus({
     super.from = 10.0,
@@ -50,16 +54,16 @@ class BackdropBlurAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     this.blendMode = BlendMode.srcOver,
-  });
+  }) : super.tween();
 
   final BlendMode blendMode;
 
-  const BackdropBlurAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const BackdropBlurAct.keyframes({
+    required super.frames,
     super.reverse,
+    super.delay,
     this.blendMode = BlendMode.srcOver,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {

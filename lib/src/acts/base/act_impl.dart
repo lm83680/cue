@@ -6,13 +6,9 @@ import 'package:flutter/widgets.dart';
 abstract class ActImpl<R extends Object?, T extends Object?> extends Act {
   final CueMotion? motion;
   final Duration? delay;
-  final ReverseBehavior<T> reverse;
+  final ReverseBehaviorBase<T> reverse;
 
-  const ActImpl({
-    this.motion,
-    this.delay,
-    this.reverse = const ReverseBehavior.mirror(),
-  });
+  const ActImpl({this.motion, this.delay, required this.reverse});
 
   @override
   List<(Act, ActContext)> resolve(ActContext context) {

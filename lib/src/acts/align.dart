@@ -6,9 +6,9 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment?> {
     super.to = Alignment.center,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
-  const AlignAct.keyframes(super.keyframes, {super.motion, super.reverse}) : super.keyframes();
+  const AlignAct.keyframed({required super.frames, super.reverse}) : super.keyframed();
 
   @override
   Alignment? transform(ActContext ctx, AlignmentGeometry? value) {
