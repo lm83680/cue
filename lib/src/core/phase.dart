@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 abstract class KeyframeBase<T extends Object?> {
   final T value;
   const KeyframeBase._(this.value);
+
 }
 
 class FractionalKeyframe<T> extends KeyframeBase<T> {
@@ -38,6 +39,11 @@ class FractionalKeyframe<T> extends KeyframeBase<T> {
       curve: curve ?? this.curve,
     );
   }
+
+  @override
+  String toString() {
+    return 'FractionalKeyframe(value: $value, at: $at, curve: $curve)'; 
+  }
 }
 
 class Keyframe<T> extends KeyframeBase<T> {
@@ -61,6 +67,11 @@ class Keyframe<T> extends KeyframeBase<T> {
       motion: motion ?? this.motion,
     );
   }
+
+  @override
+  String toString() {
+    return 'Keyframe(value: $value, motion: $motion)';
+  }
 }
 
 sealed class Keyframes<T> {
@@ -76,6 +87,8 @@ sealed class Keyframes<T> {
   Keyframes<E> mapValues<E>(E Function(T value) transform);
 
   List<T> get values;
+
+  Keyframes<T> get reversed;
 }
 
 final class MotionKeyframes<T> implements Keyframes<T> {
@@ -100,6 +113,11 @@ final class MotionKeyframes<T> implements Keyframes<T> {
   }
 
   @override
+  MotionKeyframes<T> get reversed {
+    return MotionKeyframes<T>(List.unmodifiable(frames.reversed));
+  }
+
+  @override
   T get lastTarget {
     assert(frames.isNotEmpty, 'Keyframes must have at least one frame to determine last target');
     return frames.last.value;
@@ -112,6 +130,11 @@ final class MotionKeyframes<T> implements Keyframes<T> {
 
   @override
   int get hashCode => Object.hashAll(frames);
+
+  @override
+  String toString() {
+    return 'MotionKeyframes(frames: $frames)';
+  }
 }
 
 final class FractionalKeyframes<T> implements Keyframes<T> {
@@ -139,6 +162,16 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
   }
 
   @override
+  FractionalKeyframes<T> get reversed {
+    return FractionalKeyframes<T>(
+      List.unmodifiable(
+        frames.reversed.map((frame) => frame.copyWith(at: 1.0 - frame.at)),
+      ),
+      duration: duration,
+    );
+  }
+
+  @override
   T get lastTarget {
     assert(frames.isNotEmpty, 'Keyframes must have at least one frame to determine last target');
     return frames.last.value;
@@ -154,6 +187,11 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
 
   @override
   int get hashCode => Object.hash(Object.hashAll(frames), duration);
+
+  @override
+  String toString() {
+    return 'FractionalKeyframes(frames: $frames, duration: $duration)';
+  }
 }
 
 class Phase<T extends Object?> {

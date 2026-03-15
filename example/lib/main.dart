@@ -46,7 +46,7 @@ class _OnChangeDemo extends StatefulWidget {
 
 class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProviderStateMixin {
   double size = 100.0;
-  bool checked = false;
+  bool checked = true;
 
   @override
   Widget build(BuildContext context) {
@@ -63,33 +63,37 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               // ExpandingCards(),
-              SlackStyleFab(),
-              DeleteConfirmationDialog(),
+              // SlackStyleFab(),
+              // DeleteConfirmationDialog(),
               Cue.onToggle(
+                skipFirstAnimation: false,
                 toggled: checked,
-                motion: .curved(500.ms, curve: Curves.elasticOut),
+                motion: .linear(500.ms),
 
                 // reverseMotion: Spring.linear(300.ms),
                 child: Column(
                   children: [
                     Actor(
-                      act: SizedBoxAct.keyframed(frames: Keyframes([
-                        .key(Size(100, 100), motion: .jump),
-                        .key(Size(50, 50), motion: .wobbly()),
-                        .key(Size(150, 150), motion: .smooth()),
-                      ])),
-                      // act: SlideAct.fractionalKeyframes([
-                      //   .key(Offset(0, 0), at: 0.0),
-                      //   .key(Offset(1, .2), at: 0.5, curve: Curves.elasticOut),
-                      //   .key(Offset(2, 0), at: 1.0),
-                      // ]),
-                      // act: SlideAct.keyframes([
-                      //   .key(Offset(-1, 0), motion: .wobbly()),
-                      //   .key(Offset(0, 0), motion: .wobbly()),
-                      //   .key(Offset(1, 0), motion: .wobbly()),
-                      // .key(Offset(2, 0), motion: .wobbly()),
-                      // ]),
-                      child: ColoredBox(color: Colors.blue),
+                      act: .compose([
+                        .slideX(to: 0,from: 1,  reverse: .to(-1)),
+                      ]),
+                      child: Actor(
+                        act: .compose([
+                          // .slideX(to: 2, from: 1, reverse: .exclusive()),
+                        ]),
+                        // act: SlideAct.fractionalKeyframes([
+                        //   .key(Offset(0, 0), at: 0.0),
+                        //   .key(Offset(1, .2), at: 0.5, curve: Curves.elasticOut),
+                        //   .key(Offset(2, 0), at: 1.0),
+                        // ]),
+                        // act: SlideAct.keyframes([
+                        //   .key(Offset(-1, 0), motion: .wobbly()),
+                        //   .key(Offset(0, 0), motion: .wobbly()),
+                        //   .key(Offset(1, 0), motion: .wobbly()),
+                        // .key(Offset(2, 0), motion: .wobbly()),
+                        // ]),
+                        child: SizedBox(width: 100, height: 100, child: ColoredBox(color: Colors.blue)),
+                      ),
                     ),
                     // Actor(
                     //   act: .slide(

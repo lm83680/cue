@@ -144,19 +144,34 @@ class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListe
 
   @override
   void prepare({required bool forward, double? velocity}) {
+
+    if (forward && reverseType.isExclusive) {
+      // this drive should only drive reverse animation
+      _done = true;
+      return;
+    }
+    if (!forward && reverseType.isNone) {
+      // this drive should not drive reverse animation
+      _done = true;
+      return;
+    }
     _forward = forward;
 
-    if (forward && reverseType == ReverseBehaviorType.exclusive) {
-      // this drive should only drive reverse animation
-      return;
-    }
-    if (!forward && reverseType == ReverseBehaviorType.none) {
-      // this drive should not drive reverse animation
-      return;
-    }
-
     final active = forward ? motion : (reverseMotion ?? motion);
-    _sim = active.build(forward, _sim?.phase ?? 0, _sim?.progress ?? _value, velocity ?? this.velocity);
+
+    int phase = _sim?.phase ?? 0;
+    double progress = _sim?.progress ?? _value;
+
+    if (reverseType.isExclusive) {
+      _value = 1.0;
+      progress = 1.0;
+      phase = motion.totalPhases - 1;
+    } else if (forward && reverseType.isNone) {
+      _value = 0.0;
+      progress = 0.0;
+      phase = 0;
+    }
+    _sim = active.build(forward, phase, progress, velocity ?? this.velocity);
     _delaySeconds = (forward ? delay : (reverseDelay)).inMicroseconds / Duration.microsecondsPerSecond;
     _localT = 0.0;
     _done = false;

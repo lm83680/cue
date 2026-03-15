@@ -26,6 +26,7 @@ abstract class ActImpl<R extends Object?, T extends Object?> extends Act {
         reverseMotion: reverseAnimtable?.motion ?? context.reverseMotion,
         delay: delay ?? context.delay,
         reverseDelay: reverse.delay ?? context.reverseDelay,
+        reverseType: reverse.type,
       ),
     );
     CueAnimtable<R> effectiveAnimatable = reverseAnimtable == null

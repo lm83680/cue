@@ -43,13 +43,7 @@ class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
 
   void _toggle() async {
     if (widget.toggled) {
-      final stopWatch = Stopwatch()..start();
-      controller.addListener((){
-      });
-      await controller.forward();
-      stopWatch.stop();
-   
-      print('Animation completed in ${stopWatch.elapsedMilliseconds} ms');
+      controller.forward();
     } else {
       controller.reverse();
     }

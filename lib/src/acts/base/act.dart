@@ -155,12 +155,14 @@ abstract class Act {
     double from,
     double to,
     CueMotion? motion,
+    ReverseBehavior<double> reverse,
   }) = OpacityAct.fadeIn;
 
   const factory Act.fadeOut({
     double from,
     double to,
     CueMotion? motion,
+    ReverseBehavior<double> reverse,
   }) = OpacityAct.fadeOut;
 
   const factory Act.align({

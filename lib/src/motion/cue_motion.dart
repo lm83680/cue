@@ -9,6 +9,8 @@ sealed class CueMotion {
 
   Duration get duration;
 
+  int get totalPhases => 1;
+
   CueSimulation build(bool forward, int phase, double progress, double? velocity);
 
   bool get isTimed => this is TimedMotion;
@@ -118,6 +120,7 @@ class TimedMotion extends CueMotion {
 
 mixin CueSimulation on Simulation {
   int get phase => 0;
+
   double get progress;
 }
 
@@ -196,7 +199,7 @@ class LinearSimulation extends Simulation with CueSimulation {
   double dx(double time) => 0.0;
 
   @override
-  bool isDone(double time) => true;
+  bool isDone(double time) => false;
 
   @override
   double x(double time) => _progress = time;
@@ -211,6 +214,9 @@ extension DurationExtension on int {
 class SegmentedMotion extends CueMotion {
   final List<CueMotion> motions;
   const SegmentedMotion(this.motions);
+
+  @override
+  int get totalPhases => motions.length;
 
   @override
   BakedMotion bake({int samples = 60}) {

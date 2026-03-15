@@ -81,31 +81,43 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
 
   @override
   (CueAnimtable<R> animtable, CueAnimtable<R>? reverseAnimtable) buildTweens(ActContext context) {
+    if (reverse.type == ReverseBehaviorType.exclusive) {
+      return (
+        resolveTween(
+          context,
+          from: to,
+          to: from,
+          keyframes: frames?.reversed,
+          implicitFrom: context.implicitFrom as R?,
+          motion: motion ?? context.motion,
+        ),
+        null,
+      );
+    }
+
     final animtable = resolveTween(
       context,
-      to: to,
       from: from,
+      to: to,
       keyframes: frames,
       implicitFrom: context.implicitFrom as R?,
       motion: motion ?? context.motion,
     );
 
-    switch (reverse.type) {
-      case ReverseBehaviorType.to:
-        {
-          final reverseTo = reverse.to ?? reverse.frames?.lastTarget;
-          final reverseAnimtable = resolveTween(
-            context,
-            from: to,
-            to: reverseTo,
-            keyframes: reverse.frames,
-            motion: reverse.motion ?? context.reverseMotion ?? context.motion,
-          );
-          return (animtable, reverseAnimtable);
-        }
-      default:
-        return (animtable, null);
+
+    if (reverse.type == ReverseBehaviorType.to) {
+      final reverseTo = reverse.to ?? reverse.frames?.lastTarget;
+      final reverseAnimtable = resolveTween(
+        context,
+        from: reverseTo,
+        to: to,
+        keyframes: reverse.frames?.reversed,
+        motion: reverse.motion ?? context.reverseMotion ?? context.motion,
+      );
+      return (animtable, reverseAnimtable);
     }
+
+    return (animtable, null);
   }
 
   @override
@@ -123,12 +135,18 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
   int get hashCode => Object.hash(from, to, frames);
 }
 
-enum ReverseBehaviorType { mirror, exclusive, none, to }
+enum ReverseBehaviorType { mirror, exclusive, none, to;
+
+  bool get needsReverseTween => this == ReverseBehaviorType.to;
+  bool get isMirror => this == ReverseBehaviorType.mirror;
+  bool get isExclusive => this == ReverseBehaviorType.exclusive;
+  bool get isNone => this == ReverseBehaviorType.none;
+ }
 
 class KFReverseBehavior<T> extends ReverseBehaviorBase<T> {
   const KFReverseBehavior.mirror({super.delay}) : super._(type: ReverseBehaviorType.mirror);
 
-  const KFReverseBehavior.exclusive() : super._(type: ReverseBehaviorType.mirror);
+  const KFReverseBehavior.exclusive() : super._(type: ReverseBehaviorType.exclusive);
 
   const KFReverseBehavior.none() : super._(type: ReverseBehaviorType.none);
 
@@ -143,7 +161,7 @@ class ReverseBehavior<T> extends ReverseBehaviorBase<T> {
 
   const ReverseBehavior.none() : super._(type: ReverseBehaviorType.none);
 
-  const ReverseBehavior.to({required T super.to, super.motion, super.delay}) : super._(type: ReverseBehaviorType.to);
+  const ReverseBehavior.to(T to, { super.motion, super.delay}) : super._(type: ReverseBehaviorType.to, to: to);
 }
 
 class ReverseBehaviorBase<T> {
