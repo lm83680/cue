@@ -216,11 +216,11 @@ class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListe
   int get phase => _sim?.phase ?? 0;
 }
 
-class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListenersMixin implements CueTimeline {
+class ProgressTimeline extends CueAnimationDriver with AnimationLocalListenersMixin implements CueTimeline {
   double _value;
   AnimationStatus _status;
 
-  final ValueChanged<CueProgressAnimations>? onUpdate;
+  final ValueChanged<ProgressTimeline>? onUpdate;
 
   @override
   void addOnPrepareListener(ValueChanged<bool> listener) {
@@ -229,7 +229,7 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
 
   final _willAnimateNotifer = EventNotifier<bool>();
 
-  CueProgressAnimations(
+  ProgressTimeline(
     this._value, {
     AnimationStatus status = AnimationStatus.completed,
     this.onUpdate,

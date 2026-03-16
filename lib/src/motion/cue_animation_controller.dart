@@ -78,6 +78,9 @@ class CueAnimationController extends AnimationController {
 
   @override
   TickerFuture animateWith(Simulation simulation) {
+    // assert(simulation is ProgressTimeline, 'Only ProgressTimeline is supported by CueAnimationController.animateWith');
+    // (simulation as ProgressTimeline).prepare(forward: true);
+    // super.animateWith(simulation);
     throw UnsupportedError('animateWith is not supported by CueAnimationController. Use forward instead.');
   }
 

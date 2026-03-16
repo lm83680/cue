@@ -34,7 +34,7 @@ class CueDebugTools extends StatefulWidget {
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  late final _timeline = CueProgressAnimations(
+  late final _timeline = ProgressTimeline(
     0.0,
     onUpdate: (timeline) {
       _controller.duration = timeline.totalDuration;
@@ -639,7 +639,7 @@ class DebugDataProvider extends InheritedWidget {
     required super.child,
   });
 
-  final CueProgressAnimations timeline;
+  final ProgressTimeline timeline;
   final bool isMinimized;
   final String? activeTargetId;
 
