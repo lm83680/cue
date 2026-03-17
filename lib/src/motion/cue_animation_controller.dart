@@ -49,8 +49,6 @@ class CueController extends AnimationController {
     super.value = newValue;
   }
 
-  @override
-  double get value => timeline.progress;
 
   @override
   AnimationStatus get status => timeline.status;

@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'spring_motion.dart';
@@ -6,11 +5,10 @@ import 'spring_motion.dart';
 abstract class CueMotion {
   const CueMotion();
 
-  BakedMotion bake({int samples = 60, Duration delay = Duration.zero});
-
   Duration get duration;
 
   int get totalPhases => 1;
+
 
   CueSimulation build(bool forward, int phase, double progress, double? velocity);
 
@@ -91,32 +89,7 @@ class TimedMotion extends CueMotion {
   const TimedMotion(this.duration) : curve = null;
   const TimedMotion.curved(this.duration, {required Curve this.curve});
 
-  @override
-  BakedMotion bake({int samples = 60, Duration delay = Duration.zero}) {
-    assert(samples >= 2, 'samples must be at least 2');
-    final motionSeconds = duration.inMicroseconds / Duration.microsecondsPerSecond;
-    final activeCurve = curve ?? Curves.linear;
-
-    final delaySamples = BakedMotion.backDelay(
-      totalSamples: samples,
-      motionSeconds: motionSeconds,
-      delay: delay,
-    );
-    final animCount = samples - delaySamples.length;
-
-    final animated = List<double>.generate(animCount, (i) {
-      final t = animCount == 1 ? 1.0 : i / (animCount - 1);
-      return activeCurve.transform(t);
-    });
-
-    final delaySeconds = delay.inMicroseconds / Duration.microsecondsPerSecond;
-
-    return BakedMotion(
-      motion: this,
-      samples: [...delaySamples, ...animated],
-      durationSeconds: motionSeconds + delaySeconds,
-    );
-  }
+ @override double calculateDuration() => duration.inMicroseconds / Duration.microsecondsPerSecond;
 
   @override
   bool operator ==(Object other) =>
@@ -140,7 +113,8 @@ class TimedMotion extends CueMotion {
 mixin CueSimulation on Simulation {
   int get phase => 0;
 
-  double get progress;
+  double get lastX;
+  double get duration;
 }
 
 class CurvedSimulation extends Simulation with CueSimulation {
@@ -149,10 +123,13 @@ class CurvedSimulation extends Simulation with CueSimulation {
   final double _from;
   final double _to;
 
-  double _progress = 0.0;
+  double _lastX = 0.0;
+  
+  @override
+  double get duration => _durationSeconds;
 
   @override
-  double get progress => _progress;
+  double get lastX => _lastX;
 
   CurvedSimulation({
     required Duration duration,
@@ -167,7 +144,7 @@ class CurvedSimulation extends Simulation with CueSimulation {
   @override
   double x(double t) {
     final progress = (t / _durationSeconds).clamp(0.0, 1.0);
-    return _progress = _from + (_to - _from) * _curve.transform(progress);
+    return _lastX = _from + (_to - _from) * _curve.transform(progress);
   }
 
   @override
@@ -194,37 +171,10 @@ class SegmentedMotion extends CueMotion {
   final List<CueMotion> motions;
   const SegmentedMotion(this.motions);
 
+
   @override
   int get totalPhases => motions.length;
 
-  @override
-  BakedMotion bake({int samples = 60, Duration delay = Duration.zero}) {
-    assert(samples >= 2, 'samples must be at least 2');
-    final segmentCount = motions.length;
-    final samplesPerSegment = (samples / segmentCount).ceil();
-
-    final bakedSegments = motions.map((m) => m.bake(samples: samplesPerSegment)).toList();
-
-    final motionSamples = bakedSegments.expand((b) => b.samples).toList();
-    final motionSeconds = bakedSegments.fold<double>(
-      0.0,
-      (sum, b) => sum + b.durationSeconds,
-    );
-
-    final delaySamples = BakedMotion.backDelay(
-      totalSamples: motionSamples.length,
-      motionSeconds: motionSeconds,
-      delay: delay,
-    );
-
-    final delaySeconds = delay.inMicroseconds / Duration.microsecondsPerSecond;
-
-    return BakedMotion(
-      motion: this,
-      samples: [...delaySamples, ...motionSamples],
-      durationSeconds: motionSeconds + delaySeconds,
-    );
-  }
 
   @override
   CueSimulation build(bool forward, int phase, double progress, double? velocity) {
@@ -245,13 +195,16 @@ class SegmentedSimulation extends Simulation with CueSimulation {
   final List<CueMotion> _motions;
   final bool _forward;
 
+  @override
+   double get duration => _motions.fold(0.0, (acc, motion) => acc + motion.duration.inMicroseconds / Duration.microsecondsPerSecond);
+
   int _phase;
   double _phaseStartTime = 0;
   late CueSimulation _current;
   double _progress = 0.0;
 
   @override
-  double get progress => _progress;
+  double get lastX => _progress;
 
   @override
   int get phase => _phase;
@@ -311,50 +264,3 @@ class SegmentedSimulation extends Simulation with CueSimulation {
   }
 }
 
-class BakedMotion extends CueMotion {
-  final List<double> samples;
-  final double durationSeconds;
-  final CueMotion motion;
-  final double Function(double progress, List<double> samples) valueGetter;
-
-  const BakedMotion({
-    required this.motion,
-    required this.samples,
-    required this.durationSeconds,
-    this.valueGetter = _defaultValueGetter,
-  });
-
-  static List<double> backDelay({
-    required int totalSamples,
-    required double motionSeconds,
-    required Duration delay,
-    double holdValue = 0.0,
-  }) {
-    final delaySeconds = delay.inMicroseconds / Duration.microsecondsPerSecond;
-    if (totalSamples < 2 || delaySeconds <= 0) return const [];
-    final totalSeconds = motionSeconds + delaySeconds;
-    if (totalSeconds <= 0) return const [];
-    final count = (((totalSamples - 1) * (delaySeconds / totalSeconds)).round()).clamp(0, totalSamples - 2);
-    return List<double>.filled(count, holdValue);
-  }
-
-  static double _defaultValueGetter(double progress, List<double> samples) {
-    final scaled = progress * (samples.length - 1);
-    final lo = samples[scaled.floor()];
-    final hi = samples[scaled.ceil()];
-    return lerpDouble(lo, hi, scaled - scaled.floor())!;
-  }
-
-  double valueAt(double progress) => valueGetter(progress, samples);
-
-  @override
-  BakedMotion bake({int samples = 60, Duration delay = Duration.zero}) => this;
-
-  @override
-  CueSimulation build(bool forward, int phase, double progress, double? velocity) {
-    return motion.build(forward, phase, progress, velocity);
-  }
-
-  @override
-  Duration get duration => motion.duration;
-}

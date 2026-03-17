@@ -47,7 +47,7 @@ class _OnChangeDemo extends StatefulWidget {
 
 class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProviderStateMixin {
   double size = 100.0;
-  bool checked = true;
+  bool checked = false;
   late final _controller = CueController(vsync: this, motion: .wobbly());
 
   late final _animation = DeferredCueAnimation<Offset>(
@@ -70,9 +70,11 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // IndicatorToButton(),
               Cue.onToggle(
                 toggled: checked,
-                motion: .wobbly(),
+                motion: .linear(300.ms),
+                // motion: .wobbly(),
                 child: Column(
                   children: [
                     Actor(
@@ -87,7 +89,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     ),
                     Actor(
                       act: .compose([
-                        .slideX(to: 1),
+                        .slideX(to: 1, delay: 300.ms),
                       ]),
                       child: Container(
                         height: 100,

@@ -1,6 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/motion/animtable.dart';
-import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class ActImpl<R extends Object?, T extends Object?> extends Act {

@@ -76,7 +76,10 @@ class ActorState extends State<Actor> {
     if (oldWidget.act != widget.act) {
       final scope = CueScope.of(context);
       _acts = widget.act.resolve(
-        ActContext(motion: scope.timeline.mainMotion),
+        ActContext(
+          motion: scope.timeline.mainTrackConfig.motion,
+          reverseMotion: scope.timeline.mainTrackConfig.reverseMotion,
+        ),
       );
       _setupAnimations(scope);
     }
@@ -94,7 +97,10 @@ class ActorState extends State<Actor> {
     final scope = CueScope.of(context);
     if (_acts.isEmpty) {
       _acts = widget.act.resolve(
-        ActContext(motion: scope.timeline.mainMotion),
+        ActContext(
+          motion: scope.timeline.mainTrackConfig.motion,
+          reverseMotion: scope.timeline.mainTrackConfig.reverseMotion,
+        ),
       );
     }
     if (_cachedScope?.willReanimateNotifier != scope.willReanimateNotifier) {

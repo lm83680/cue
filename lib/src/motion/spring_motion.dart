@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/physics.dart';
 
@@ -19,13 +17,30 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
     super.snapToEnd,
   });
 
+  double? _duration;
+
+  @override
+  double get duration => _duration ??= calculateSettleDuration();
+
+  double calculateSettleDuration({double stepSize = 1 / 60}) {
+    double t = 0.0;
+    final tolerance = this.tolerance;
+    while (t < 100.0) {
+      final x = this.x(t);
+      final v = dx(t);
+      if ((x - 1.0).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+      t += stepSize;
+    }
+    return t;
+  }
+
   @override
   int get phase => 0;
 
   double _progress = 0.0;
 
   @override
-  double get progress => _progress;
+  double get lastX => _progress;
 
   @override
   double x(double time) {
@@ -178,95 +193,56 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
   }
 
   @override
-  BakedMotion bake({int samples = 60, Duration delay = Duration.zero}) {
-    assert(samples >= 2, 'samples must be at least 2');
-    final sim = build(true, 0, 0.0, 0.0);
-    final settlingDuration = calculateSettleDurationHybrid(sim, springDescription);
-    final delaySamples = BakedMotion.backDelay(
-      totalSamples: samples,
-      motionSeconds: settlingDuration,
-      delay: delay,
-    );
-    final animCount = samples - delaySamples.length;
-
-    final animated = List<double>.generate(animCount, (i) {
-      final t = animCount == 1 ? settlingDuration : (i / (animCount - 1)) * settlingDuration;
-      return sim.x(t);
-    });
-
-    final delaySeconds = delay.inMicroseconds / Duration.microsecondsPerSecond;
-
-    return BakedMotion(
-      motion: this,
-      samples: [...delaySamples, ...animated],
-      durationSeconds: settlingDuration + delaySeconds,
-    );
-  }
-
-  @override
   Duration get duration {
     final sim = build(true, 0, 0.0, 0.0);
-    final settlingDuration = calculateSettleDurationHybrid(sim, springDescription);
-    return Duration(microseconds: (settlingDuration * Duration.microsecondsPerSecond).round());
+    return Duration(milliseconds: (sim.calculateSettleDuration() * 1000).round());
   }
 
-  // double calculateSettleDuration(SpringSimulation sim, {double stepSize = 1 / 60}) {
-  //   double t = 0.0;
-  //   final tolerance = sim.tolerance;
-  //   while (t < 100.0) {
+  // double calculateSettleDurationHybrid(SpringSimulation sim, SpringDescription desc, {int samples = 60}) {
+  //   final stepSize = 1 / samples;
+  //   final s = desc;
+  //   final m = s.mass;
+  //   final k = s.stiffness;
+  //   final c = s.damping;
+
+  //   final x0 = sim.x(0);
+  //   final target = 1.0;
+  //   final deltaX = (x0 - target).abs();
+  //   final tol = sim.tolerance.distance;
+
+  //   if (deltaX < tol) return 0.0;
+
+  //   // damping ratio
+  //   final zeta = c / (2 * sqrt(k * m));
+  //   final omegaN = sqrt(k / m);
+
+  //   double tEstimate;
+
+  //   if (zeta < 1.0) {
+  //     // underdamped: use envelope to estimate
+  //     tEstimate = -log(tol / (deltaX * sqrt(1 - zeta * zeta))) / (zeta * omegaN);
+  //   } else {
+  //     // critically or overdamped
+  //     tEstimate = -log(tol / deltaX) / (c / (2 * m));
+  //   }
+
+  //   // clamp estimate to positive
+  //   tEstimate = tEstimate.clamp(0.0, double.infinity);
+
+  //   // now step a few ticks from tEstimate - 2*stepSize to capture exact Flutter settle
+  //   double t = max(0.0, tEstimate - 2 * stepSize);
+  //   final maxTime = tEstimate + 2.0; // safety cap
+
+  //   while (t < maxTime) {
   //     final x = sim.x(t);
   //     final v = sim.dx(t);
-  //     if ((x - 1.0).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+  //     if ((x - target).abs() < tol && v.abs() < sim.tolerance.velocity) {
+  //       return t;
+  //     }
   //     t += stepSize;
   //   }
+
+  //   // fallback
   //   return t;
   // }
-
-  double calculateSettleDurationHybrid(SpringSimulation sim, SpringDescription desc, {int samples = 60}) {
-    final stepSize = 1 / samples;
-    final s = desc;
-    final m = s.mass;
-    final k = s.stiffness;
-    final c = s.damping;
-
-    final x0 = sim.x(0);
-    final target = 1.0;
-    final deltaX = (x0 - target).abs();
-    final tol = sim.tolerance.distance;
-
-    if (deltaX < tol) return 0.0;
-
-    // damping ratio
-    final zeta = c / (2 * sqrt(k * m));
-    final omegaN = sqrt(k / m);
-
-    double tEstimate;
-
-    if (zeta < 1.0) {
-      // underdamped: use envelope to estimate
-      tEstimate = -log(tol / (deltaX * sqrt(1 - zeta * zeta))) / (zeta * omegaN);
-    } else {
-      // critically or overdamped
-      tEstimate = -log(tol / deltaX) / (c / (2 * m));
-    }
-
-    // clamp estimate to positive
-    tEstimate = tEstimate.clamp(0.0, double.infinity);
-
-    // now step a few ticks from tEstimate - 2*stepSize to capture exact Flutter settle
-    double t = max(0.0, tEstimate - 2 * stepSize);
-    final maxTime = tEstimate + 2.0; // safety cap
-
-    while (t < maxTime) {
-      final x = sim.x(t);
-      final v = sim.dx(t);
-      if ((x - target).abs() < tol && v.abs() < sim.tolerance.velocity) {
-        return t;
-      }
-      t += stepSize;
-    }
-
-    // fallback
-    return t;
-  }
 }

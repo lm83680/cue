@@ -18,7 +18,7 @@ abstract class CueTimeline extends Simulation {
 
   CueTrack buildTrack(TrackConfig config);
 
-  CueMotion get mainMotion;
+  TrackConfig get mainTrackConfig => tracks.keys.first;
 
   CueTrack get mainTrack;
 
@@ -34,7 +34,6 @@ abstract class CueTimeline extends Simulation {
 }
 
 class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixin {
-
   @override
   void addOnPrepareListener(ValueChanged<bool> listener) {
     _onPrepareNotifier.addEventListener(listener);
@@ -64,9 +63,10 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   @override
   CueTrack trackFor(TrackConfig config) {
-    final mergedConfig = tracks.keys.first.merge(config);
-    if (mergedConfig == config) return mainTrack;
-    final animation = tracks.putIfAbsent(mergedConfig, () => buildTrack(mergedConfig));
+    if (config == mainTrackConfig) {
+      return mainTrack;
+    }
+    final animation = tracks.putIfAbsent(config, () => buildTrack(config));
     if (mainTrack.isAnimating) {
       animation.prepare(
         forward: mainTrack.isForwardOrCompleted,
@@ -151,7 +151,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
       }
     }
     _updateStatus();
-    return mainTrack.value;
+    return mainTrack.progress;
   }
 
   @override
@@ -160,10 +160,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   bool isDone(double time) => tracks.values.every((anim) => anim.isDone);
 
-  @override
-  CueMotion get mainMotion => tracks.keys.first.motion;
-
-  
+ 
   @override
   CueTrack buildTrack(TrackConfig config) {
     return CueTrackImpl(
@@ -174,7 +171,6 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
       reverseType: config.reverseType,
     );
   }
-
 
   @override
   void didRegisterListener() {
@@ -192,14 +188,14 @@ abstract class CueTrack extends Animation<double> with AnimationLocalListenersMi
 
   CueMotion get motion;
   CueMotion? get reverseMotion;
-  
+
   Duration get delay;
   Duration get reverseDelay;
-  
-  Duration get duration;
-  Duration get reverseDuration;
 
-  void tick(double progress);
+  double get duration;
+  double get reverseDuration;
+
+  void tick(double td);
 
   void setProgress(double t, {bool forward = true});
 
@@ -220,8 +216,6 @@ abstract class CueTrack extends Animation<double> with AnimationLocalListenersMi
   bool get isReverseOrDismissed => status == AnimationStatus.reverse || status == AnimationStatus.dismissed;
 }
 
- 
-
 class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   @override
   final CueMotion motion;
@@ -238,22 +232,23 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   final ReverseBehaviorType reverseType;
 
   @override
-  Duration get duration => _duration ?? motion.duration + delay;
-
-  @override
-  Duration get reverseDuration => _reverseDuration ?? (reverseMotion ?? motion).duration + reverseDelay;
-
-  @override
-  double get progress {
-    final activeDuration = _forward ? duration : reverseDuration;
-    final totalSeconds = activeDuration.inMicroseconds / Duration.microsecondsPerSecond;
-    if (totalSeconds <= 0) return 1.0;
-    final progress = (_localT / totalSeconds).clamp(0.0, 1.0);
-    return _forward ? progress : 1.0 - progress;
+  double get duration {
+    return _duration ??= (motion.duration + delay).inMicroseconds / Duration.microsecondsPerSecond;
   }
 
-  Duration? _duration;
-  Duration? _reverseDuration;
+  @override
+  double get reverseDuration {
+    return _reverseDuration ??=
+        (reverseMotion?.duration ?? motion.duration + reverseDelay).inMicroseconds / Duration.microsecondsPerSecond;
+  }
+
+  double _progress = 0.0;
+
+  @override
+  double get progress => _progress;
+
+  double? _duration;
+  double? _reverseDuration;
 
   CueSimulation? _sim;
 
@@ -262,6 +257,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
 
   double _value = 0.0;
   double _localT = 0.0;
+  double _startProgress = 0.0;
   double _delaySeconds = 0.0;
   bool _done = true; // idle until prepared
 
@@ -287,18 +283,21 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   void setProgress(double t, {bool forward = true}) {
     assert(t >= 0.0 && t <= 1.0, 'Progress value must be between 0.0 and 1.0. Received: $t');
     _forward = forward;
+    _progress = t;
     double newValue = _value;
     if (forward && !reverseType.isExclusive) {
       final sim = _seekableForwardSim ??= motion.build(true, 0, 0, 0);
-      final targetT = (duration.inMicroseconds / Duration.microsecondsPerSecond) * t;
+      final targetT = duration * t;
       newValue = sim.x(targetT);
       _done = sim.isDone(targetT);
     } else if (!forward && !reverseType.isNone) {
       final sim = _seekableReverseSim ??= (reverseMotion ?? motion).build(false, 0, 0, 0);
-      final targetT = (reverseDuration.inMicroseconds / Duration.microsecondsPerSecond) * t;
+      final targetT = reverseDuration * t;
       newValue = sim.x(targetT);
       _done = sim.isDone(targetT);
     }
+    _sim = null; // invalidate current simulation since we're jumping to a new progress
+    _localT = 0.0;
     if (_value != newValue) {
       _value = newValue;
       notifyListeners();
@@ -323,7 +322,9 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     final active = forward ? motion : (reverseMotion ?? motion);
 
     int phase = _sim?.phase ?? 0;
-    double progress = from ?? _sim?.progress ?? this.progress;
+    double progress = from ?? _progress;
+    _startProgress = progress;
+
     if (reverseType.isExclusive) {
       _value = 1.0;
       progress = 1.0;
@@ -333,6 +334,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
       progress = 0.0;
       phase = 0;
     }
+
     _sim = active.build(forward, phase, progress, exteranlVelocity ?? velocity);
     _value = _sim!.x(0);
     _delaySeconds = (forward ? delay : reverseDelay).inMicroseconds / Duration.microsecondsPerSecond;
@@ -355,15 +357,20 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   }
 
   @override
-  void tick(double progress) {
+  void tick(double td) {
     if (_done || _sim == null) return;
-    _localT += progress;
+    _localT += td;
+    final target = _forward ? 1.0 : 0.0;
+    final fraction = (_localT / _sim!.duration).clamp(0.0, 1.0);
+    _progress = _startProgress + (target - _startProgress) * fraction;
+
     final t = _localT - _delaySeconds;
     if (t < 0) return; // still in delay
 
     if (_sim!.isDone(t)) {
       _value = _sim!.x(t);
       _done = true;
+      _progress = target;
       notifyListeners();
       _updateStatue(_forward ? AnimationStatus.completed : AnimationStatus.dismissed);
       return;
@@ -386,7 +393,6 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   int get phase => _sim?.phase ?? 0;
 }
 
-
 class TrackConfig {
   final CueMotion motion;
   final CueMotion? reverseMotion;
@@ -401,16 +407,6 @@ class TrackConfig {
     this.reverseDelay = Duration.zero,
     this.reverseType = ReverseBehaviorType.mirror,
   });
-
-  TrackConfig merge(TrackConfig other) {
-    return copyWith(
-      motion: other.motion,
-      reverseMotion: other.reverseMotion,
-      delay: other.delay,
-      reverseDelay: other.reverseDelay,
-      reverseType: other.reverseType,
-    );
-  }
 
   TrackConfig copyWith({
     CueMotion? motion,

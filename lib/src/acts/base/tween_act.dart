@@ -1,6 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/act_impl.dart';
-import 'package:cue/src/motion/animtable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
