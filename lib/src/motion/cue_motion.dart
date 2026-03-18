@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'spring_motion.dart';
 
@@ -8,7 +7,6 @@ abstract class CueMotion {
   Duration get duration;
 
   int get totalPhases => 1;
-
 
   CueSimulation build(bool forward, int phase, double progress, double? velocity);
 
@@ -89,7 +87,8 @@ class TimedMotion extends CueMotion {
   const TimedMotion(this.duration) : curve = null;
   const TimedMotion.curved(this.duration, {required Curve this.curve});
 
- @override double calculateDuration() => duration.inMicroseconds / Duration.microsecondsPerSecond;
+  @override
+  double calculateDuration() => duration.inMicroseconds / Duration.microsecondsPerSecond;
 
   @override
   bool operator ==(Object other) =>
@@ -102,7 +101,7 @@ class TimedMotion extends CueMotion {
   @override
   CueSimulation build(bool forward, int phase, double progress, double? velocity) {
     return CurvedSimulation(
-      duration: duration,
+      baseDuration: duration,
       curve: curve ?? Curves.linear,
       from: progress,
       to: forward ? 1.0 : 0.0,
@@ -118,32 +117,32 @@ mixin CueSimulation on Simulation {
 }
 
 class CurvedSimulation extends Simulation with CueSimulation {
-  final double _durationSeconds;
   final Curve _curve;
   final double _from;
   final double _to;
+  final double _duration;
 
   double _lastX = 0.0;
-  
+
   @override
-  double get duration => _durationSeconds;
+  double get duration => _duration;
 
   @override
   double get lastX => _lastX;
 
   CurvedSimulation({
-    required Duration duration,
+    required Duration baseDuration,
     required Curve curve,
     required double from,
     required double to,
-  }) : _durationSeconds = duration.inMicroseconds / Duration.microsecondsPerSecond,
+  }) : _duration = (baseDuration.inMicroseconds / Duration.microsecondsPerSecond) * (to - from).abs(),
        _curve = curve,
        _from = from,
        _to = to;
 
   @override
   double x(double t) {
-    final progress = (t / _durationSeconds).clamp(0.0, 1.0);
+    final progress = (t / _duration).clamp(0.0, 1.0);
     return _lastX = _from + (_to - _from) * _curve.transform(progress);
   }
 
@@ -154,7 +153,7 @@ class CurvedSimulation extends Simulation with CueSimulation {
   }
 
   @override
-  bool isDone(double t) => t >= _durationSeconds;
+  bool isDone(double t) => t >= _duration;
 }
 
 abstract class SimulationMotion<S extends CueSimulation> extends CueMotion {
@@ -171,10 +170,8 @@ class SegmentedMotion extends CueMotion {
   final List<CueMotion> motions;
   const SegmentedMotion(this.motions);
 
-
   @override
   int get totalPhases => motions.length;
-
 
   @override
   CueSimulation build(bool forward, int phase, double progress, double? velocity) {
@@ -196,7 +193,8 @@ class SegmentedSimulation extends Simulation with CueSimulation {
   final bool _forward;
 
   @override
-   double get duration => _motions.fold(0.0, (acc, motion) => acc + motion.duration.inMicroseconds / Duration.microsecondsPerSecond);
+  double get duration =>
+      _motions.fold(0.0, (acc, motion) => acc + motion.duration.inMicroseconds / Duration.microsecondsPerSecond);
 
   int _phase;
   double _phaseStartTime = 0;
@@ -263,4 +261,3 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     }
   }
 }
-
