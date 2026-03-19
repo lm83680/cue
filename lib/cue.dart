@@ -10,5 +10,6 @@ export 'src/actor/actor.dart';
 export 'src/acts/base/tween_act.dart';
 export 'src/motion/cue_motion.dart';
 export 'src/motion/cue_controller.dart';
-export 'src/motion/timeline.dart';
+export 'src/timeline/timeline.dart';
 export 'src/motion/animtable.dart';
+export 'src/motion/utils.dart';

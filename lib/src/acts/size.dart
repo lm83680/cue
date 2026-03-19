@@ -27,13 +27,11 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
   (CueAnimtable<Size>, CueAnimtable<Size>?) buildTweens(ActContext context) {
     // We build fake tweens here just to extract the motion and other parameters from the context.
     // The actual tween will be built later in the render object when we have the constraints.
-
-    print(reverse.type);
     final builder = _SizeActBuilder(
       motion: motion,
       delay: delay,
-      from: Size.zero,
-      to: Size.infinite,
+      from: width != null || height != null ? Size.zero : null,
+      to: width != null || height != null ? Size.infinite : null,
       frames: frames,
       reverse: reverse,
     );

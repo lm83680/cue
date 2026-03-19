@@ -52,8 +52,8 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     final builder = _NullableSizeActBuilder(
       motion: motion ?? context.motion,
       delay: delay ?? context.delay,
-      from: Size.zero,
-      to: Size.infinite,
+      from: from != null ? Size.zero : null,
+      to: to != null ? Size.infinite : null,
       frames: frames?.mapValues((v) => Size.zero),
       reverse: _reverse.mapValues((v) => Size.zero),
     );

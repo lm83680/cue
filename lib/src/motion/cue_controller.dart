@@ -1,5 +1,7 @@
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:cue/src/motion/timeline.dart';
+import 'package:cue/src/timeline/timeline.dart';
+import 'package:cue/src/timeline/track/track.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 
 class CueController extends AnimationController {
@@ -38,7 +40,6 @@ class CueController extends AnimationController {
 
   @override
   set value(double newValue) {
-    if (newValue == value) return;
     final forward = newValue >= value;
     setProgress(newValue, forward: forward);
   }

@@ -1,11 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/bottom_bar.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/expanding_cards.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
-import 'package:example/examples/indicator_to_button.dart';
-import 'package:example/examples/slack_style_fab.dart';
-import 'package:example/examples/three_dots_action.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Cue Demo',
       // showPerformanceOverlay: true,
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark,),
       ),
       theme: ThemeData(
         splashFactory: NoSplash.splashFactory,
@@ -77,36 +70,36 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               // IndicatorToButton(),
               Cue.onToggle(
                 toggled: checked,
-                motion: .wobbly(),
+                motion: .linear(300.ms),
                 child: Column(
                   children: [
-                    Actor(
-                      act: .compose([
-                        ScaleAct.keyframed(
-                          frames: Keyframes([
-                            .key(2, motion: .wobbly()),
-                            .key(3, motion: .wobbly()),
-                            .key(4, motion: .wobbly()),
-                          ]),
-                        ),
-                      ]),
-                      child: Container(
-                        height: 50,
-                        width: 50,
-                        color: Colors.blue,
-                      ),
-                    ),
                     // Actor(
                     //   act: .compose([
-                    //     .slideX(to: 1),
+                    //     SizedBoxAct.keyframed(
+                    //       frames: Keyframes([
+                    //         .key(Size.square(20), motion: .none),
+                    //         .key(Size.square(50), motion: .wobbly()),
+                    //         .key(Size.square(70), motion: .wobbly()),
+                    //       ]),
+                    //     ),
                     //   ]),
                     //   child: Container(
-                    //     height: 100,
-                    //     width: 100,
-                    //     color: Colors.red,
+                    //     height: 50,
+                    //     width: 50,
+                    //     color: Colors.blue,
                     //   ),
                     // ),
 
+                    Actor(
+                      act: .compose([
+                        .slideX(to: 1, reverse: .mirror(motion: .wobbly())),
+                      ]),
+                      child: Container(
+                        height: 100,
+                        width: 100,
+                        color: Colors.red,
+                      ),
+                    ),
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () => setState(() => checked = !checked),

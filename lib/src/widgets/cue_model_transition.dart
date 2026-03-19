@@ -1,7 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/core/curves.dart';
-import 'package:cue/src/motion/cue_controller.dart';
-import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 
 @optionalTypeArgs

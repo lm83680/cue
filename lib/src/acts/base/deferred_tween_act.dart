@@ -1,6 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/act_impl.dart';
-import 'package:cue/src/motion/animtable.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class DeferredTweenAct<T extends Object?> extends ActImpl<T, T> {

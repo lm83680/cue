@@ -1,6 +1,6 @@
 // import 'package:cue/cue.dart';
 // import 'package:cue/src/effects/base/tween_effect.dart';
-// import 'package:cue/src/motion/cue_motion.dart';
+// import 'package:cue/src/timeline/cue_motion.dart';
 // import 'package:flutter/foundation.dart';
 // import 'package:flutter/material.dart';
 

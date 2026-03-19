@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class ActImpl<R extends Object?, T extends Object?> extends Act {
@@ -18,12 +19,14 @@ abstract class ActImpl<R extends Object?, T extends Object?> extends Act {
   @override
   CueAnimation<R> buildAnimation(CueTimeline timline, ActContext context) {
     final (animtable, reverseAnimtable) = buildTweens(context);
+    final delay = (this.delay ?? context.delay ?? Duration.zero).inMicroseconds / Duration.microsecondsPerSecond;
+    final reverseDelay = (reverse.delay ?? context.reverseDelay ?? Duration.zero).inMicroseconds / Duration.microsecondsPerSecond;
     final driver = timline.trackFor(
       TrackConfig(
         motion: animtable.motion ?? context.motion,
-        reverseMotion: reverseAnimtable?.motion ?? context.reverseMotion,
-        delay: delay ?? context.delay ?? Duration.zero,
-        reverseDelay: reverse.delay ?? context.reverseDelay ?? Duration.zero,
+        reverseMotion: reverseAnimtable?.motion ?? reverse.motion ?? context.reverseMotion,
+        delay: delay,
+        reverseDelay: reverseDelay,
         reverseType: reverse.type,
       ),
     );

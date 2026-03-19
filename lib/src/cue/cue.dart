@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:cue/cue.dart';
-import 'package:cue/src/motion/cue_controller.dart';
-import 'package:cue/src/motion/timeline.dart';
+import 'package:cue/src/timeline/track/track.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

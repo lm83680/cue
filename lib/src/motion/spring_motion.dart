@@ -1,4 +1,5 @@
 import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/src/motion/simulation.dart';
 import 'package:flutter/physics.dart';
 
 // holds default values for spring simulation

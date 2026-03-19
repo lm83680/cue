@@ -1,4 +1,4 @@
-import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

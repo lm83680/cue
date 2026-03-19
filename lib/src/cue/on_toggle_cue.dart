@@ -26,12 +26,15 @@ class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
   @override
   void initState() {
     super.initState();
-
     if (widget.skipFirstAnimation) {
       controller.value = widget.toggled ? 1.0 : 0.0;
     } else {
       _toggle();
     }
+
+    // controller.addListener((){
+    //   print('value: ${controller.value}, status: ${controller.status.name}');
+    // });
    
   }
 
