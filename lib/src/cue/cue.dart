@@ -141,15 +141,13 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     super.didChangeDependencies();
     if (kDebugMode) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
-        void statusListener(status) {
-          if (status.isForwardOrCompleted) {
+        void statusListener(AnimationStatus status) {
+          if (status.isCompleted) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _deattachDebugOverlay?.call();
-              _deattachDebugOverlay = null;
               _deattachDebugOverlay = CueDebugTools.attachDebugTarget(
                 context,
                 id: _debugId,
-                driver: timeline.mainTrack,
+                track: timeline.mainTrack,
               );
             });
           }

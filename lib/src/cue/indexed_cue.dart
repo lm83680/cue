@@ -23,6 +23,8 @@ class _IndexedCueState extends _CueState<_IndexedCue> {
   @override
   String get debugName => 'IndexedCue';
 
+  @override
+  String get _debugId => '$debugName-${widget.controller.hashCode}-${widget.index}';
 
   Listenable get listenable => widget.controller.tickListenable;
   @override
@@ -40,13 +42,7 @@ class _IndexedCueState extends _CueState<_IndexedCue> {
 
   void _updateAnimation() {
     final value = widget.controller.valueFor(widget.index);
-    final forward = switch (value) {
-      1.0 => true,
-      0.0 => false,
-      _ => value > _progressTimeline.progress ? true : false,
-    };
-
-    _progressTimeline.setProgress(value, forward: forward);
+    _progressTimeline.setProgress(value, forward: value > _progressTimeline.progress);
   }
 
   @override

@@ -1,4 +1,7 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/delete_confirmation.dart';
+import 'package:example/examples/indicator_to_button.dart';
+import 'package:example/examples/slack_style_fab.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +65,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             mainAxisAlignment: .center,
             crossAxisAlignment: .center,
             children: [
-              // SlackStyleFab(),
-              // DeleteConfirmationDialog(),
               // IndicatorToButton(),
               Cue.onMount(
                 // toggled: checked,

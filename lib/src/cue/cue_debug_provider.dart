@@ -19,10 +19,10 @@ class CueDebugTools extends StatefulWidget {
   static VoidCallback? attachDebugTarget(
     BuildContext context, {
     required String id,
-    required CueTrack driver,
+    required CueTrack track,
   }) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
-    return provider?.attachDebugTarget(context, id: id, track: driver);
+    return provider?.attachDebugTarget(context, id: id, track: track);
   }
 
   static DebugDataProvider of(BuildContext context) {
