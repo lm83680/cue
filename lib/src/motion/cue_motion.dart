@@ -9,9 +9,9 @@ abstract class CueMotion {
 
   Duration get baseDuration;
 
-  CueSimulation build(bool forward, int phase, double progress, double? velocity);
+  CueSimulation build(SimulationBuildData data);
 
-  CueSimulation buildBase([bool forward = true]) => build(forward, 0, forward ? 0.0 : 1.0, 0.0);
+  CueSimulation buildBase([bool forward = true]) => build(SimulationBuildData.base(forward));
 
   bool get isTimed => this is TimedMotion;
 
@@ -102,16 +102,106 @@ class TimedMotion extends CueMotion {
   int get hashCode => baseDuration.hashCode ^ curve.hashCode;
 
   @override
-  CueSimulation build(bool forward, int phase, double progress, double? velocity) {
+  CueSimulation build(SimulationBuildData data) {
     return CurvedSimulation(
       baseDuration: baseDuration,
       curve: curve ?? Curves.linear,
-      from: progress,
-      to: forward ? 1.0 : 0.0,
+      from: data.startValue,
+      to: data.endValue,
     );
   }
 }
 
 abstract class SimulationMotion<S extends CueSimulation> extends CueMotion {
   const SimulationMotion();
+}
+
+class SegmentedMotion extends CueMotion {
+  final List<CueMotion> motions;
+  const SegmentedMotion(this.motions);
+
+  @override
+  Duration get baseDuration => motions.fold(Duration.zero, (total, motion) => total + motion.baseDuration);
+
+  @override
+  int get totalPhases => motions.length;
+
+  @override
+  CueSimulation build(SimulationBuildData data) {
+    return SegmentedSimulation(
+      motions: motions,
+      forward: data.forward,
+      initialPhase: data.phase,
+      startValue: data.startValue,
+      velocity: data.velocity ?? 0.0,
+    );
+  }
+}
+
+class DelayedMotion extends CueMotion {
+  final CueMotion base;
+  final Duration delay;
+
+  const DelayedMotion(this.base, this.delay);
+
+  @override
+  Duration get baseDuration => base.baseDuration + delay;
+
+  @override
+  CueSimulation build(SimulationBuildData data) {
+    final baseSim = base.build(data);
+    double delaySeconds = delay.inMicroseconds / Duration.microsecondsPerSecond;
+    if (data.startProgress case final progress?) {
+      final totalDuration = delaySeconds + baseSim.duration;
+      final elapsedTime = data.forward ? progress * totalDuration : (1.0 - progress) * totalDuration;
+      delaySeconds = (delaySeconds - elapsedTime).clamp(0.0, double.infinity);
+    }
+    return DelayedSimulation(base: baseSim, delay: delaySeconds);
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DelayedMotion && runtimeType == other.runtimeType && base == other.base && delay == other.delay;
+
+  @override
+  int get hashCode => Object.hash(base, delay);
+}
+
+class SimulationBuildData {
+  final bool forward;
+  final int phase;
+  final double startValue;
+  final double? startProgress;
+  final double? velocity;
+
+  double get endValue => forward ? 1.0 : 0.0;
+
+  const SimulationBuildData({
+    required this.forward,
+    required this.startValue,
+    this.phase = 0,
+    this.velocity,
+    this.startProgress,
+  });
+
+  const SimulationBuildData.forward({
+    this.phase = 0,
+    this.startValue = 0.0,
+    this.velocity,
+    this.startProgress,
+  }) : forward = true;
+
+  const SimulationBuildData.reverse({
+    this.phase = 0,
+    this.startValue = 1.0,
+    this.velocity,
+    this.startProgress,
+  }) : forward = false;
+
+  const SimulationBuildData.base([this.forward = true])
+    : phase = 0,
+      startValue = forward ? 0.0 : 1.0,
+      velocity = null,
+      startProgress = null;
 }

@@ -1,15 +1,63 @@
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 mixin CueSimulation on Simulation {
   int get phase => 0;
 
-  double get lastX;
+  double get value;
   double get duration;
 
-  double valueAtProgress(double progress) {
-    return x(progress * duration);
+  (double value, int phase) valueAtProgress(double progress) {
+    return (x(progress * duration), phase);
   }
+}
+
+class DelayedSimulation extends Simulation with CueSimulation {
+  final CueSimulation _base;
+  final double _delay;
+
+  DelayedSimulation({
+    required CueSimulation base,
+    required double delay,
+  }) : _base = base,
+       _delay = delay;
+
+  @override
+  double get duration => _delay + _base.duration;
+
+  @override
+  double get value => _value;
+
+  double _value = 0.0;
+
+  @override
+  int get phase => _base.phase;
+
+  // Core progress mapping - delay is first portion of progress
+  @override
+  (double value, int phase) valueAtProgress(double progress) {
+    final totalDuration = duration;
+    final delayProgress = totalDuration <= 0 ? 0.0 : _delay / totalDuration;
+
+    final localProgress = progress <= delayProgress
+        ? 0.0
+        : ((progress - delayProgress) / (1.0 - delayProgress)).clamp(0.0, 1.0);
+
+    return _base.valueAtProgress(localProgress);
+  }
+
+  @override
+  double x(double t) {
+    final tAfterDelay = (t - _delay).clamp(0.0, double.infinity);
+    return _value = _base.x(tAfterDelay);
+  }
+
+  @override
+  double dx(double t) => t <= _delay ? 0.0 : _base.dx(t - _delay);
+
+  @override
+  bool isDone(double t) => t > _delay && _base.isDone(t - _delay);
 }
 
 class CurvedSimulation extends Simulation with CueSimulation {
@@ -18,13 +66,13 @@ class CurvedSimulation extends Simulation with CueSimulation {
   final double _to;
   final double _duration;
 
-  double _lastX = 0.0;
+  double _value = 0.0;
 
   @override
   double get duration => _duration;
 
   @override
-  double get lastX => _lastX;
+  double get value => _value;
 
   CurvedSimulation({
     required Duration baseDuration,
@@ -39,7 +87,7 @@ class CurvedSimulation extends Simulation with CueSimulation {
   @override
   double x(double t) {
     final progress = (t / _duration).clamp(0.0, 1.0);
-    return _lastX = _from + (_to - _from) * _curve.transform(progress);
+    return _value = _from + (_to - _from) * _curve.transform(progress);
   }
 
   @override
@@ -50,28 +98,6 @@ class CurvedSimulation extends Simulation with CueSimulation {
 
   @override
   bool isDone(double t) => t >= _duration;
-}
-
-class SegmentedMotion extends CueMotion {
-  final List<CueMotion> motions;
-  const SegmentedMotion(this.motions);
-
-  @override
-  Duration get baseDuration => motions.fold(Duration.zero, (total, motion) => total + motion.baseDuration);
-
-  @override
-  int get totalPhases => motions.length;
-
-  @override
-  CueSimulation build(bool forward, int phase, double progress, double? velocity) {
-    return SegmentedSimulation(
-      motions: motions,
-      forward: forward,
-      initialPhase: phase,
-      initialValue: progress,
-      velocity: velocity ?? 0.0,
-    );
-  }
 }
 
 class SegmentedSimulation extends Simulation with CueSimulation {
@@ -87,14 +113,14 @@ class SegmentedSimulation extends Simulation with CueSimulation {
   late CueSimulation _current;
 
   @override
-  double get lastX => _lastX;
+  double get value => _value;
 
   @override
   int get phase => _phase;
 
   double _phaseStartTime = 0;
 
-  double _lastX = 0.0;
+  double _value = 0.0;
 
   List<CueSimulation> _buildSeekableSegments() {
     if (_forward) {
@@ -110,11 +136,18 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     required bool forward,
     required double velocity,
     int initialPhase = 0,
-    double initialValue = 0,
+    double startValue = 0,
   }) : _motions = motions,
        _forward = forward,
        _phase = initialPhase {
-    _current = motions[initialPhase].build(forward, initialPhase, initialValue, velocity);
+    _current = motions[initialPhase].build(
+      SimulationBuildData(
+        forward: forward,
+        startValue: startValue,
+        phase: initialPhase,
+        velocity: velocity,
+      ),
+    );
     _duration = _current.duration;
     if (_forward) {
       for (int i = initialPhase + 1; i < motions.length; i++) {
@@ -128,10 +161,8 @@ class SegmentedSimulation extends Simulation with CueSimulation {
   }
 
   @override
-  double valueAtProgress(double progress) {
-    if (_motions.isEmpty) return 0.0;
-    if (_motions.isEmpty) return 0.0;
-
+  (double value, int phase) valueAtProgress(double progress) {
+    if (_motions.isEmpty) return (0.0, 0);
     final totalBaseDuration = _seekableSegments.fold(0.0, (sum, value) => sum + value.duration);
     if (totalBaseDuration <= 0.0) {
       return _seekableSegments.first.valueAtProgress(1.0);
@@ -142,16 +173,19 @@ class SegmentedSimulation extends Simulation with CueSimulation {
       elapsed -= _seekableSegments[phase].duration;
       phase++;
     }
+
     final segmentDuration = _seekableSegments[phase].duration;
+
     final localProgress = segmentDuration <= 0.0 ? 1.0 : (elapsed / segmentDuration).clamp(0.0, 1.0);
+    final (value, _) = _seekableSegments[phase].valueAtProgress(localProgress);
     _phase = _forward ? phase : _motions.length - 1 - phase;
-    return _seekableSegments[phase].valueAtProgress(localProgress);
+    return (value, _phase);
   }
 
   @override
   double x(double time) {
     _advanceIfNeeded(time);
-    return _lastX = _current.x(time - _phaseStartTime);
+    return _value = _current.x(time - _phaseStartTime);
   }
 
   @override
@@ -181,7 +215,52 @@ class SegmentedSimulation extends Simulation with CueSimulation {
       _phaseStartTime = time;
       _forward ? _phase++ : _phase--;
       final initialProgress = _forward ? 0.0 : 1.0;
-      _current = _motions[_phase].build(_forward, 0, initialProgress, exitVelocity);
+      _current = _motions[_phase].build(
+        SimulationBuildData(
+          forward: _forward,
+          startValue: initialProgress,
+          velocity: exitVelocity,
+        ),
+      );
     }
+  }
+}
+
+class CueSpringSimulation extends SpringSimulation with CueSimulation {
+  CueSpringSimulation(
+    super.spring,
+    super.start,
+    super.end,
+    super.velocity, {
+    super.tolerance,
+    super.snapToEnd,
+  }) : _end = end;
+
+  final double _end;
+  double? _duration;
+
+  @override
+  double get duration => _duration ??= calculateSettleDuration();
+
+  double _value = 0.0;
+
+  double calculateSettleDuration({double stepSize = 1 / 60}) {
+    double t = 0.0;
+    final tolerance = this.tolerance;
+    while (t < 100.0) {
+      final x = this.x(t);
+      final v = dx(t);
+      if ((x - _end).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+      t += stepSize;
+    }
+    return t;
+  }
+
+  @override
+  double get value => _value;
+
+  @override
+  double x(double time) {
+    return _value = super.x(time);
   }
 }

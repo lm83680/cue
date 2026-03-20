@@ -130,8 +130,6 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     return CueTrackImpl(
       config.motion,
       reverseMotion: config.reverseMotion,
-      delay: config.delay,
-      reverseDelay: config.reverseDelay,
       reverseType: config.reverseType,
     );
   }
@@ -160,7 +158,11 @@ abstract class CueTimeline extends Simulation {
 
   double get progress {
     final progressList = tracks.values.map((track) => track.progress);
-    return progressList.fold(double.infinity, min).clamp(0.0, 1.0);
+     if (status == AnimationStatus.reverse) {
+      return progressList.fold(0.0, max).clamp(0.0, 1.0);
+    } else {
+      return progressList.fold(double.infinity, min).clamp(0.0, 1.0);
+    }
   }
 
   final Map<TrackConfig, CueTrack> tracks;

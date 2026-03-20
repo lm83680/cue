@@ -85,8 +85,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
         TrackConfig(
           motion: track.motion,
           reverseMotion: track.reverseMotion,
-          delay: track.delay,
-          reverseDelay: track.reverseDelay,
         ),
       );
       _controller.setProgress(track.progress, forward: _overlayData.value.forward);

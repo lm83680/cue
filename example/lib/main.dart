@@ -1,6 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/slack_style_fab.dart';
-import 'package:example/examples/three_dots_action.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +45,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
   bool checked = false;
   late final _controller = CueController(vsync: this, motion: .wobbly());
 
-  late final _animation = DeferredCueAnimation<Offset>(
-    parent: _controller.timeline.mainTrack,
-    context: ActContext(motion: _controller.timeline.mainTrack.motion),
-  );
 
   Offset offset = Offset.zero;
 
@@ -66,13 +60,13 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: .center,
-            crossAxisAlignment: .end,
+            crossAxisAlignment: .center,
             children: [
               // SlackStyleFab(),
               // DeleteConfirmationDialog(),
               // IndicatorToButton(),
-              Cue.onToggle(
-                toggled: checked,
+              Cue.onMount(
+                // toggled: checked,
                 motion: .linear(300.ms),
                 child: Column(
                   children: [
@@ -93,16 +87,16 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     //   ),
                     // ),
 
-                    // Actor(
-                    //   act: .compose([
-                    //     .slideX(to: 1, reverse: .mirror(delay: 300.ms)),
-                    //   ]),
-                    //   child: Container(
-                    //     height: 100,
-                    //     width: 100,
-                    //     color: Colors.red,
-                    //   ),
-                    // ),
+                    Actor(
+                      act: .compose([
+                        .slideX(to: 1, delay: 300.ms, reverse: .mirror(delay: 300.ms)),
+                      ]),
+                      child: Container(
+                        height: 100,
+                        width: 100,
+                        color: Colors.red,
+                      ),
+                    ),
                     // SizedBox(height: 20),
                     // ElevatedButton(
                     //   onPressed: () => setState(() => checked = !checked),
@@ -112,7 +106,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 ),
               ), 
 
-              ThreeDotsAction(),
+              // ThreeDotsAction(),
               //  SlackStyleFab(),
               //  DeleteConfirmationDialog(),
               //   GestureDetector(

@@ -1,5 +1,4 @@
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:cue/src/motion/simulation.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:flutter/widgets.dart';
 

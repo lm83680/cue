@@ -19,21 +19,29 @@ abstract class ActImpl<R extends Object?, T extends Object?> extends Act {
   @override
   CueAnimation<R> buildAnimation(CueTimeline timline, ActContext context) {
     final (animtable, reverseAnimtable) = buildTweens(context);
-    final delay = (this.delay ?? context.delay ?? Duration.zero).inMicroseconds / Duration.microsecondsPerSecond;
-    final reverseDelay = (reverse.delay ?? context.reverseDelay ?? Duration.zero).inMicroseconds / Duration.microsecondsPerSecond;
-    final driver = timline.trackFor(
+    final delay = this.delay ?? context.delay;
+    final reverseDelay = reverse.delay ?? context.reverseDelay;
+
+    final motion = animtable.motion ?? context.motion;
+    CueMotion effectiveMotion = motion;
+    CueMotion? effectiveReverseMotion = reverseAnimtable?.motion ?? reverse.motion ?? context.reverseMotion;
+    if (delay != null) {
+      effectiveMotion = DelayedMotion(effectiveMotion, delay);
+    }
+    if (reverseDelay != null) {
+      effectiveReverseMotion = DelayedMotion(effectiveReverseMotion ?? motion, reverseDelay);
+    }
+    final track = timline.trackFor(
       TrackConfig(
-        motion: animtable.motion ?? context.motion,
-        reverseMotion: reverseAnimtable?.motion ?? reverse.motion ?? context.reverseMotion,
-        delay: delay,
-        reverseDelay: reverseDelay,
+        motion: effectiveMotion,
+        reverseMotion: effectiveReverseMotion,
         reverseType: reverse.type,
       ),
     );
     CueAnimtable<R> effectiveAnimatable = reverseAnimtable == null
         ? animtable
         : DualAnimatable(forward: animtable, reverse: reverseAnimtable);
-    return CueAnimationImpl<R>(parent: driver, animtable: effectiveAnimatable);
+    return CueAnimationImpl<R>(parent: track, animtable: effectiveAnimatable);
   }
 
   @override

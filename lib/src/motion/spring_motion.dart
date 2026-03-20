@@ -8,48 +8,6 @@ const double _kStandardIosDamping = 45.7099552;
 const Tolerance _kStandardIosTolerance = Tolerance(velocity: 0.03);
 const Tolerance _kDefaultTolerance = Tolerance(distance: 0.01, velocity: 0.03);
 
-class CueSpringSimulation extends SpringSimulation with CueSimulation {
-  CueSpringSimulation(
-    super.spring,
-    super.start,
-    super.end,
-    super.velocity, {
-    super.tolerance,
-    super.snapToEnd,
-  }): _end = end;
-
-  final double _end;
-  double? _duration;
-
-  @override
-  double get duration => _duration ??= calculateSettleDuration();
-
-  double calculateSettleDuration({double stepSize = 1 / 60}) {
-    double t = 0.0;
-    final tolerance = this.tolerance;
-    while (t < 100.0) {
-      final x = this.x(t);
-      final v = dx(t);
-      if ((x - _end).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
-      t += stepSize;
-    }
-    return t;
-  }
-
-  @override
-  int get phase => 0;
-
-  double _progress = 0.0;
-
-  @override
-  double get lastX => _progress;
-
-  @override
-  double x(double time) {
-    return _progress = super.x(time);
-  }
-}
-
 final class Spring extends SimulationMotion<CueSpringSimulation> {
   final double mass;
   final double stiffness;
@@ -72,12 +30,12 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
   );
 
   @override
-  CueSpringSimulation build(bool forward, int phase, double progress, double? velocity) {
+  CueSpringSimulation build(SimulationBuildData data) {
     return CueSpringSimulation(
       springDescription,
-      progress,
-      forward ? 1.0 : 0.0,
-      velocity ?? 0.0,
+      data.startValue,
+      data.endValue,
+      data.velocity ?? 0.0,
       tolerance: tolerance,
       snapToEnd: snapToEnd,
     );
@@ -196,8 +154,8 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
 
   @override
   Duration get baseDuration {
-    final sim = build(true, 0, 0.0, 0.0);
+    final sim = build(SimulationBuildData.base(true));
     return Duration(milliseconds: (sim.calculateSettleDuration() * 1000).round());
   }
-
 }
+
