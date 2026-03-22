@@ -10,7 +10,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     : super({
         TrackConfig(
           motion: main.motion,
-          reverseMotion: main.reverseMotion,
+          reverseMotion: main.reverseMotion ?? main.motion,
         ): main,
       });
 

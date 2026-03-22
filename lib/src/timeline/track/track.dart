@@ -7,7 +7,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   final CueMotion motion;
 
   @override
-  final CueMotion? reverseMotion;
+  final CueMotion reverseMotion;
 
   final ReverseBehaviorType reverseType;
 
@@ -23,7 +23,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   bool _needsPrepare = false;
 
   late final CueSimulation _seekableSim = motion.buildBase();
-  late final CueSimulation _seekableReverseSim = reverseMotion?.buildBase(false) ?? motion.buildBase(false);
+  late final CueSimulation _seekableReverseSim = reverseMotion.buildBase(false);
 
   @override
   double get forwardDuration => _seekableSim.duration;
@@ -40,9 +40,9 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
 
   CueTrackImpl(
     this.motion, {
-    this.reverseMotion,
+    CueMotion? reverseMotion,
     this.reverseType = ReverseBehaviorType.mirror,
-  });
+  }) : reverseMotion = reverseMotion ?? motion;
 
   @override
   double get value => _value;
@@ -103,7 +103,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
       return;
     }
 
-    final active = forward ? motion : (reverseMotion ?? motion);
+    final active = forward ? motion : reverseMotion;
 
     _startProgress = from ?? _progress;
 

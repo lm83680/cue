@@ -2,12 +2,12 @@ import 'package:cue/cue.dart';
 
 class TrackConfig {
   final CueMotion motion;
-  final CueMotion? reverseMotion;
+  final CueMotion reverseMotion;
   final ReverseBehaviorType reverseType;
 
   const TrackConfig({
     required this.motion,
-    this.reverseMotion,
+    required this.reverseMotion,
     this.reverseType = ReverseBehaviorType.mirror,
   });
 

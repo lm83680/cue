@@ -17,14 +17,14 @@ class CueController extends AnimationController {
     required CueMotion motion,
     CueMotion? reverseMotion,
   }) : _timeline = CueTimelineImpl(
-         CueTrackImpl(motion, reverseMotion: reverseMotion),
+         CueTrackImpl(motion, reverseMotion: reverseMotion ?? motion),
        ),
        super.unbounded();
 
   void updateMotion(CueMotion newMotion, {CueMotion? newReverseMotion}) {
     final mainTrack = timeline.mainTrack;
     if (newMotion != mainTrack.motion || newReverseMotion != mainTrack.reverseMotion) {
-      timeline.resetTracks(TrackConfig(motion: newMotion, reverseMotion: newReverseMotion));
+      timeline.resetTracks(TrackConfig(motion: newMotion, reverseMotion: newReverseMotion ?? newMotion));
     }
   }
 
