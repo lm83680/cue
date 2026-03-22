@@ -1,22 +1,18 @@
-
 import 'package:flutter/material.dart';
 
 /// A ChangeNotifier that allows listeners to receive data when notified
-class EventNotifier<T> {
+mixin class EventNotifier<T> {
   final List<void Function(T)> _eventListeners = [];
 
   bool _disposed = false;
 
-  /// Add a listener that receives data when events are fired
-  void addEventListener(void Function(T) listener) {
+  VoidCallback addEventListener<E extends T>(void Function(E) listener) {
     assert(!_disposed, 'Cannot add event listener to a disposed EventNotifier');
-    _eventListeners.add(listener);
-  }
-
-  /// Remove an event listener
-  void removeEventListener(void Function(T) listener) {
-    assert(!_disposed, 'Cannot remove event listener from a disposed EventNotifier');
-    _eventListeners.remove(listener);
+    void wrapper(T event) {
+      if (event is E) listener(event);
+    }
+    _eventListeners.add(wrapper);
+    return () => _eventListeners.remove(wrapper);
   }
 
   /// Fire an event with data to all event listeners

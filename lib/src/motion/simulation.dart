@@ -5,7 +5,6 @@ import 'package:flutter/physics.dart';
 mixin CueSimulation on Simulation {
   int get phase => 0;
 
-  double get value;
   double get duration;
 
   (double value, int phase) valueAtProgress(double progress) {
@@ -27,11 +26,6 @@ class DelayedSimulation extends Simulation with CueSimulation {
   double get duration => _delay + _base.duration;
 
   @override
-  double get value => _value;
-
-  double _value = 0.0;
-
-  @override
   int get phase => _base.phase;
 
   // Core progress mapping - delay is first portion of progress
@@ -50,7 +44,7 @@ class DelayedSimulation extends Simulation with CueSimulation {
   @override
   double x(double t) {
     final tAfterDelay = (t - _delay).clamp(0.0, double.infinity);
-    return _value = _base.x(tAfterDelay);
+    return _base.x(tAfterDelay);
   }
 
   @override
@@ -66,13 +60,8 @@ class CurvedSimulation extends Simulation with CueSimulation {
   final double _to;
   final double _duration;
 
-  double _value = 0.0;
-
   @override
   double get duration => _duration;
-
-  @override
-  double get value => _value;
 
   CurvedSimulation({
     required Duration baseDuration,
@@ -87,7 +76,7 @@ class CurvedSimulation extends Simulation with CueSimulation {
   @override
   double x(double t) {
     final progress = (t / _duration).clamp(0.0, 1.0);
-    return _value = _from + (_to - _from) * _curve.transform(progress);
+    return _from + (_to - _from) * _curve.transform(progress);
   }
 
   @override
@@ -113,14 +102,9 @@ class SegmentedSimulation extends Simulation with CueSimulation {
   late CueSimulation _current;
 
   @override
-  double get value => _value;
-
-  @override
   int get phase => _phase;
 
   double _phaseStartTime = 0;
-
-  double _value = 0.0;
 
   List<CueSimulation> _buildSeekableSegments() {
     if (_forward) {
@@ -160,6 +144,29 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     }
   }
 
+ 
+
+  @override
+  double x(double time) {
+    _advanceIfNeeded(time);
+    return _current.x(time - _phaseStartTime);
+  }
+
+  @override
+  double dx(double time) {
+    _advanceIfNeeded(time);
+    return _current.dx(time - _phaseStartTime);
+  }
+
+  @override
+  bool isDone(double time) {
+    if (_forward) {
+      return _phase >= _motions.length - 1 && _current.isDone(time - _phaseStartTime);
+    } else {
+      return _phase <= 0 && _current.isDone(time - _phaseStartTime);
+    }
+  }
+
   @override
   (double value, int phase) valueAtProgress(double progress) {
     if (_motions.isEmpty) return (0.0, 0);
@@ -180,27 +187,6 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     final (value, _) = _seekableSegments[phase].valueAtProgress(localProgress);
     _phase = _forward ? phase : _motions.length - 1 - phase;
     return (value, _phase);
-  }
-
-  @override
-  double x(double time) {
-    _advanceIfNeeded(time);
-    return _value = _current.x(time - _phaseStartTime);
-  }
-
-  @override
-  double dx(double time) {
-    _advanceIfNeeded(time);
-    return _current.dx(time - _phaseStartTime);
-  }
-
-  @override
-  bool isDone(double time) {
-    if (_forward) {
-      return _phase >= _motions.length - 1 && _current.isDone(time - _phaseStartTime);
-    } else {
-      return _phase <= 0 && _current.isDone(time - _phaseStartTime);
-    }
   }
 
   void _advanceIfNeeded(double time) {
@@ -237,12 +223,9 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
   }) : _end = end;
 
   final double _end;
-  double? _duration;
 
   @override
-  double get duration => _duration ??= calculateSettleDuration();
-
-  double _value = 0.0;
+  late final double duration = calculateSettleDuration();
 
   double calculateSettleDuration({double stepSize = 1 / 60}) {
     double t = 0.0;
@@ -254,13 +237,5 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
       t += stepSize;
     }
     return t;
-  }
-
-  @override
-  double get value => _value;
-
-  @override
-  double x(double time) {
-    return _value = super.x(time);
   }
 }

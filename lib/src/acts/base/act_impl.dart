@@ -31,6 +31,7 @@ abstract class ActImpl<R extends Object?, T extends Object?> extends Act {
     if (reverseDelay != null) {
       effectiveReverseMotion = DelayedMotion(effectiveReverseMotion ?? motion, reverseDelay);
     }
+
     final track = timline.trackFor(
       TrackConfig(
         motion: effectiveMotion,

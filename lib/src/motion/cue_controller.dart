@@ -21,20 +21,15 @@ class CueController extends AnimationController {
        ),
        super.unbounded();
 
-  AnimationStatusListener? _statusListener;
-
   void updateMotion(CueMotion newMotion, {CueMotion? newReverseMotion}) {
     final mainTrack = timeline.mainTrack;
     if (newMotion != mainTrack.motion || newReverseMotion != mainTrack.reverseMotion) {
-      timeline.reset(TrackConfig(motion: newMotion, reverseMotion: newReverseMotion));
+      timeline.resetTracks(TrackConfig(motion: newMotion, reverseMotion: newReverseMotion));
     }
   }
 
   @override
   void dispose() {
-    if (_statusListener != null) {
-      removeStatusListener(_statusListener!);
-    }
     _timeline.dispose();
     super.dispose();
   }
@@ -69,7 +64,7 @@ class CueController extends AnimationController {
 
   @override
   TickerFuture forward({double? from}) {
-    _timeline.willAnimate(true);
+    _timeline.willAnimate(forward: true);
     if (from != null) {
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0. Received: $from');
       value = from;
@@ -80,7 +75,7 @@ class CueController extends AnimationController {
 
   @override
   TickerFuture reverse({double? from}) {
-    _timeline.willAnimate(false);
+    _timeline.willAnimate(forward: false);
     if (from != null) {
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0. Received: $from');
       value = from;
@@ -100,39 +95,29 @@ class CueController extends AnimationController {
   }
 
   @override
-  void reset() => timeline.setProgress(0.0);
-
-  @override
-  void stop({bool canceled = true}) {
-    if (_statusListener != null) {
-      super.removeStatusListener(_statusListener!);
-    }
-    super.stop(canceled: canceled);
-  }
+  void reset() => timeline.reset();
 
   @override
   TickerFuture repeat({double? min, double? max, bool reverse = false, int? count, Duration? period}) {
-    if (_statusListener != null) {
-      super.removeStatusListener(_statusListener!);
+    if (period != null || min != null || max != null) {
+      throw UnsupportedError(
+        'CueController does does not support time-based repetitio because physics-based animations is a first-class citizen. You may only specify count and reverse parameters. Received: period: $period, min: $min, max: $max',
+      );
     }
-    int loopCount = 0;
-    _statusListener = (status) {
-      if (status == AnimationStatus.completed) {
-        loopCount++;
-        if (count != null && loopCount >= count) {
-          return;
-        }
-        if (reverse) {
-          this.reverse();
-        } else {
-          forward();
-        }
-      } else if (status == AnimationStatus.dismissed && reverse) {
-        forward();
-      }
-    };
-    super.addStatusListener(_statusListener!);
-    forward();
-    return TickerFuture.complete();
+    assert(count == null || count > 0, 'The "count" value must be greater than 0. Received: $count');
+    _timeline.willAnimate(forward: true);
+    _timeline.prepareForRepeat(RepeatConfig(reverse: reverse, count: count));
+    return super.animateWith(_timeline);
+  }
+
+  @override
+  TickerFuture fling({
+    double velocity = 1.0,
+    SpringDescription? springDescription,
+    AnimationBehavior? animationBehavior,
+  }) {
+    throw UnsupportedError(
+      'fling is not supported by CueController. Use forward or reverse instead.',
+    );
   }
 }

@@ -81,7 +81,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   VoidCallback attachDebugTarget(BuildContext context, {required String id, required CueTrack track}) {
 
       _overlayData.value = _overlayData.value.copyWith(activeTargetId: id);
-      _controller.timeline.reset(
+      _controller.timeline.resetTracks(
         TrackConfig(
           motion: track.motion,
           reverseMotion: track.reverseMotion,

@@ -26,13 +26,10 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   late final CueSimulation _seekableReverseSim = reverseMotion?.buildBase(false) ?? motion.buildBase(false);
 
   @override
-  double get baseDuration {
-    if (_forward) {
-      return _seekableSim.duration;
-    } else {
-      return _seekableReverseSim.duration;
-    }
-  }
+  double get forwardDuration => _seekableSim.duration;
+
+  @override
+  double get reverseDuration => _seekableReverseSim.duration;
 
   double _value = 0.0;
   double _localT = 0.0;
@@ -116,13 +113,13 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     } else if (forward && reverseType.isNone) {
       _value = 0.0;
       _phase = 0;
-    } else if (_activeSim case final sim?) {
-      _value = sim.value;
-      _phase = sim.phase;
-    } else {
+    } else if (from != null || _activeSim == null) {
       final (value, phase) = _valueAtProgress(_startProgress, forward);
       _value = value;
       _phase = phase;
+    } else if (_activeSim case final sim?) {
+      _value = sim.x(_localT);
+      _phase = sim.phase;
     }
     _activeSim = active.build(
       SimulationBuildData(
@@ -200,7 +197,8 @@ abstract class CueTrack extends Animation<double> with AnimationLocalListenersMi
   CueMotion get motion;
   CueMotion? get reverseMotion;
 
-  double get baseDuration;
+  double get forwardDuration;
+  double get reverseDuration;
 
   void tick(double td);
 

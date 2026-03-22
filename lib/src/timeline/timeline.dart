@@ -15,37 +15,48 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
       });
 
   @override
-  void addOnPrepareListener(ValueChanged<bool> listener) {
-    _onPrepareNotifier.addEventListener(listener);
+  void willAnimate({required bool forward}) {
+    _eventsNotifier.fireEvent(TimelineWillAnimateEvent(forward));
   }
 
-  @override
-  void removeOnPrepareListener(ValueChanged<bool> listener) {
-    _onPrepareNotifier.removeEventListener(listener);
-  }
-
-  @override
-  void addOnWillAnimateListener(ValueChanged<bool> listener) {
-    _onWillAnimateNotifier.addEventListener(listener);
-  }
-
-  @override
-  void removeOnWillAnimateListener(ValueChanged<bool> listener) {
-    _onWillAnimateNotifier.removeEventListener(listener);
-  }
-
-  @override
-  void willAnimate(bool forward) {
-    _onWillAnimateNotifier.fireEvent(forward);
-  }
-
-  final _onPrepareNotifier = EventNotifier<bool>();
-  final _onWillAnimateNotifier = EventNotifier<bool>();
+  final _eventsNotifier = EventNotifier<TimelineEvent>();
 
   double _lastT = 0.0;
+  double _cycleOffset = 0.0;
+  RepeatConfig? _repeatConfig;
 
   @override
   CueTrack get mainTrack => tracks.values.first;
+
+  @override
+  Duration get forwardDuration {
+    double maxDurationSeconds = 0.0;
+    for (final track in tracks.values) {
+      if (track.forwardDuration > maxDurationSeconds) {
+        maxDurationSeconds = track.forwardDuration;
+      }
+    }
+    return Duration(milliseconds: (maxDurationSeconds * 1000).round());
+  }
+
+  @override
+  Duration get reverseDuration {
+    double maxDurationSeconds = 0.0;
+    for (final track in tracks.values) {
+      if (track.reverseDuration > maxDurationSeconds) {
+        maxDurationSeconds = track.reverseDuration;
+      }
+    }
+    return Duration(milliseconds: (maxDurationSeconds * 1000).round());
+  }
+
+
+  @override
+  void reset() {
+    _repeatConfig = null;
+    _cycleOffset = 0.0;
+    setProgress(0.0, forward: true);
+  }
 
   @override
   CueTrack trackFor(TrackConfig config) {
@@ -114,21 +125,36 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   @override
   void prepare({required bool forward, double? from}) {
-    _onPrepareNotifier.fireEvent(forward);
+    _repeatConfig = null;
+    _cycleOffset = 0.0;
+    fireEvent(TimelinePrepareEvent(forward));
     _lastT = 0.0;
-    for (final anim in tracks.values) {
-      anim.prepare(forward: forward, from: from);
+    _prepareInternal(forward, from);
+  }
+
+  void _prepareInternal(bool forward, [double? from]) {
+    for (final track in tracks.values) {
+      track.prepare(forward: forward, from: from);
     }
     _updateStatus();
   }
 
   @override
+  void prepareForRepeat(RepeatConfig config) {
+    _repeatConfig = config;
+    _lastT = 0.0;
+    _cycleOffset = 0.0;
+    _prepareInternal(true, 0.0);
+  }
+
+  @override
   double x(double time) {
-    final dt = time - _lastT;
-    _lastT = time;
+    final adjustedTime = time - _cycleOffset;
+    final dt = adjustedTime - _lastT;
+    _lastT = adjustedTime;
     if (dt > 0) {
-      for (final anim in tracks.values) {
-        anim.tick(dt);
+      for (final track in tracks.values) {
+        track.tick(dt);
       }
     }
     _updateStatus();
@@ -139,7 +165,33 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   double dx(double time) => mainTrack.velocity;
 
   @override
-  bool isDone(double time) => tracks.values.every((anim) => anim.isDone);
+  bool isDone(double time) {
+    final cycleDone = tracks.values.every((track) => track.isDone);
+    if (!cycleDone) return false;
+
+    final config = _repeatConfig;
+    if (config == null) return true;
+
+    if (config.count != null) {
+      final nextCount = config.count! - 1;
+      _repeatConfig = config.updateCount(nextCount);
+
+      if (nextCount == 0) {
+        return true;
+      }
+    }
+
+    _cycleOffset = time;
+    _lastT = 0.0;
+
+    if (config.reverse) {
+      _prepareInternal(!mainTrack.isForwardOrCompleted);
+    } else {
+      _prepareInternal(true, 0.0);
+    }
+
+    return false;
+  }
 
   @override
   CueTrack buildTrack(TrackConfig config) {
@@ -162,23 +214,30 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   @override
   void dispose() {
-    _onPrepareNotifier.dispose();
-    _onWillAnimateNotifier.dispose();
+    super.dispose();
+    _eventsNotifier.dispose();
   }
 }
 
-abstract class CueTimeline extends Simulation {
+abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> {
   CueTrack trackFor(TrackConfig config);
 
   void prepare({required bool forward, double? from});
+  void prepareForRepeat(RepeatConfig config);
 
-  void willAnimate(bool forward);
+  void willAnimate({required bool forward});
 
   void setProgress(double value, {bool forward = true});
+
+  void reset();
 
   void release(CueTrack anim);
 
   AnimationStatus get status;
+
+  Duration get forwardDuration;
+
+  Duration get reverseDuration;
 
   double get progress {
     final progressList = tracks.values.map((track) => track.progress);
@@ -199,17 +258,44 @@ abstract class CueTimeline extends Simulation {
 
   CueTrack get mainTrack;
 
+  @override
   void dispose();
 
-  void reset(TrackConfig config) {
+  void resetTracks(TrackConfig main) {
     tracks.clear();
-    tracks[config] = buildTrack(config);
+    tracks[main] = buildTrack(main);
   }
 
-  void addOnPrepareListener(ValueChanged<bool> listener);
-  void addOnWillAnimateListener(ValueChanged<bool> listener);
-  void removeOnWillAnimateListener(ValueChanged<bool> listener);
-  void removeOnPrepareListener(ValueChanged<bool> listener);
   void addStatusListener(AnimationStatusListener listener);
   void removeStatusListener(AnimationStatusListener listener);
+}
+
+sealed class TimelineEvent {
+  const TimelineEvent();
+}
+
+class TimelineWillAnimateEvent extends TimelineEvent {
+  final bool forward;
+
+  const TimelineWillAnimateEvent(this.forward);
+}
+
+class TimelinePrepareEvent extends TimelineEvent {
+  final bool forward;
+
+  const TimelinePrepareEvent(this.forward);
+}
+
+class RepeatConfig {
+  final int? count;
+  final bool reverse;
+
+  RepeatConfig({
+    this.count,
+    required this.reverse,
+  });
+
+  RepeatConfig updateCount(int newCount) {
+    return RepeatConfig(count: newCount, reverse: reverse);
+  }
 }

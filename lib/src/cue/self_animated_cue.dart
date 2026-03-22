@@ -9,12 +9,14 @@ class SelfAnimatedCue extends Cue {
     super.debugLabel,
     this.loop = false,
     this.reverseOnLoop = false,
+    this.loopCount,
     super.act,
   }) : super._();
 
   final CueMotion motion;
   final CueMotion? reverseMotion;
   final bool loop;
+  final int? loopCount;
   final bool reverseOnLoop;
 
   @override
@@ -28,7 +30,7 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   @override
   void onControllerReady() async {
     if (widget.loop) {
-      controller.repeat(reverse: widget.reverseOnLoop);
+      controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
     } else {
       controller.forward();
     }
@@ -37,10 +39,10 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop) {
+    if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop || widget.loopCount != oldWidget.loopCount) {
       controller.stop();
       if (widget.loop) {
-        controller.repeat(reverse: widget.reverseOnLoop);
+        controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
       } else {
         controller.forward();
       }

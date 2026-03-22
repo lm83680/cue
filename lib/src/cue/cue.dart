@@ -52,6 +52,7 @@ abstract class Cue extends StatefulWidget {
     CueMotion? reverseMotion,
     bool loop,
     bool reverseOnLoop,
+    int? loopCount,
     Act? act,
     required Widget child,
   }) = SelfAnimatedCue;
@@ -150,6 +151,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             });
           }
         }
+
         timeline.removeStatusListener(statusListener);
         timeline.addStatusListener(statusListener);
       }

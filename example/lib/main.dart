@@ -16,7 +16,10 @@ class MyApp extends StatelessWidget {
       title: 'Cue Demo',
       // showPerformanceOverlay: true,
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark,),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
       ),
       theme: ThemeData(
         splashFactory: NoSplash.splashFactory,
@@ -45,7 +48,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
   bool checked = false;
   late final _controller = CueController(vsync: this, motion: .wobbly());
 
-
   Offset offset = Offset.zero;
 
   @override
@@ -63,11 +65,11 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             crossAxisAlignment: .center,
             children: [
               // IndicatorToButton(),
-              Cue.onChange(
-                value: slide,
-                fromCurrentValue: true,
-                // toggled: checked,
-                motion: .linear(300.ms),
+              Cue.onToggle(
+                toggled: checked,
+                // loop: true,
+                // reverseOnLoop: true,
+                motion: .gentle(),
                 child: Column(
                   children: [
                     // Actor(
@@ -86,11 +88,11 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     //     color: Colors.blue,
                     //   ),
                     // ),
-
                     Actor(
-                      act: .compose([
-                        .slideX(to: slide),
-                      ]),
+                      act: .slideX(
+                        to: slide,
+                        reverse: .mirror(motion: .wobbly()),
+                      ),
                       child: Container(
                         height: 100,
                         width: 100,
@@ -101,14 +103,15 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          slide = slide+.1;
+                          checked = !checked;
+                          // slide = checked ? 2.0 : 1.0;
                         });
                       },
                       child: Text('Toggle'),
                     ),
                   ],
                 ),
-              ), 
+              ),
 
               // ThreeDotsAction(),
               //  SlackStyleFab(),
