@@ -1,6 +1,6 @@
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:cue/src/motion/simulation.dart';
-import 'package:flutter/physics.dart';
+import 'package:flutter/widgets.dart';
 
 // holds default values for spring simulation
 const double _kStandardIosStiffness = 522.35;
@@ -31,6 +31,8 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
 
   @override
   CueSpringSimulation build(SimulationBuildData data) {
+    final view = WidgetsBinding.instance.platformDispatcher.views.firstOrNull;
+    final refreshRate = view?.display.refreshRate ?? 60.0;
     return CueSpringSimulation(
       springDescription,
       data.startValue,
@@ -38,6 +40,7 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
       data.velocity ?? 0.0,
       tolerance: tolerance,
       snapToEnd: snapToEnd,
+      samplingStepSize: 1 / refreshRate,
     );
   }
 
@@ -155,7 +158,7 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
   @override
   Duration get baseDuration {
     final sim = build(SimulationBuildData.base(true));
-    return Duration(milliseconds: (sim.calculateSettleDuration() * 1000).round());
+    return Duration(milliseconds: (sim.duration * 1000).round());
   }
 }
 

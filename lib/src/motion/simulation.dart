@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
@@ -144,8 +146,6 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     }
   }
 
- 
-
   @override
   double x(double time) {
     _advanceIfNeeded(time);
@@ -220,22 +220,50 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
     super.velocity, {
     super.tolerance,
     super.snapToEnd,
-  }) : _end = end;
-
+    this.samplingStepSize = 1 / 60,
+  }) : _end = end,
+       _start = start,
+       _spring = spring;
+  final double samplingStepSize;
+  final SpringDescription _spring;
+  SpringDescription get spring => _spring;
+  final double _start;
   final double _end;
 
   @override
-  late final double duration = calculateSettleDuration();
+  late final double duration = calculateSettleDuration(spring: _spring, stepSize: samplingStepSize);
 
-  double calculateSettleDuration({double stepSize = 1 / 60}) {
-    double t = 0.0;
-    final tolerance = this.tolerance;
+
+
+  // double calculateSettleDuration({double stepSize = 1 / 60}) {
+  //   double t = 0.0;
+  //   final tolerance = this.tolerance;
+  //   while (t < 100.0) {
+  //     final x = this.x(t);
+  //     final v = dx(t);
+  //     if ((x - _end).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+  //     t += stepSize;
+  //   }
+  //   return t;
+  // }
+
+ double calculateSettleDuration({
+      double stepSize = 1 / 60,
+       required SpringDescription spring,
+    }) {
+     final omega0 = math.sqrt(spring.stiffness / spring.mass);
+    final zeta = spring.damping / (2 * math.sqrt(spring.stiffness * spring.mass));
+    final amplitude = (_start - _end).abs();
+
+    final estimate = math.max(0.0, -math.log(tolerance.distance / amplitude) / (zeta * omega0));
+    // double t = math.max(0.0, estimate - stepSize * 10);
+    double t = (estimate / stepSize).floor() * stepSize;
     while (t < 100.0) {
-      final x = this.x(t);
-      final v = dx(t);
-      if ((x - _end).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+      if (isDone(t)) return t;
       t += stepSize;
     }
+
     return t;
+    
   }
 }

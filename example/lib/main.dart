@@ -2,6 +2,7 @@ import 'package:cue/cue.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 void main() {
   runApp(const MyApp());
@@ -69,7 +70,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 toggled: checked,
                 // loop: true,
                 // reverseOnLoop: true,
-                motion: .linear(300.ms),
+                motion: .wobbly(),
                 child: Column(
                   children: [
                     // Actor(
@@ -89,10 +90,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     //   ),
                     // ),
                     Actor(
-                      act: .slideX(
-                        to: slide,
-                        delay: 300.ms,
-                      ),
+                      act: .slideX(to: slide),
                       child: Container(
                         height: 100,
                         width: 100,
@@ -106,6 +104,8 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                           checked = !checked;
                           // slide = checked ? 2.0 : 1.0;
                         });
+
+                       
                       },
                       child: Text('Toggle'),
                     ),

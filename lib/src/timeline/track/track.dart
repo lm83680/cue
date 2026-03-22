@@ -161,6 +161,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     _progress = _startProgress + (target - _startProgress) * fraction;
 
     if (_activeSim!.isDone(_localT)) {
+      print('on Tick end: $_localT');
       _value = _activeSim!.x(_localT);
       _phase = _activeSim!.phase;
       _done = true;
