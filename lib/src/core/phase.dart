@@ -263,7 +263,7 @@ class Phase<T extends Object?> {
   static List<Phase<R>> resolveFractionalFrames<T extends Object?, R extends Object?>(
     List<FractionalKeyframe<T>> frames, {
     T? from,
-    bool reverse = false,
+    bool forReverse = false,
     required R Function(T value) transform,
   }) {
     if (frames.isEmpty) {
@@ -312,9 +312,9 @@ class Phase<T extends Object?> {
     if (from != null) {
       final fromFrame = FractionalKeyframe<T>(
         from,
-        at: reverse ? 1.0 : 0.0,
+        at: forReverse ? 1.0 : 0.0,
       );
-      if (reverse) {
+      if (forReverse) {
         resolvedFrames.add(fromFrame);
       } else {
         resolvedFrames.insert(0, fromFrame);
@@ -337,7 +337,7 @@ class Phase<T extends Object?> {
   static List<Phase<R>> resolveMotionFrames<T extends Object?, R extends Object?>(
     List<Keyframe<T>> frames, {
     T? from,
-    bool reverse = false,
+    bool forReverse = false,
     required R Function(T value) transform,
   }) {
     if (frames.isEmpty) {
@@ -346,7 +346,7 @@ class Phase<T extends Object?> {
     final mFrames = List.from(frames);
     final List<Phase<R>> phases = [];
     if (from != null) {
-      if (reverse) {
+      if (forReverse) {
         mFrames.add(Keyframe(from, motion: CueMotion.none));
       } else {
         mFrames.insert(0, Keyframe(from, motion: CueMotion.none));

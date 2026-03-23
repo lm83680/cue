@@ -208,7 +208,6 @@ class SegmentedSimulation extends Simulation with CueSimulation {
           velocity: exitVelocity,
         ),
       );
-      print('current: ${(_current as CurvedSimulation)._curve} phase; ${_phase}');
     }
   }
 }
