@@ -22,18 +22,18 @@ abstract class Cue extends StatefulWidget {
     super.key,
     required this.child,
     this.debugLabel,
-    this.act,
+    this.acts,
   });
 
   final String? debugLabel;
   final Widget child;
-  final Act? act;
+  final List<Act>? acts;
 
   const factory Cue({
     Key? key,
     String? debugLabel,
     bool isBounded,
-    Act? act,
+    List<Act>? acts,
     required CueTimeline timeline,
     required Widget child,
   }) = _ControlledCue;
@@ -53,7 +53,7 @@ abstract class Cue extends StatefulWidget {
     bool loop,
     bool reverseOnLoop,
     int? loopCount,
-    Act? act,
+    List<Act>? acts,
     required Widget child,
   }) = SelfAnimatedCue;
 
@@ -63,7 +63,7 @@ abstract class Cue extends StatefulWidget {
     CueMotion motion,
     MouseCursor cursor,
     bool opaque,
-    Act? act,
+    List<Act>? acts,
     required Widget child,
   }) = _OnHoverCue;
 
@@ -75,7 +75,7 @@ abstract class Cue extends StatefulWidget {
     required bool toggled,
     bool skipFirstAnimation,
     required Widget child,
-    Act? act,
+    List<Act>? acts,
   }) = _TogglableCue;
 
   const factory Cue.onChange({
@@ -84,7 +84,7 @@ abstract class Cue extends StatefulWidget {
     String? debugLabel,
     bool skipFirstAnimation,
     bool fromCurrentValue,
-    Act? act,
+    List<Act>? acts,
     required Object? value,
     required Widget child,
   }) = _OnChangeCue;
@@ -92,7 +92,7 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.indexed({
     Key? key,
     String? debugLabel,
-    Act? act,
+    List<Act>? acts,
     required IndexedCueController controller,
     required int index,
     required Widget child,
@@ -101,7 +101,7 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onProgress({
     Key? key,
     String? debugLabel,
-    Act? act,
+    List<Act>? acts,
 
     required Listenable listenable,
     required ValueGetter<double> progress,
@@ -118,7 +118,7 @@ abstract class Cue extends StatefulWidget {
     required Key key,
     String? debugLabel,
     bool enabled,
-    Act? act,
+    List<Act>? acts,
     required Widget child,
   }) = _OnScrollVisibleCue;
 }
@@ -167,8 +167,8 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   @override
   Widget build(BuildContext context) {
     Widget child = widget.child;
-    if (widget.act != null) {
-      child = Actor(act: widget.act!, child: child);
+    if (widget.acts != null) {
+      child = Actor(acts: widget.acts!, child: child);
     }
     if (kDebugMode) {
       final debugToolsScope = CueDebugTools.maybeOf(context);

@@ -1,6 +1,6 @@
 part of 'base/act.dart';
 
-class DecoratedBoxAct extends ActImpl<Decoration, Decoration> {
+class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
   final AnimatableValue<Color>? color;
   final AnimatableValue<BorderRadiusGeometry>? borderRadius;
   final AnimatableValue<BoxBorder>? border;
@@ -67,7 +67,6 @@ class DecoratedBoxAct extends ActImpl<Decoration, Decoration> {
     return (
       TweenAnimtable(
         DecorationTween(begin: from, end: to),
-        motion: motion ?? context.motion,
       ),
       null,
     );
@@ -98,6 +97,12 @@ class DecoratedBoxAct extends ActImpl<Decoration, Decoration> {
 
   @override
   int get hashCode => Object.hash(color, borderRadius, border, boxShadow, gradient, shape, position);
+  
+  @override
+ActContext resolve(ActContext context) {
+    // TODO: implement resolve
+    throw UnimplementedError();
+  }
 }
 
 class DecoratedBoxActor extends StatelessWidget {
@@ -129,7 +134,7 @@ class DecoratedBoxActor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Actor(
-      act: DecoratedBoxAct(
+      acts: [DecoratedBoxAct(
         color: color,
         borderRadius: borderRadius,
         border: border,
@@ -138,7 +143,7 @@ class DecoratedBoxActor extends StatelessWidget {
         shape: shape,
         position: position,
         motion: motion,
-      ),
+      )]  ,
       child: child ?? const SizedBox.shrink(),
     );
   }

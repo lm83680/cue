@@ -9,7 +9,7 @@ class _OnChangeCue extends SelfAnimatedCue {
     this.value,
     this.skipFirstAnimation = true,
     this.fromCurrentValue = false,
-    super.act,
+    super.acts,
   });
 
   final Object? value;

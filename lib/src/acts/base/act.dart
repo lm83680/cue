@@ -3,7 +3,9 @@ import 'dart:ui';
 
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/deferred_tween_act.dart';
-import 'package:cue/src/acts/base/act_impl.dart';
+import 'package:cue/src/acts/base/animatable_act.dart';
+import 'package:cue/src/timeline/track/track.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -34,14 +36,6 @@ typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
 
 abstract class Act {
   const Act();
-
-  const factory Act.compose(
-    List<Act> acts, {
-    CueMotion? motion,
-    Duration? delay,
-    CueMotion? reverseMotion,
-    Duration? reverseDelay,
-  }) = ComposeAct;
 
   const factory Act.scale({
     required double from,
@@ -118,7 +112,7 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-    Duration? delay,
+    Duration delay,
   }) = SlideAct.fromX;
 
   const factory Act.slideY({
@@ -174,7 +168,7 @@ abstract class Act {
     EdgeInsetsGeometry from,
     EdgeInsetsGeometry to,
     CueMotion? motion,
-    Duration? delay,
+    Duration delay,
     ReverseBehavior<EdgeInsetsGeometry> reverse,
   }) = PaddingAct;
 
@@ -214,7 +208,7 @@ abstract class Act {
     AnimatableValue<double>? height,
     AlignmentGeometry alignment,
     CueMotion? motion,
-    Duration? delay,
+    Duration delay,
   }) = SizedBoxAct;
 
   const factory Act.sizedClip({
@@ -303,99 +297,126 @@ abstract class Act {
     CueMotion? motion,
   }) = DecoratedBoxAct;
 
+  ActContext resolve(ActContext context);
+
   CueAnimation<Object?> buildAnimation(CueTimeline timline, ActContext context);
 
   Widget build(BuildContext context, covariant CueAnimation<Object?> animation, Widget child);
-
-  List<(Act, ActContext)> resolve(ActContext base);
 }
 
-class ComposeAct extends Act {
-  final List<Act> acts;
-  final CueMotion? motion;
-  final CueMotion? reverseMotion;
-  final Duration? delay;
-  final Duration? reverseDelay;
-  const ComposeAct(
-    this.acts, {
-    this.motion,
-    this.reverseMotion,
-    this.delay,
-    this.reverseDelay,
-  });
+// class ComposeAct extends Act {
+//   final List<Act> acts;
+//   final CueMotion? motion;
+//   final CueMotion? reverseMotion;
+//   final Duration delay;
+//   final Duration reverseDelay;
 
-  @override
-  CueAnimationImpl<Object?> buildAnimation(CueTimeline timline, ActContext context) {
-    throw StateError('ComposeAct should not be used directly');
-  }
+//   const ComposeAct(
+//     this.acts, {
+//     this.motion,
+//     this.reverseMotion,
+//     this.delay = Duration.zero,
+//     this.reverseDelay = Duration.zero,
+//   });
 
-  @override
-  Widget build(BuildContext context, covariant CueAnimationImpl<Object?> animation, Widget child) {
-    throw StateError('ComposeAct should not be used directly');
-  }
+//   @override
+//   List<(AnimtableAct, ActContext)> resolve(ActContext context) {
+//     final result = <(AnimtableAct, ActContext)>[];
+//     final composeContext = context.copyWith(
+//       motion: motion,
+//       reverseMotion: reverseMotion,
+//       delay: delay + context.delay,
+//       reverseDelay: reverseDelay + context.reverseDelay,
+//     );
+//     for (final act in acts) {
+//       result.addAll(act.resolve(composeContext));
+//     }
+//     return result;
+//   }
 
-  @override
-  List<(Act, ActContext)> resolve(ActContext base) {
-    final result = <(Act, ActContext)>[];
-    final context = base.copyWith(
-      motion: motion,
-      reverseMotion: reverseMotion,
-      delay: delay,
-      reverseDelay: reverseDelay,
-    );
-    for (final act in acts) {
-      result.addAll(act.resolve(context));
-    }
-    return result;
-  }
+//   @override
+//   bool operator ==(Object other) =>
+//       identical(this, other) ||
+//       other is ComposeAct &&
+//           runtimeType == other.runtimeType &&
+//           listEquals(acts, other.acts) &&
+//           motion == other.motion &&
+//           reverseMotion == other.reverseMotion &&
+//           delay == other.delay &&
+//           reverseDelay == other.reverseDelay;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ComposeAct &&
-          runtimeType == other.runtimeType &&
-          listEquals(acts, other.acts) &&
-          motion == other.motion &&
-          reverseMotion == other.reverseMotion &&
-          delay == other.delay &&
-          reverseDelay == other.reverseDelay;
+//   @override
+//   int get hashCode => Object.hashAll(acts);
+// }
 
-  @override
-  int get hashCode => Object.hashAll(acts);
-}
+// class SequenceAct extends Act {
+//   final List<Act> acts;
+//   final Duration overlap;
+
+//   const SequenceAct(this.acts, {this.overlap = Duration.zero});
+
+//   @override
+//   List<(AnimtableAct, ActContext)> resolve(ActContext context) {
+//     final result = <(AnimtableAct, ActContext)>[];
+//     Duration accumulatedDelay = Duration.zero;
+//     for (final act in acts) {
+//       final actContext = context.copyWith(
+//         delay: accumulatedDelay + context.delay,
+//         reverseDelay: context.reverseDelay,
+//       );
+//       final actResult = act.resolve(actContext);
+//       final longestDuration = actResult.map((e) => e.$2.motion.baseDuration).reduce((a, b) => a > b ? a : b);
+//       // Assuming each act has a method to calculate its duration, which is not defined here.
+//       accumulatedDelay += longestDuration - overlap;
+//       result.addAll(actResult);
+//     }
+//     return result;
+//   }
+
+//   @override
+//   bool operator ==(Object other) =>
+//       identical(this, other) ||
+//       other is SequenceAct &&
+//           runtimeType == other.runtimeType &&
+//           listEquals(acts, other.acts) &&
+//           overlap == other.overlap;
+
+//   @override
+//   int get hashCode => Object.hash(Object.hashAll(acts), overlap);
+// }
 
 class ActContext {
   final CueMotion motion;
-  final CueMotion? reverseMotion;
-  final Duration? delay;
-  final Duration? reverseDelay;
+  final CueMotion reverseMotion;
+  final Duration delay;
+  final Duration reverseDelay;
   final TextDirection textDirection;
   final Object? implicitFrom;
 
   const ActContext({
     required this.motion,
-    this.delay,
-    this.reverseDelay,
-    this.reverseMotion,
+    required this.reverseMotion,
+    this.delay = Duration.zero,
+    this.reverseDelay = Duration.zero,
     this.textDirection = TextDirection.ltr,
     this.implicitFrom,
   });
 
   ActContext copyWith({
-    CueMotion? motion,
-    CueMotion? reverseMotion,
     TextDirection? textDirection,
     Object? implicitFrom,
+    CueMotion? motion,
+    CueMotion? reverseMotion,
     Duration? delay,
     Duration? reverseDelay,
   }) {
     return ActContext(
       motion: motion ?? this.motion,
       reverseMotion: reverseMotion ?? this.reverseMotion,
-      textDirection: textDirection ?? this.textDirection,
-      implicitFrom: implicitFrom ?? this.implicitFrom,
       delay: delay ?? this.delay,
       reverseDelay: reverseDelay ?? this.reverseDelay,
+      textDirection: textDirection ?? this.textDirection,
+      implicitFrom: implicitFrom ?? this.implicitFrom,
     );
   }
 }

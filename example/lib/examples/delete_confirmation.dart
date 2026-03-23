@@ -23,7 +23,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
       ),
       builder: (context, rect) {
         return Actor(
-          act: .translate(to: Offset(-28, -28)),
+          acts: [.translate(to: Offset(-28, -28))],
           child: Material(
             clipBehavior: .hardEdge,
             borderRadius: BorderRadius.circular(32),
@@ -31,10 +31,10 @@ class DeleteConfirmationDialog extends StatelessWidget {
             elevation: 2,
             shadowColor: Colors.black.withValues(alpha: .3),
             child: Actor(
-              act: .compose([
+              acts: [
                 .sizedClip(from: .size(rect.size), to: .width(220), alignment: .bottomRight),
                 .slideY(from: 0.4),
-              ]),
+              ],
               child: Column(
                 mainAxisSize: .min,
                 crossAxisAlignment: .end,
@@ -44,11 +44,11 @@ class DeleteConfirmationDialog extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Actor(
-                        act: .compose([
+                        acts: [
                           .fadeIn(),
                           .zoomIn(from: .5),
                           .blur(from: 10),
-                        ]),
+                        ],
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                           child: Column(
@@ -83,13 +83,13 @@ class DeleteConfirmationDialog extends StatelessWidget {
                         label: Text('Delete Item'),
                         iconAlignment: .end,
                         icon: Actor(
-                          act: .compose([
+                          acts: [
                             .translateFromGlobalRect(rect),
                             .iconTheme(
                               from: IconThemeData(size: 24),
                               to: IconThemeData(size: 20),
                             ),
-                          ]),
+                          ],
                           child: Icon(
                             Iconsax.trash,
                             color: theme.colorScheme.error,

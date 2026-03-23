@@ -39,41 +39,41 @@ class OptionsButton extends StatelessWidget {
                 ),
                 elevation: 1,
                 child: Actor(
-                  act: .sizedClip(from: .size(rect.size)),
+                  acts: [.sizedClip(from: .size(rect.size))],
                   child: Column(
                     mainAxisSize: .min,
                     crossAxisAlignment: .start,
                     children: [
                       Actor(
-                        act: .compose([
+                        acts: [
                           .translateFromGlobal(offset: rect.topLeft),
                           .textStyle(
                             from: labelStyle.copyWith(color: theme.primaryColor),
                             to: labelStyle.copyWith(fontSize: 22),
                           ),
-                        ]),
+                        ],
                         child: Padding(
                           padding: .symmetric(horizontal: 24, vertical: 14),
                           child: Text('Options'),
                         ),
                       ),
                       Actor(
-                        act: .compose([
+                        acts: [
                           .focus(),
                           .zoomIn(from: .8),
                           .fadeIn(),
                           .slideUp(),
-                        ]),
+                        ],
                         child: Padding(
                           padding: const .fromLTRB(16, 0, 16, 16),
                           child: Column(
                             children: [
                               for (var i = 0; i < 4; i++)
                                 Actor(
-                                  act: .compose([
+                                  acts: [
                                     .translateY(from: 10 * (i + 1)),
                                     .zoomIn(from: i * -.1),
-                                  ]),
+                                  ],
                                   child: Card(
                                     clipBehavior: .hardEdge,
                                     elevation: 0,

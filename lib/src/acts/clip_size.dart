@@ -50,8 +50,8 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     // we build a fake tweens here just to extract motion
     // the actual tween will be built later.
     final builder = _NullableSizeActBuilder(
-      motion: motion ?? context.motion,
-      delay: delay ?? context.delay,
+      motion: motion ,
+      delay: delay,
       from: from != null ? Size.zero : null,
       to: to != null ? Size.infinite : null,
       frames: frames?.mapValues((v) => Size.zero),
@@ -59,6 +59,8 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     );
     return builder.buildTweens(context);
   }
+
+  
 
   @override
   CueAnimation<Size?> buildAnimation(CueTimeline timline, ActContext context) {
@@ -78,6 +80,12 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
       clipBehavior: clipBehavior,
       child: child,
     );
+  }
+  
+  @override
+  ActContext resolve(ActContext context) {
+    // TODO: implement resolve
+    throw UnimplementedError();
   }
 }
 

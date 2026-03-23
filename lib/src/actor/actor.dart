@@ -1,14 +1,24 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class Actor extends StatefulWidget {
-  final Act act;
+  final List<Act> acts;
   final Widget child;
+  final CueMotion? motion;
+  final CueMotion? reverseMotion;
+  final Duration delay;
+  final Duration reverseDelay;
 
   const Actor({
     super.key,
-    required this.act,
+    required this.acts,
     required this.child,
+    this.motion,
+    this.reverseMotion,
+    this.delay = Duration.zero,
+    this.reverseDelay = Duration.zero,
   });
 
   @override
@@ -73,16 +83,32 @@ class ActorState extends State<Actor> {
   @override
   void didUpdateWidget(covariant Actor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.act != widget.act) {
+    if (!listEquals(widget.acts, oldWidget.acts) ||
+        widget.delay != oldWidget.delay ||
+        widget.reverseDelay != oldWidget.reverseDelay ||
+        widget.motion != oldWidget.motion ||
+        widget.reverseMotion != oldWidget.reverseMotion) {
       final scope = CueScope.of(context);
-      _acts = widget.act.resolve(
-        ActContext(
-          motion: scope.timeline.mainTrackConfig.motion,
-          reverseMotion: scope.timeline.mainTrackConfig.reverseMotion,
-        ),
-      );
+      _setupActs(scope.timeline.mainTrackConfig);
       _setupAnimations(scope);
     }
+  }
+
+  void _setupActs(TrackConfig mainTrack) {
+    _acts = [
+      for (final act in widget.acts)
+        (
+          act,
+          act.resolve(
+            ActContext(
+              motion: widget.motion ?? mainTrack.motion,
+              reverseMotion: widget.reverseMotion ?? mainTrack.reverseMotion,
+              delay: widget.delay,
+              reverseDelay: widget.reverseDelay,
+            ),
+          ),
+        ),
+    ];
   }
 
   void _clearCache() {
@@ -91,19 +117,15 @@ class ActorState extends State<Actor> {
     _animationSnapshots.clear();
   }
 
- VoidCallback? _eventsDisposer;
+  VoidCallback? _eventsDisposer;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scope = CueScope.of(context);
     if (_acts.isEmpty) {
-      _acts = widget.act.resolve(
-        ActContext(
-          motion: scope.timeline.mainTrackConfig.motion,
-          reverseMotion: scope.timeline.mainTrackConfig.reverseMotion,
-        ),
-      );
+      _setupActs(scope.timeline.mainTrackConfig);
+      
     }
     if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
       if (_cachedScope?.timeline != scope.timeline) {
@@ -135,10 +157,10 @@ class ActorState extends State<Actor> {
   @override
   void dispose() {
     super.dispose();
-      _eventsDisposer?.call();
-      _eventsDisposer = null;
-      _clearCache();
-      _cachedScope = null;
+    _eventsDisposer?.call();
+    _eventsDisposer = null;
+    _clearCache();
+    _cachedScope = null;
     // _cachedScope?.animations.disposeAll(_animations.values);
   }
 }
@@ -174,11 +196,11 @@ abstract class SingleActorBase<T> extends StatelessWidget {
   }) : _from = null,
        _to = null;
 
-  Act get effect;
+  Act get act;
 
   @override
   Widget build(BuildContext context) {
-    return Actor(act: effect, child: child);
+    return Actor(acts: [act], child: child);
   }
 }
 

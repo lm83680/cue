@@ -9,7 +9,7 @@ class _ProgressCue extends Cue {
     required this.progress,
      this.min = 0.0, 
      this.max = 1.0,
-    super.act,
+    super.acts,
   }) : super._();
 
   final double min;

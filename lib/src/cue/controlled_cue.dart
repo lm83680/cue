@@ -7,7 +7,7 @@ class _ControlledCue extends Cue {
     this.isBounded = true,
     super.debugLabel,
     required this.timeline,
-    super.act,
+    super.acts,
   }) : super._();
 
   final CueTimeline timeline;

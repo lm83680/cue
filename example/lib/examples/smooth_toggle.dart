@@ -32,14 +32,15 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
           });
         },
         child: Actor(
-          act: ScaleAct.keyframed(
-            frames: .fractional([
-              .key(1, at: .0),
-              .key(.90, at: .45),
-              .key(.99, at: .65),
-              .key(1.0, at: 1.0),
-            ]),
-          ),
+          acts: [
+            ScaleAct.keyframed(
+              frames: Keyframes([
+                .key(1, motion: .smooth()),
+                .key(1.3, motion: .wobbly()),
+                .key(2, motion: .curved(400.ms, curve: Curves.bounceIn)),
+              ]),
+            ),
+          ],
           child: Container(
             width: width,
             height: height,

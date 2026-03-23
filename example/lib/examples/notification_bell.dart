@@ -24,7 +24,7 @@ class _NotificationBellState extends State<NotificationBell> {
               clipBehavior: .none,
               children: [
                 Actor(
-                  act: .compose([
+                  acts:[
                   //   RotateAct.keyframes(
                   //   [
                   //     .begin(0.0),
@@ -37,14 +37,14 @@ class _NotificationBellState extends State<NotificationBell> {
                   //   unit: .degrees,
                   //   alignment: .topCenter,
                   // ),
-                  ]),
+                  ],
                   child: Icon(Iconsax.notification_bing4, size: 32),
                 ),
                 Positioned(
                   top: -7,
                   right: 2,
                   child: Actor(
-                    act: .compose([
+                    acts: [
                       // PathMotionAct.arc(
                       //   radius: 5,
                       //   startAngle: -12,
@@ -55,7 +55,7 @@ class _NotificationBellState extends State<NotificationBell> {
                       //   .key(1.3, at: .5),
                       //   .end(1),
                       // ]),
-                    ]),
+                    ],
 
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),

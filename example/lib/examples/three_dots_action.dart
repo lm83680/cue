@@ -41,19 +41,21 @@ class ThreeDotsAction extends StatelessWidget {
                 shape: CircleBorder(),
                 onPressed: () => Navigator.of(context).pop(),
                 child: Actor(
-                  act: .compose([
+                  acts: [
                     .fadeIn(from: 0),
                     .focus(from: 8),
                     .slideY(from: 1),
-                  ]),
+                  ],
                   child: const Icon(Icons.keyboard_arrow_down),
                 ),
               ),
               Actor(
-                act: TranslateAct.y(
-                  from: -rect.height / 3,
-                  to: -rect.height - 4, // 4 is little extra padding
-                ),
+                acts: [
+                  .translateY(
+                    from: -rect.height / 3,
+                    to: -rect.height - 4, // 4 is little extra padding
+                  ),
+                ],
                 child: Column(
                   mainAxisSize: .min,
                   children: [
@@ -63,13 +65,13 @@ class ThreeDotsAction extends StatelessWidget {
                       Icons.translate,
                     ])
                       Actor(
-                        act: .compose([
+                        acts: [
                           .padding(from: .all(1), to: .only(bottom: 10.0)),
                           .sizedBox(
                             width: .tween(from: 5, to: 44),
                             height: .tween(from: 5, to: 44),
                           ),
-                        ]),
+                        ],
                         child: FloatingActionButton(
                           mini: true,
                           backgroundColor: Colors.black,
@@ -78,11 +80,11 @@ class ThreeDotsAction extends StatelessWidget {
                           heroTag: null,
                           onPressed: () {},
                           child: Actor(
-                            act: .compose([
+                            acts: [
                               .focus(from: 8),
                               .zoomIn(),
                               .fadeIn(),
-                            ]),
+                            ],
                             child: Icon(icon, color: Colors.white, size: 20),
                           ),
                         ),

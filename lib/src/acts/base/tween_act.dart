@@ -1,11 +1,11 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/acts/base/act_impl.dart';
+import 'package:cue/src/acts/base/animatable_act.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 typedef ValueTransformer<R, T> = R Function(ActContext context, T value);
 
-abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImpl<R, T> {
+abstract class TweenActBase<T extends Object?, R extends Object?> extends AnimtableAct<R, T> {
   final T? from;
   final T? to;
   final Keyframes<T>? frames;
@@ -37,13 +37,44 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
     return Tween<R>(begin: from, end: to);
   }
 
+  @override
+  ActContext resolve(ActContext context) {
+    CueMotion motion = switch (frames) {
+      MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: from != null)),
+      FractionalKeyframes<T> m => SegmentedMotion(
+        m.extractMotion(includeFirst: from != null, duration: m.duration ?? context.motion.baseDuration),
+      ),
+      _ => this.motion ?? context.motion,
+    };
+
+    CueMotion reverseMotion = switch (reverse.frames) {
+      MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: reverse.to != null)),
+      FractionalKeyframes<T> m => SegmentedMotion(
+        m.extractMotion(
+          includeFirst: reverse.to != null,
+          duration: m.duration ?? context.reverseMotion.baseDuration,
+        ),
+      ),
+      _ => reverse.motion ?? context.reverseMotion,
+    };
+    final delay = this.delay + context.delay;
+    final reverseDelay = reverse.delay + context.reverseDelay;
+
+    if (delay != Duration.zero) {
+      motion = motion.delayed(delay);
+    }
+    if (reverseDelay != Duration.zero) {
+      reverseMotion = reverseMotion.delayed(reverseDelay);
+    }
+    return context.copyWith(motion: motion, reverseMotion: reverseMotion);
+  }
+
   CueAnimtable<R> resolveTween(
     ActContext context, {
     required T? from,
     required T? to,
     R? implicitFrom,
     required Keyframes<T>? keyframes,
-    required CueMotion motion,
   }) {
     if (keyframes != null) {
       final phases = switch (keyframes) {
@@ -52,10 +83,9 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
           from: from,
           transform: (v) => transform(context, v),
         ),
-        FractionalKeyframes<T>(:final frames, :final duration) => Phase.resolveFractionalFrames<T, R>(
+        FractionalKeyframes<T>(:final frames) => Phase.resolveFractionalFrames<T, R>(
           frames,
           from: from,
-          duration: duration ?? motion.baseDuration,
           transform: (v) => transform(context, v),
         ),
       };
@@ -63,7 +93,6 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
         for (final phase in phases)
           AnimatableSegment(
             animatable: createSingleTween(phase.begin, phase.end),
-            motion: phase.motion,
           ),
       ]);
     } else {
@@ -74,7 +103,6 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
       } else {
         return TweenAnimtable<R>(
           createSingleTween(effectiveFrom, transform(context, to as T)),
-          motion: motion,
         );
       }
     }
@@ -90,7 +118,6 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
           to: from,
           keyframes: frames?.reversed,
           implicitFrom: context.implicitFrom as R?,
-          motion: motion ?? context.motion,
         ),
         null,
       );
@@ -102,9 +129,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
       to: to,
       keyframes: frames,
       implicitFrom: context.implicitFrom as R?,
-      motion: motion ?? context.motion,
     );
-
 
     if (reverse.type == ReverseBehaviorType.to) {
       final reverseTo = reverse.to ?? reverse.frames?.lastTarget;
@@ -113,7 +138,6 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
         from: reverseTo,
         to: to,
         keyframes: reverse.frames?.reversed,
-        motion: reverse.motion ?? context.reverseMotion ?? context.motion,
       );
       return (animtable, reverseAnimtable);
     }
@@ -136,13 +160,18 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
   int get hashCode => Object.hash(from, to, frames);
 }
 
-enum ReverseBehaviorType { mirror, exclusive, none, to;
+enum ReverseBehaviorType {
+  mirror,
+  exclusive,
+  none,
+  to
+  ;
 
   bool get needsReverseTween => this == ReverseBehaviorType.to;
   bool get isMirror => this == ReverseBehaviorType.mirror;
   bool get isExclusive => this == ReverseBehaviorType.exclusive;
   bool get isNone => this == ReverseBehaviorType.none;
- }
+}
 
 class KFReverseBehavior<T> extends ReverseBehaviorBase<T> {
   const KFReverseBehavior.mirror({super.delay}) : super._(type: ReverseBehaviorType.mirror);
@@ -162,7 +191,7 @@ class ReverseBehavior<T> extends ReverseBehaviorBase<T> {
 
   const ReverseBehavior.none() : super._(type: ReverseBehaviorType.none);
 
-  const ReverseBehavior.to(T to, { super.motion, super.delay}) : super._(type: ReverseBehaviorType.to, to: to);
+  const ReverseBehavior.to(T to, {super.motion, super.delay}) : super._(type: ReverseBehaviorType.to, to: to);
 }
 
 class ReverseBehaviorBase<T> {
@@ -170,14 +199,14 @@ class ReverseBehaviorBase<T> {
   final T? to;
   final Keyframes<T>? frames;
   final CueMotion? motion;
-  final Duration? delay;
+  final Duration delay;
 
   const ReverseBehaviorBase._({
     required this.type,
     this.to,
     this.frames,
     this.motion,
-    this.delay,
+    this.delay = Duration.zero,
   });
 
   bool get needsReverseTween => type == ReverseBehaviorType.to;

@@ -40,10 +40,10 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                   final fromBottomRadius = isActive || isLast || isPrevious ? 24.0 : 0.0;
 
                   return Actor(
-                    act: .compose([
+                    acts: [
                       .scale(from: 1.0, to: 1.05),
                       .padding(to: const .symmetric(vertical: 12)),
-                    ]),
+                    ],
                     child: Material(
                       clipBehavior: .hardEdge,
                       color: theme.colorScheme.surfaceContainer,
@@ -72,7 +72,7 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                                   SizedBox(width: 12),
                                   Expanded(child: Text(_cardIfno[i].$1)),
                                   Actor(
-                                    act: .rotate(to: -180),
+                                    acts: [.rotate(to: -180)],
                                     child: Icon(
                                       Icons.expand_more_rounded,
                                       color: theme.colorScheme.onSurface.withValues(alpha: .6),
@@ -81,12 +81,12 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                                 ],
                               ),
                               Actor(
-                                act: .compose([
+                                acts: [
                                   .clipHeight(from: .3),
                                   .fadeIn(),
                                   .slideY(from: 0.5),
                                   .blur(from: 8),
-                                ]),
+                                ],
                                 child: Padding(
                                   padding: const .only(left: 8, right: 8, bottom: 12),
                                   child: Text(

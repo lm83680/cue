@@ -1,6 +1,6 @@
 part of 'base/act.dart';
 
-class FractionalSizeAct extends ActImpl<FractionaSizeProps, FractionaSizeProps> {
+class FractionalSizeAct extends AnimtableAct<FractionaSizeProps, FractionaSizeProps> {
   final AnimatableValue<double>? widthFactor;
   final AnimatableValue<double>? heightFactor;
   final AnimatableValue<AlignmentGeometry>? alignment;
@@ -52,7 +52,13 @@ class FractionalSizeAct extends ActImpl<FractionaSizeProps, FractionaSizeProps> 
         alignment: alignment?.to,
       ),
     );
-    return (TweenAnimtable(tween, motion: motion ?? context.motion), null);
+    return (TweenAnimtable(tween), null);
+  }
+
+  @override
+  ActContext resolve(ActContext context) {
+    // TODO: implement resolve
+    throw UnimplementedError();
   }
 }
 

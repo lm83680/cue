@@ -7,7 +7,7 @@ class _IndexedCue extends Cue {
     required super.child,
     required this.index,
     required this.controller,
-    super.act,
+    super.acts,
   }) : super._();
 
   final int index;

@@ -44,18 +44,20 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                 for (var i = 0; i < cardsInfo.length; i++)
                   Cue.onToggle(
                     toggled: i == _expandedIndex,
-                    motion:   Spring.smooth(),
+                    motion: Spring.smooth(),
                     child: Card(
                       margin: .zero,
                       elevation: 0,
                       shape: RoundedSuperellipseBorder(borderRadius: .circular(20)),
                       clipBehavior: .antiAlias,
                       child: Actor(
-                        act: .sizedClip(
-                          from: .width(availableWidth * 0.16),
-                          to: .width(availableWidth * 0.6),
-                          motion: .smooth(),
-                        ),
+                        acts: [
+                          .sizedClip(
+                            from: .width(availableWidth * 0.16),
+                            to: .width(availableWidth * 0.6),
+                            motion: .smooth(),
+                          ),
+                        ],
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             image: DecorationImage(
@@ -80,10 +82,10 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                                 crossAxisAlignment: .start,
                                 children: [
                                   Actor(
-                                    act: .compose([
+                                    acts: [
                                       .align(from: .bottomCenter, to: .bottomLeft),
                                       .rotateLayout(from: -1, unit: .quarterTurns),
-                                    ]),
+                                    ],
                                     child: Text(
                                       cardsInfo[i].title,
                                       style: textTheme.titleMedium?.copyWith(
@@ -95,10 +97,10 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                                   SizedBox(height: 2),
                                   Flexible(
                                     child: Actor(
-                                      act: .compose([
+                                      acts: [
                                         .fadeIn(),
                                         .clipHeight(from: .3),
-                                      ]),
+                                      ],
                                       child: Padding(
                                         padding: .only(bottom: 14),
                                         child: Text(

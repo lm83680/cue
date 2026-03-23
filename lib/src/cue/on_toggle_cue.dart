@@ -9,7 +9,7 @@ class _TogglableCue extends SelfAnimatedCue {
     super.reverseMotion,
     required this.toggled,
     this.skipFirstAnimation = true,
-    super.act,
+    super.acts,
   }) : super();
 
   final bool toggled;

@@ -159,7 +159,7 @@ class PositionActor extends SingleActorBase<Position> {
   }) : _relativeTo = size;
 
   @override
-  Act get effect => PositionAct.internal(
+  Act get act => PositionAct.internal(
     from: from,
     to: to,
     frames: frames,

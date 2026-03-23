@@ -10,7 +10,7 @@ class SelfAnimatedCue extends Cue {
     this.loop = false,
     this.reverseOnLoop = false,
     this.loopCount,
-    super.act,
+    super.acts,
   }) : super._();
 
   final CueMotion motion;

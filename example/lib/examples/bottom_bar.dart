@@ -41,7 +41,7 @@ class _BottomBarState extends State<BottomBar> {
                         value: _activeTab,
                         fromCurrentValue: true,
                         motion: Spring.smooth(),
-                        act: .slideX(to: slideStep * _activeTab),
+                        acts: [.slideX(to: slideStep * _activeTab)],
                         child: Container(
                           width: expandedWidth,
                           height: 48,
@@ -63,22 +63,22 @@ class _BottomBarState extends State<BottomBar> {
                               },
                               child: Cue.onToggle(
                                 toggled: _activeTab == i,
-                                motion:  Spring.smooth(damping: 30),
+                                motion: Spring.smooth(damping: 30),
                                 child: Actor(
-                                  act: .compose([
+                                  acts: [
                                     .sizedClip(from: .width(collapsedWidth), to: .width(expandedWidth)),
                                     .colorTint(from: Colors.white60, to: Colors.black),
-                                  ]),
+                                  ],
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(_tabs[i].icon, color: Colors.white),
                                       Actor(
-                                        act: .compose([
+                                        acts: [
                                           .clipWidth(),
                                           .fadeIn(),
                                           .zoomIn(from: .7),
-                                        ]),
+                                        ],
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                           child: Text(

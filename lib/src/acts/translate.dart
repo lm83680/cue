@@ -6,12 +6,13 @@ abstract class TranslateAct extends Act {
     Offset to,
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
+    Duration delay,
   }) = _TranslateOffset;
 
   const factory TranslateAct.keyframed({
     required Keyframes<Offset> frames,
     KFReverseBehavior<Offset> reverse,
-    Duration? delay,
+    Duration delay,
   }) = _TranslateOffset.keyframed;
 
   const factory TranslateAct.fromX({
@@ -24,7 +25,7 @@ abstract class TranslateAct extends Act {
   const factory TranslateAct.keyframedX({
     required Keyframes<double> frames,
     KFReverseBehavior<double> reverse,
-    Duration? delay,
+    Duration delay,
   }) = _AxisTranslate.keyframedX;
 
   const factory TranslateAct.y({
@@ -37,7 +38,7 @@ abstract class TranslateAct extends Act {
   const factory TranslateAct.keyframedY({
     required Keyframes<double> frames,
     KFReverseBehavior<double> reverse,
-    Duration? delay,
+    Duration delay,
   }) = _AxisTranslate.keyframedY;
 
   const factory TranslateAct.fromGlobal({
@@ -67,6 +68,7 @@ class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
     super.to = Offset.zero,
     super.motion,
     super.reverse,
+    super.delay ,
   }) : super.tween();
 
   const _TranslateOffset.keyframed({

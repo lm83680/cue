@@ -36,7 +36,7 @@ class PaintActor extends SingleActorBase<double> {
   }) : super(from: 0.0, to: 1.0);
 
   @override
-  Act get effect => PaintAct(
+  Act get act => PaintAct(
     painter: painter,
     paintOnTop: paintOnTop,
     motion: motion,

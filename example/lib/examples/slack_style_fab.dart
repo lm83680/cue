@@ -52,27 +52,31 @@ class SlackStyleFab extends StatelessWidget {
             side: BorderSide(color: theme.primaryColor.withValues(alpha: .2), width: .4),
           ),
           child: Actor(
-            act: .sizedClip(
-              from: .size(rect.size),
-              to: NSize(w: 300),
-              alignment: .bottomRight,
-            ),
-            child: Actor(
-              act: .padding(
-                to: .symmetric(horizontal: 16, vertical: 12),
-                delay: 100.ms,
+            acts: [
+              .sizedClip(
+                from: .size(rect.size),
+                to: NSize(w: 300),
+                alignment: .bottomRight,
               ),
+            ],
+            child: Actor(
+              acts: [
+                .padding(
+                  to: .symmetric(horizontal: 16, vertical: 12),
+                  delay: 100.ms,
+                ),
+              ],
               child: Column(
                 mainAxisSize: .min,
                 crossAxisAlignment: .end,
                 spacing: 4,
                 children: [
                   Actor(
-                    act: .compose([
+                    acts: [
                       .slide(from: Offset(.8, .8)),
                       .fadeIn(),
                       .focus(),
-                    ]),
+                    ],
                     child: ListTile(
                       contentPadding: EdgeInsets.symmetric(horizontal: 8),
                       visualDensity: VisualDensity(vertical: -4),
@@ -93,11 +97,13 @@ class SlackStyleFab extends StatelessWidget {
                     ),
                   ),
                   Actor(
-                    act: .sizedBox(
-                      width: .tween(from: rect.width, to: .infinity),
-                      height: .tween(from: rect.height, to: 44),
-                      alignment: .bottomEnd,
-                    ),
+                    acts: [
+                      .sizedBox(
+                        width: .tween(from: rect.width, to: .infinity),
+                        height: .tween(from: rect.height, to: 44),
+                        alignment: .bottomEnd,
+                      ),
+                    ],
                     child: TextButton(
                       onPressed: () {},
                       style: TextButton.styleFrom(
@@ -111,11 +117,11 @@ class SlackStyleFab extends StatelessWidget {
                         mainAxisAlignment: .center,
                         children: [
                           Actor(
-                            act: .compose([
+                            acts: [
                               .focus(),
                               .fadeIn(),
                               .clipWidth(),
-                            ]),
+                            ],
                             child: Row(
                               mainAxisSize: .min,
                               mainAxisAlignment: .center,
@@ -127,15 +133,13 @@ class SlackStyleFab extends StatelessWidget {
                             ),
                           ),
                           Actor(
-                            act: .compose(
-                              [
-                                .unfocus(),
-                                .fadeOut(),
-                                .slideX(to: -2, ),
-                                .rotate(to: 90),
-                              ],
-                              delay: 100.ms,
-                            ),
+                            acts: [
+                              .unfocus(),
+                              .fadeOut(),
+                              .slideX(to: -2),
+                              .rotate(to: 90),
+                            ],
+                            delay: 100.ms,
                             child: Icon(Icons.add, size: 24),
                           ),
                         ],
@@ -165,14 +169,14 @@ class _LongPressContent extends StatelessWidget {
       children: [
         for (var i = 0; i < 3; i++)
           Actor(
-            act: .compose([
+            acts: [
               .translateFromGlobal(
                 offset: Offset(triggerRect.left - 64, triggerRect.top),
                 toLocal: Offset(-40, 0),
               ),
               .fadeIn(),
               .focus(from: 6),
-            ]),
+            ],
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12.0),
               child: Row(
@@ -205,7 +209,7 @@ class _LongPressContent extends StatelessWidget {
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
           child: Actor(
-            act: .rotate(to: .5, unit: .quarterTurns),
+            acts: [.rotate(to: .5, unit: .quarterTurns)],
             child: Icon(Icons.add),
           ),
           onPressed: () {

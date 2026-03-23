@@ -69,7 +69,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 toggled: checked,
                 // loop: true,
                 // reverseOnLoop: true,
-                motion: .wobbly(),
+                motion: .linear(300.ms),
                 child: Column(
                   children: [
                     // Actor(
@@ -89,7 +89,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     //   ),
                     // ),
                     Actor(
-                      act: .slideX(to: slide),
+                      acts: [.zoomIn(to: 1.5,from: 1)],
                       child: Container(
                         height: 100,
                         width: 100,
@@ -103,8 +103,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                           checked = !checked;
                           // slide = checked ? 2.0 : 1.0;
                         });
-
-                       
                       },
                       child: Text('Toggle'),
                     ),

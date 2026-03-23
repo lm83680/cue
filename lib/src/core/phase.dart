@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 abstract class KeyframeBase<T extends Object?> {
   final T value;
   const KeyframeBase._(this.value);
-
 }
 
 class FractionalKeyframe<T> extends KeyframeBase<T> {
@@ -42,7 +41,7 @@ class FractionalKeyframe<T> extends KeyframeBase<T> {
 
   @override
   String toString() {
-    return 'FractionalKeyframe(value: $value, at: $at, curve: $curve)'; 
+    return 'FractionalKeyframe(value: $value, at: $at, curve: $curve)';
   }
 }
 
@@ -97,6 +96,11 @@ final class MotionKeyframes<T> implements Keyframes<T> {
 
   @override
   List<T> get values => List.unmodifiable(frames.map((f) => f.value));
+
+  List<CueMotion> extractMotion({bool includeFirst = false}) {
+    final motions = frames.map((f) => f.motion);
+    return List.unmodifiable(includeFirst ? motions : motions.skip(1));
+  }
 
   @override
   MotionKeyframes<E> mapValues<E>(E Function(T value) transform) {
@@ -177,6 +181,49 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
     return frames.last.value;
   }
 
+  List<CueMotion> extractMotion({bool includeFirst = false, required Duration duration}) {
+    // Remove duplicates (keep last) and track curves
+    final Map<double, Curve?> frameCurves = {};
+
+    for (int i = 0; i < frames.length; i++) {
+      final frame = frames[i];
+      final clampedTime = frame.at.clamp(0.0, 1.0);
+      frameCurves[clampedTime] = frame.curve;
+    }
+
+    // Sort by time
+    final sortedTimes = frameCurves.keys.toList()..sort();
+
+    // Handle edge cases
+    if (sortedTimes.isEmpty) {
+      return [];
+    }
+
+    if (!includeFirst && sortedTimes.length < 2) {
+      return [];
+    }
+
+    final List<CueMotion> motions = [];
+
+    // Add motion to first frame if requested
+    if (includeFirst) {
+      final firstTime = sortedTimes.first;
+      final firstCurve = frameCurves[firstTime] ?? Curves.linear;
+      motions.add(CueMotion.curved(duration * firstTime, curve: firstCurve));
+    }
+
+    // Add motions between consecutive frames
+    for (int i = 0; i < sortedTimes.length - 1; i++) {
+      final currentTime = sortedTimes[i];
+      final nextTime = sortedTimes[i + 1];
+      final weight = nextTime - currentTime;
+      final curve = frameCurves[nextTime] ?? Curves.linear;
+      motions.add(CueMotion.curved(duration * weight, curve: curve));
+    }
+
+    return motions;
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -195,34 +242,27 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
 }
 
 class Phase<T extends Object?> {
-  final CueMotion motion;
   final T begin;
   final T end;
 
   const Phase({
     required this.begin,
     required this.end,
-    required this.motion,
   });
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Phase &&
-          runtimeType == other.runtimeType &&
-          motion == other.motion &&
-          begin == other.begin &&
-          end == other.end;
+      other is Phase && runtimeType == other.runtimeType && begin == other.begin && end == other.end;
 
   @override
-  int get hashCode => Object.hash(motion, begin, end);
+  int get hashCode => Object.hash(begin, end);
 
   bool get isAlwaysStopped => begin == end;
 
   static List<Phase<R>> resolveFractionalFrames<T extends Object?, R extends Object?>(
     List<FractionalKeyframe<T>> frames, {
     T? from,
-    required Duration duration,
     required R Function(T value) transform,
   }) {
     if (frames.isEmpty) {
@@ -253,15 +293,9 @@ class Phase<T extends Object?> {
     if (from == null && sortedTimes.length < 2) {
       final time = sortedTimes.first;
       final value = transform(uniqueFrames[time] as T);
-      final phaseDuration = duration * time;
-      final curve = frameCurves[time];
 
       return [
-        Phase(
-          begin: value,
-          end: value,
-          motion: CueMotion.curved(phaseDuration, curve: curve ?? Curves.linear),
-        ),
+        Phase(begin: value, end: value),
       ];
     }
 
@@ -270,13 +304,11 @@ class Phase<T extends Object?> {
     final List<Phase<R>> phases = [];
     if (from != null) {
       final firstTime = sortedTimes.first;
-      final firstCurve = frameCurves[firstTime] ?? Curves.linear;
 
       phases.add(
         Phase(
           begin: transform(from),
           end: transform(uniqueFrames[firstTime] as T),
-          motion: CueMotion.curved(duration * firstTime, curve: firstCurve),
         ),
       );
     }
@@ -284,14 +316,10 @@ class Phase<T extends Object?> {
     for (int i = 0; i < sortedTimes.length - 1; i++) {
       final currentTime = sortedTimes[i];
       final nextTime = sortedTimes[i + 1];
-      final weight = nextTime - currentTime;
-      final curve = frameCurves[nextTime] ?? Curves.linear;
-
       phases.add(
         Phase(
           begin: transform(uniqueFrames[currentTime] as T),
           end: transform(uniqueFrames[nextTime] as T),
-          motion: CueMotion.curved(duration * weight, curve: curve),
         ),
       );
     }
@@ -317,7 +345,6 @@ class Phase<T extends Object?> {
         Phase(
           begin: transform(from),
           end: transform(frames.first.value),
-          motion: frames.first.motion,
         ),
       );
     }
@@ -329,7 +356,6 @@ class Phase<T extends Object?> {
         Phase(
           begin: transform(frames[i - 1].value),
           end: transform(currentFrame.value),
-          motion: currentFrame.motion,
         ),
       );
     }

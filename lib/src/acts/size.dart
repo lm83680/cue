@@ -39,6 +39,12 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
   }
 
   @override
+  ActContext resolve(ActContext context) {
+    // TODO: implement resolve
+    throw UnimplementedError();
+  }
+
+  @override
   CueAnimation<Size> buildAnimation(CueTimeline timline, ActContext context) {
     final superDriver = super.buildAnimation(timline, context);
     return DeferredCueAnimation<Size>(parent: superDriver.parent, context: context);
@@ -245,8 +251,6 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     }
 
     final actBuilder = _SizeActBuilder(
-      motion: _driver.context.motion,
-      delay: _driver.context.delay,
       from: from,
       to: to,
       frames: _keyframes?.mapValues((v) => _normalizeSize(v, constraints)),

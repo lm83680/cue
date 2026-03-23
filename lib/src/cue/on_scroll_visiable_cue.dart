@@ -6,7 +6,7 @@ class _OnScrollVisibleCue extends Cue {
     required super.child,
     super.debugLabel,
     this.enabled = true,
-    super.act,
+    super.acts,
   }) : super._();
 
   final bool enabled;

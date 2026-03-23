@@ -47,12 +47,12 @@ class _IndicatorToButton2State extends State<IndicatorToButton2> {
             listenable: _pageController,
             progress: () => _pageController.page ?? 0.0,
             max: lastIndex,
-            act: .fractionalSize(widthFactor: .tween(from: .4, to: 1)),
+            acts: [.fractionalSize(widthFactor: .tween(from: .4, to: 1))],
             child: Cue.indexed(
               index: lastIndex.toInt(),
               controller: _pageController,
               child: Actor(
-                act: .padding(from: .all(2)),
+                acts: [.padding(from: .all(2))],
                 child: Material(
                   color: Colors.black,
                   borderRadius: .circular(32.0),
@@ -60,17 +60,17 @@ class _IndicatorToButton2State extends State<IndicatorToButton2> {
                   child: InkWell(
                     onTap: _onNext,
                     child: Actor(
-                      act: .align(from: .centerRight),
+                      acts: [.align(from: .centerRight)],
                       child: Row(
                         mainAxisSize: .min,
                         children: [
                           Actor(
-                            act: .compose([
+                            acts: [
                               .clipWidth(alignment: .centerLeft),
                               .zoomIn(),
                               .focus(),
                               .slideX(from: 1),
-                            ]),
+                            ],
                             child: Padding(
                               padding: const .symmetric(horizontal: 8.0),
                               child: Text(

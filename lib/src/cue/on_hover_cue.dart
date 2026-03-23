@@ -8,7 +8,7 @@ class _OnHoverCue extends SelfAnimatedCue {
     super.motion = const CueMotion.linear(Duration(milliseconds: 200)),
     this.cursor = MouseCursor.defer,
     this.opaque = false,
-    super.act,
+    super.acts,
   }) : super();
 
   final MouseCursor cursor;

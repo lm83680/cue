@@ -17,6 +17,8 @@ abstract class CueMotion {
 
   bool get isSimulation => this is SimulationMotion;
 
+  CueMotion delayed(Duration delay) => DelayedMotion(this, delay);
+
   const factory CueMotion.curved(
     Duration duration, {
     required Curve curve,
@@ -143,6 +145,9 @@ class DelayedMotion extends CueMotion {
   final Duration delay;
 
   const DelayedMotion(this.base, this.delay);
+
+  @override
+  CueMotion delayed(Duration delay) => DelayedMotion(base, delay + this.delay);
 
   @override
   Duration get baseDuration => base.baseDuration + delay;

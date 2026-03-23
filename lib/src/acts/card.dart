@@ -11,7 +11,7 @@ part of 'base/act.dart';
 /// Use [borderRadius] for the common case of animating rounded corners on a
 /// rectangle. Use [shape] for arbitrary [ShapeBorder] animations (e.g.
 /// [StadiumBorder], [BeveledRectangleBorder]). The two are mutually exclusive.
-class CardAct extends ActImpl<CardProps, CardProps> {
+class CardAct extends AnimtableAct<CardProps, CardProps> {
   final Clip clipBehavior;
   final bool borderOnForeground;
   final AnimatableValue<Color>? color;
@@ -65,7 +65,7 @@ class CardAct extends ActImpl<CardProps, CardProps> {
       shape: shape?.to,
       margin: margin?.to,
     );
-    return (TweenAnimtable(_CardPropsProxyTween(begin: from, end: to), motion: motion ?? context.motion), null);
+    return (TweenAnimtable(_CardPropsProxyTween(begin: from, end: to)), null);
   }
 
   @override
@@ -155,6 +155,12 @@ class CardAct extends ActImpl<CardProps, CardProps> {
     clipBehavior,
     borderOnForeground,
   );
+  
+  @override
+ ActContext resolve(ActContext context) {
+    // TODO: implement resolve
+    throw UnimplementedError();
+  }
 }
 
 class _ShapeBorderPainter extends CustomPainter {
@@ -284,7 +290,7 @@ class CardActor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Actor(
-      act: CardAct(
+      acts: [CardAct(
         color: color,
         shadowColor: shadowColor,
         surfaceTintColor: surfaceTintColor,
@@ -296,7 +302,7 @@ class CardActor extends StatelessWidget {
         margin: margin,
         motion: motion,
         reverse: reverse,
-      ),
+      )],
       child: child ?? const SizedBox.shrink(),
     );
   }
