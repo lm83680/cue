@@ -263,6 +263,7 @@ class Phase<T extends Object?> {
   static List<Phase<R>> resolveFractionalFrames<T extends Object?, R extends Object?>(
     List<FractionalKeyframe<T>> frames, {
     T? from,
+    bool reverse = false,
     required R Function(T value) transform,
   }) {
     if (frames.isEmpty) {
@@ -299,27 +300,33 @@ class Phase<T extends Object?> {
       ];
     }
 
-    // Each frame's curve describes how to arrive at that frame (target curve).
-    // If a starting value is provided, prepend a phase into the first resolved keyframe.
-    final List<Phase<R>> phases = [];
-    if (from != null) {
-      final firstTime = sortedTimes.first;
-
-      phases.add(
-        Phase(
-          begin: transform(from),
-          end: transform(uniqueFrames[firstTime] as T),
+    final resolvedFrames = <FractionalKeyframe<T>>[
+      for (final time in sortedTimes)
+        FractionalKeyframe<T>(
+          uniqueFrames[time] as T,
+          at: time,
+          curve: frameCurves[time],
         ),
+    ];
+
+    if (from != null) {
+      final fromFrame = FractionalKeyframe<T>(
+        from,
+        at: reverse ? 1.0 : 0.0,
       );
+      if (reverse) {
+        resolvedFrames.add(fromFrame);
+      } else {
+        resolvedFrames.insert(0, fromFrame);
+      }
     }
 
-    for (int i = 0; i < sortedTimes.length - 1; i++) {
-      final currentTime = sortedTimes[i];
-      final nextTime = sortedTimes[i + 1];
+    final List<Phase<R>> phases = [];
+    for (int i = 1; i < resolvedFrames.length; i++) {
       phases.add(
         Phase(
-          begin: transform(uniqueFrames[currentTime] as T),
-          end: transform(uniqueFrames[nextTime] as T),
+          begin: transform(resolvedFrames[i - 1].value),
+          end: transform(resolvedFrames[i].value),
         ),
       );
     }
@@ -330,31 +337,27 @@ class Phase<T extends Object?> {
   static List<Phase<R>> resolveMotionFrames<T extends Object?, R extends Object?>(
     List<Keyframe<T>> frames, {
     T? from,
+    bool reverse = false,
     required R Function(T value) transform,
   }) {
     if (frames.isEmpty) {
       return [];
     }
-
+    final mFrames = List.from(frames);
     final List<Phase<R>> phases = [];
-
-    // Each frame's motion describes how to arrive at that frame (target motion).
-    // If a starting value is provided, prepend a phase into the first keyframe.
     if (from != null) {
-      phases.add(
-        Phase(
-          begin: transform(from),
-          end: transform(frames.first.value),
-        ),
-      );
+      if (reverse) {
+        mFrames.add(Keyframe(from, motion: CueMotion.none));
+      } else {
+        mFrames.insert(0, Keyframe(from, motion: CueMotion.none));
+      }
     }
 
-    for (int i = 1; i < frames.length; i++) {
-      final currentFrame = frames[i];
-
+    for (int i = 1; i < mFrames.length; i++) {
+      final currentFrame = mFrames[i];
       phases.add(
         Phase(
-          begin: transform(frames[i - 1].value),
+          begin: transform(mFrames[i - 1].value),
           end: transform(currentFrame.value),
         ),
       );

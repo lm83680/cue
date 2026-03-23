@@ -130,6 +130,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
         velocity: exteranlVelocity ?? velocity,
       ),
     );
+    _phase = _activeSim!.phase;
 
     _localT = 0.0;
     _done = false;
@@ -159,9 +160,9 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     final simDuration = _activeSim!.duration;
     final fraction = simDuration <= 0 ? 1.0 : (_localT / simDuration).clamp(0.0, 1.0);
     _progress = _startProgress + (target - _startProgress) * fraction;
-
+    
     if (_activeSim!.isDone(_localT)) {
-      print('on Tick end: $_localT');
+     
       _value = _activeSim!.x(_localT);
       _phase = _activeSim!.phase;
       _done = true;

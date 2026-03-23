@@ -69,7 +69,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 toggled: checked,
                 // loop: true,
                 // reverseOnLoop: true,
-                motion: .linear(300.ms),
+                motion: .smooth(),
                 child: Column(
                   children: [
                     // Actor(
@@ -89,7 +89,25 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     //   ),
                     // ),
                     Actor(
-                      acts: [.zoomIn(to: 1.5,from: 1)],
+                      acts: [
+                       SlideAct.keyframedX(
+                          frames: Keyframes([
+                           .key(1, motion: .linear(150.ms)),
+                           .key(2, motion: .linear(150.ms)),
+                          ]),
+                          reverse: .to(Keyframes([
+                            .key(1, motion: .linear(150.ms)),
+                            .key(-1, motion: .linear(150.ms)),
+                          ]))
+                        ),
+                        // ScaleAct.keyframed(
+                        //   frames: Keyframes([
+                        //     .key(1, motion: .linear(150.ms)),
+                        //     .key(1.2, motion: .linear(150.ms)),
+                        //     .key(1, motion: .linear(150.ms)),
+                        //   ]),
+                        // ),
+                      ],
                       child: Container(
                         height: 100,
                         width: 100,

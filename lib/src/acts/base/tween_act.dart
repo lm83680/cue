@@ -47,16 +47,17 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
       _ => this.motion ?? context.motion,
     };
 
-    CueMotion reverseMotion = switch (reverse.frames) {
-      MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: reverse.to != null)),
+    CueMotion reverseMotion = switch (reverse.frames?.reversed) {
+      MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: true)),
       FractionalKeyframes<T> m => SegmentedMotion(
         m.extractMotion(
-          includeFirst: reverse.to != null,
+          includeFirst: true,
           duration: m.duration ?? context.reverseMotion.baseDuration,
         ),
       ),
-      _ => reverse.motion ?? context.reverseMotion,
+      _ => reverse.motion ?? (frames != null ? motion : context.reverseMotion),
     };
+
     final delay = this.delay + context.delay;
     final reverseDelay = reverse.delay + context.reverseDelay;
 
@@ -73,22 +74,27 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
     ActContext context, {
     required T? from,
     required T? to,
+    T? iniitalkeyframe,
     R? implicitFrom,
+    bool reverseKeyframes = false,
     required Keyframes<T>? keyframes,
   }) {
     if (keyframes != null) {
       final phases = switch (keyframes) {
         MotionKeyframes<T>(:final frames) => Phase.resolveMotionFrames<T, R>(
           frames,
-          from: from,
+          from: iniitalkeyframe,
+          reverse: reverseKeyframes,
           transform: (v) => transform(context, v),
         ),
         FractionalKeyframes<T>(:final frames) => Phase.resolveFractionalFrames<T, R>(
           frames,
-          from: from,
+          from: iniitalkeyframe,
+          reverse: reverseKeyframes,
           transform: (v) => transform(context, v),
         ),
       };
+      print('Resolved phases: ${phases.map((p) => 'B: ${p.begin}, E: ${p.end}').join(', ')}');
       return SegmentedAnimtable([
         for (final phase in phases)
           AnimatableSegment(
@@ -116,6 +122,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
           context,
           from: to,
           to: from,
+          iniitalkeyframe: from,
           keyframes: frames?.reversed,
           implicitFrom: context.implicitFrom as R?,
         ),
@@ -126,6 +133,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
     final animtable = resolveTween(
       context,
       from: from,
+      iniitalkeyframe: from,
       to: to,
       keyframes: frames,
       implicitFrom: context.implicitFrom as R?,
@@ -137,7 +145,9 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
         context,
         from: reverseTo,
         to: to,
+        iniitalkeyframe: frames?.lastTarget ?? to,
         keyframes: reverse.frames?.reversed,
+        reverseKeyframes: true,
       );
       return (animtable, reverseAnimtable);
     }

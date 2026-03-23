@@ -201,13 +201,14 @@ class SegmentedSimulation extends Simulation with CueSimulation {
       _phaseStartTime = time;
       _forward ? _phase++ : _phase--;
       final initialProgress = _forward ? 0.0 : 1.0;
-      _current = _motions[_phase].build(
+      _current = _motions[phase].build(
         SimulationBuildData(
           forward: _forward,
           startValue: initialProgress,
           velocity: exitVelocity,
         ),
       );
+      print('current: ${(_current as CurvedSimulation)._curve} phase; ${_phase}');
     }
   }
 }

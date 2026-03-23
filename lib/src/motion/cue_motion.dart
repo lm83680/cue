@@ -123,7 +123,10 @@ class SegmentedMotion extends CueMotion {
   const SegmentedMotion(this.motions);
 
   @override
-  Duration get baseDuration => motions.fold(Duration.zero, (total, motion) => total + motion.baseDuration);
+  Duration get baseDuration => motions.fold(
+    Duration.zero,
+    (total, motion) => total + motion.baseDuration,
+  );
 
   @override
   int get totalPhases => motions.length;
