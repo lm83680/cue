@@ -37,12 +37,21 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
     return Tween<R>(begin: from, end: to);
   }
 
-  @override
-  ActContext resolve(ActContext context) {
+  static ActContext resolveMotion<T>(
+    ActContext context, {
+    CueMotion? motion,
+    Duration delay = Duration.zero,
+    required ReverseBehaviorBase reverse,
+    Keyframes<T>? frames,
+    bool includeFirstFrame = false,
+  }) {
     CueMotion? framesMotion = switch (frames) {
-      MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: from != null)),
+      MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: includeFirstFrame)),
       FractionalKeyframes<T> m => SegmentedMotion(
-        m.extractMotion(includeFirst: from != null, duration: m.duration ?? context.motion.baseDuration),
+        m.extractMotion(
+          includeFirst: includeFirstFrame,
+          duration: m.duration ?? context.motion.baseDuration,
+        ),
       ),
       _ => null,
     };
@@ -58,20 +67,31 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
       _ => framesMotion,
     };
 
-    final delay = this.delay + context.delay;
+    final forwardDelay = delay + context.delay;
     final reverseDelay = reverse.delay + context.reverseDelay;
-    
 
     CueMotion forwardMotion = framesMotion ?? motion ?? context.motion;
     CueMotion reverseMotion = reverseFramesMotion ?? reverse.motion ?? motion ?? context.reverseMotion;
 
-    if (delay != Duration.zero) {
-      forwardMotion = forwardMotion.delayed(delay);
+    if (forwardDelay != Duration.zero) {
+      forwardMotion = forwardMotion.delayed(forwardDelay);
     }
     if (reverseDelay != Duration.zero) {
       reverseMotion = reverseMotion.delayed(reverseDelay);
     }
     return context.copyWith(motion: forwardMotion, reverseMotion: reverseMotion);
+  }
+
+  @override
+  ActContext resolve(ActContext context) {
+    return resolveMotion(
+      context,
+      motion: motion,
+      delay: delay,
+      reverse: reverse,
+      frames: frames,
+      includeFirstFrame: from != null,
+    );
   }
 
   CueAnimtable<R> resolveTween(

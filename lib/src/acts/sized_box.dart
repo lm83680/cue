@@ -1,7 +1,7 @@
 part of 'base/act.dart';
 
 class SizedBoxAct extends DeferredTweenAct<Size> {
-  
+
   @override
   final ActKey key = const ActKey('SizedBox');
 
@@ -29,25 +29,23 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
 
   @override
   ActContext resolve(ActContext context) {
-     final builder = _SizeActBuilder(
+    return TweenActBase.resolveMotion(
+      context,
       motion: motion,
       delay: delay,
-      from: width != null || height != null ? Size.zero : null,
-      to: width != null || height != null ? Size.infinite : null,
-      frames: frames,
       reverse: reverse,
+      frames: frames,
     );
-    return builder.resolve(context);
   }
 
   @override
   CueAnimation<Size> buildAnimation(CueTimeline timline, ActContext context) {
-     final trackConfig = TrackConfig(
-       motion: context.motion,
-       reverseMotion: context.reverseMotion,
-       reverseType: reverse.type,
-     );
-      final track = timline.trackFor(trackConfig);
+    final trackConfig = TrackConfig(
+      motion: context.motion,
+      reverseMotion: context.reverseMotion,
+      reverseType: reverse.type,
+    );
+    final track = timline.trackFor(trackConfig);
     return DeferredCueAnimation<Size>(parent: track, context: context);
   }
 
@@ -188,19 +186,6 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     _keyframes = value;
   }
 
-  List<FractionalKeyframe<Size>>? _fractionalKeyframes;
-
-  set fractionalKeyframes(List<FractionalKeyframe<Size>>? value) {
-    if (_fractionalKeyframes == value) return;
-    _fractionalKeyframes = value;
-  }
-
-  Duration? _fractionalKeyframesDuration;
-
-  set fractionalKeyframesDuration(Duration? value) {
-    if (_fractionalKeyframesDuration == value) return;
-    _fractionalKeyframesDuration = value;
-  }
 
   ReverseBehaviorBase<Size> _reverse;
 
@@ -251,7 +236,7 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
       );
     }
 
-    final actBuilder = _SizeActBuilder(
+    final actBuilder = _SizedBoxActBuilder(
       from: from,
       to: to,
       frames: _keyframes?.mapValues((v) => _normalizeSize(v, constraints)),
@@ -313,10 +298,8 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
   }
 }
 
-class _SizeActBuilder extends TweenAct<Size> {
-  const _SizeActBuilder({
-    super.motion,
-    super.delay,
+ class _SizedBoxActBuilder extends TweenAct<Size> {
+  const _SizedBoxActBuilder({
     super.from,
     super.to,
     super.frames,
@@ -331,13 +314,12 @@ class _SizeActBuilder extends TweenAct<Size> {
   @override
   Widget apply(BuildContext context, covariant CueAnimation<Size> animation, Widget child) {
     throw UnimplementedError(
-      'This class is only used to build the animatable for SizeAct and should never be built itself.',
+      'This class is only used to build the animatables for SizedBoxAct and should never be built itself.',
     );
   }
+
   @override
-  ActKey get key => throw UnimplementedError(
-    'This class is only used to build the animatable for SizeAct and should never be built itself.',
-  );
+  ActKey get key => ActKey('TempSizedBox');
 }
 
 class _SizeTween extends Tween<Size> {

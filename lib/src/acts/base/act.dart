@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-part '../clip_size.dart';
+part '../sized_clip.dart';
 part '../fractional_size.dart';
 part '../translate.dart';
 part '../decorate.dart';
@@ -17,7 +17,7 @@ part '../color_tint.dart';
 part '../rotate.dart';
 part '../rotate_layout.dart';
 part '../scale.dart';
-part '../size.dart';
+part '../sized_box.dart';
 part '../opacity.dart';
 part '../blur.dart';
 part '../align.dart';
@@ -217,6 +217,7 @@ abstract class Act {
     NSize? to,
     CueMotion? motion,
     AlignmentGeometry alignment,
+    ClipGeometry clipGeometry,
     Clip clipBehavior,
   }) = SizedClipAct;
 

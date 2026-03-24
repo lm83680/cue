@@ -92,7 +92,20 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     // ),
                     Actor(
                       acts: [
-                        .slideX(to: 1),
+                        .sizedClip(
+                          from: .square(50),
+                          to: .square(100),
+                          clipGeometry: .superEllipse(BorderRadius.circular(16))
+                        ),
+                        // SizedBoxAct.keyframed(
+                        //   frames: Keyframes(
+                        //     [
+                        //       .key(Size(100, 100), motion: .none),
+                        //       .key(Size(200, 200), motion: .wobbly()),
+                        //       .key(Size(150, 150), motion: .wobbly()),
+                        //     ],
+                        //   ),
+                        // ),
                         //  SlideAct.keyframedX(
                         //     frames: Keyframes([
                         //      .key(1, motion: .linear(150.ms)),

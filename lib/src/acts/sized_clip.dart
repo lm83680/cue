@@ -1,7 +1,6 @@
 part of 'base/act.dart';
 
 class SizedClipAct extends DeferredTweenAct<Size?> {
-
   @override
   final ActKey key = const ActKey('SizedClip');
 
@@ -11,13 +10,15 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   final NSize? to;
   final Keyframes<NSize>? frames;
   final ReverseBehaviorBase<NSize> _reverse;
-
+  final ClipGeometry clipGeometry;
+  
   const SizedClipAct({
     this.from = NSize.childSize,
     this.to = NSize.childSize,
     super.motion,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
+    this.clipGeometry = const ClipGeometry.rect(),
     ReverseBehavior<NSize> reverse = const ReverseBehavior.mirror(),
   }) : frames = null,
        _reverse = reverse;
@@ -27,6 +28,7 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     super.delay,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
+    this.clipGeometry = const ClipGeometry.rect(),
     KFReverseBehavior<NSize> reverse = const KFReverseBehavior.mirror(),
   }) : _reverse = reverse,
        from = null,
@@ -42,12 +44,13 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
           from == other.from &&
           to == other.to &&
           _reverse == other._reverse &&
+          clipGeometry == other.clipGeometry &&
           frames == other.frames &&
           delay == other.delay &&
           _reverse == other._reverse;
 
   @override
-  int get hashCode => Object.hash(alignment, clipBehavior, from, to, delay, _reverse, frames);
+  int get hashCode => Object.hash(alignment, clipBehavior, from, to, delay, _reverse, frames, clipGeometry);
 
   @override
   CueAnimation<Size?> buildAnimation(CueTimeline timline, ActContext context) {
@@ -70,21 +73,20 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
       reverse: _reverse,
       alignment: alignment ?? Alignment.center,
       clipBehavior: clipBehavior,
+      clipGeometry: clipGeometry,
       child: child,
     );
   }
 
   @override
   ActContext resolve(ActContext context) {
-    final builder = _NullableSizeActBuilder(
+    return TweenActBase.resolveMotion(
+      context,
       motion: motion,
       delay: delay,
-      from: from != null ? Size.zero : null,
-      to: to != null ? Size.infinite : null,
-      frames: frames?.mapValues((v) => Size.zero),
-      reverse: _reverse.mapValues((v) => Size.zero),
+      reverse: _reverse,
+      frames: frames,
     );
-    return builder.resolve(context);
   }
 }
 
@@ -97,11 +99,13 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
     required this.reverse,
     this.alignment = Alignment.center,
     this.clipBehavior = Clip.hardEdge,
+    required this.clipGeometry,
     required super.child,
   });
 
   final DeferredCueAnimation<Size?> driver;
   final ReverseBehaviorBase<NSize> reverse;
+  final ClipGeometry clipGeometry;
   final NSize? from;
   final NSize? to;
   final Keyframes<NSize>? frames;
@@ -119,6 +123,7 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
       alignment: alignment,
       textDirection: Directionality.maybeOf(context),
       clipBehavior: clipBehavior,
+      clipGeometry: clipGeometry,
     );
   }
 
@@ -134,8 +139,9 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
       ..frames = frames
       ..reverse = reverse
       ..alignment = alignment
+      ..clipBehavior = clipBehavior
       ..textDirection = Directionality.maybeOf(context)
-      ..clipBehavior = clipBehavior;
+      ..clipGeometry = clipGeometry;
   }
 }
 
@@ -146,6 +152,7 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     required NSize? toSize,
     required Keyframes<NSize>? frames,
     required ReverseBehaviorBase<NSize> reverse,
+    required ClipGeometry clipGeometry,
     super.alignment,
     super.textDirection,
     Clip clipBehavior = Clip.hardEdge,
@@ -154,8 +161,10 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
        _to = toSize,
        _frames = frames,
        _reverse = reverse,
-       _clipBehavior = clipBehavior {
+       _clipBehavior = clipBehavior,
+       _clipGeometry = clipGeometry {
     _addintionalConstrains = _calculateAddintionalConstrains();
+    _buildClipHandler(clipGeometry);
   }
 
   DeferredCueAnimation<Size?> _driver;
@@ -203,15 +212,34 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
 
   Clip _clipBehavior;
 
-  Clip get clipBehavior => _clipBehavior;
-
   set clipBehavior(Clip value) {
     if (_clipBehavior == value) return;
     _clipBehavior = value;
     markNeedsPaint();
   }
 
-  final LayerHandle<ClipRectLayer> _clipRectLayer = LayerHandle<ClipRectLayer>();
+  ClipGeometry _clipGeometry;
+
+  set clipGeometry(ClipGeometry value) {
+    if (_clipGeometry == value) return;
+    _clipGeometry = value;
+    _clipGeometryHandler.invalidate();
+    _buildClipHandler(value);
+    markNeedsPaint();
+  }
+
+  void _buildClipHandler(ClipGeometry value) {
+    switch ((value.borderRadius, value.useSuperEllipse)) {
+      case (null, _):
+        _clipGeometryHandler = _ClipRectGeometry();
+      case (final borderRadius, false):
+        _clipGeometryHandler = _ClipRRectGeometry(borderRadius!.resolve(textDirection));
+      case (final borderRadius, true):
+        _clipGeometryHandler = _ClipSuperEllipseGeometry(borderRadius!.resolve(textDirection));
+    }
+  }
+
+  _ClipGeometryHandler _clipGeometryHandler = _ClipRectGeometry();
 
   // Cached animation and related state
   Size? _cachedMaxSize;
@@ -388,19 +416,19 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    if (child != null && _hasVisualOverflow && clipBehavior != Clip.none) {
+    if (child != null && (_hasVisualOverflow || _clipGeometry.borderRadius != null) && _clipBehavior != Clip.none) {
       // When allowOverflow is true, always clip the overflow
       final Rect rect = Offset.zero & size;
-      _clipRectLayer.layer = context.pushClipRect(
-        needsCompositing,
-        offset,
-        rect,
-        super.paint,
-        clipBehavior: clipBehavior,
-        oldLayer: _clipRectLayer.layer,
+      _clipGeometryHandler.push(
+        context,
+        needsCompositing: needsCompositing,
+        offset: offset,
+        painter: super.paint,
+        rect: rect,
+        clipBehavior: _clipBehavior,
       );
     } else {
-      _clipRectLayer.layer = null;
+       _clipGeometryHandler.invalidate();
       super.paint(context, offset);
     }
   }
@@ -408,9 +436,138 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
   @override
   void dispose() {
     _driver.removeListener(markNeedsLayout);
-    _clipRectLayer.layer = null;
+    _clipGeometryHandler.invalidate();
     super.dispose();
   }
+}
+
+abstract class _ClipGeometryHandler<L extends Layer> {
+  final LayerHandle<L> _handler = LayerHandle<L>();
+  void push(
+    PaintingContext context, {
+    required bool needsCompositing,
+    required Offset offset,
+    required void Function(PaintingContext, Offset) painter,
+    required Rect rect,
+    required Clip clipBehavior,
+  });
+
+  void invalidate() => _handler.layer = null;
+}
+
+class _ClipRectGeometry extends _ClipGeometryHandler<ClipRectLayer> {
+  @override
+  void push(
+    PaintingContext context, {
+    required bool needsCompositing,
+    required Offset offset,
+    required void Function(PaintingContext, Offset) painter,
+    required Rect rect,
+    required Clip clipBehavior,
+  }) {
+    _handler.layer = context.pushClipRect(
+      needsCompositing,
+      offset,
+      rect,
+      painter,
+      clipBehavior: clipBehavior,
+      oldLayer: _handler.layer,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is _ClipRectGeometry && runtimeType == other.runtimeType;
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+class _ClipRRectGeometry extends _ClipGeometryHandler<ClipRRectLayer> {
+  final BorderRadius borderRadius;
+
+  _ClipRRectGeometry(this.borderRadius);
+
+  @override
+  void push(
+    PaintingContext context, {
+    required bool needsCompositing,
+    required Offset offset,
+    required void Function(PaintingContext, Offset) painter,
+    required Rect rect,
+    required Clip clipBehavior,
+  }) {
+    _handler.layer = context.pushClipRRect(
+      needsCompositing,
+      offset,
+      rect,
+      borderRadius.toRRect(rect),
+      painter,
+      clipBehavior: clipBehavior,
+      oldLayer: _handler.layer,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _ClipRRectGeometry && runtimeType == other.runtimeType && borderRadius == other.borderRadius;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, borderRadius);
+}
+
+class _ClipSuperEllipseGeometry extends _ClipGeometryHandler<ClipRSuperellipseLayer> {
+  final BorderRadius borderRadius;
+
+  _ClipSuperEllipseGeometry(this.borderRadius);
+
+  @override
+  void push(
+    PaintingContext context, {
+    required bool needsCompositing,
+    required Offset offset,
+    required void Function(PaintingContext, Offset) painter,
+    required Rect rect,
+    required Clip clipBehavior,
+  }) {
+    _handler.layer = context.pushClipRSuperellipse(
+      needsCompositing,
+      offset,
+      rect,
+      borderRadius.toRSuperellipse(rect),
+      painter,
+      clipBehavior: clipBehavior,
+      oldLayer: _handler.layer,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _ClipSuperEllipseGeometry && runtimeType == other.runtimeType && borderRadius == other.borderRadius;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, borderRadius);
+}
+
+class ClipGeometry {
+  final BorderRadiusGeometry? borderRadius;
+  final bool useSuperEllipse;
+
+  const ClipGeometry.rect() : borderRadius = null, useSuperEllipse = false;
+  const ClipGeometry.rrect(BorderRadiusGeometry this.borderRadius) : useSuperEllipse = false;
+  const ClipGeometry.superEllipse(BorderRadiusGeometry this.borderRadius) : useSuperEllipse = true;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ClipGeometry &&
+          runtimeType == other.runtimeType &&
+          borderRadius == other.borderRadius &&
+          useSuperEllipse == other.useSuperEllipse;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, borderRadius, useSuperEllipse);
 }
 
 /// A size specification where each axis can be `null` to mean
@@ -474,8 +631,6 @@ class NSize {
 
 class _NullableSizeActBuilder extends TweenAct<Size?> {
   const _NullableSizeActBuilder({
-    super.motion,
-    super.delay,
     super.from,
     super.to,
     super.frames,
@@ -490,10 +645,10 @@ class _NullableSizeActBuilder extends TweenAct<Size?> {
   @override
   Widget apply(BuildContext context, covariant CueAnimation<Size?> animation, Widget child) {
     throw UnimplementedError(
-      'This class is only used to build the animatable for SizeAct and should never be built itself.',
+      'This class is only used to build the animatables for SizedClipAct and should never be built itself.',
     );
   }
-  
+
   @override
-  ActKey get key => throw UnimplementedError();
+  ActKey get key => const ActKey('TempNullableSize');
 }
