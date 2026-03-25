@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/deferred_tween_act.dart';
 import 'package:cue/src/acts/base/animatable_act.dart';
+import 'package:cue/src/acts/base/tween_act.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,8 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-  }) = SlideAct.fromY;
+    Duration delay,
+  }) = SlideAct.y;
 
   const factory Act.slideUp({
     CueMotion? motion,
@@ -253,6 +255,8 @@ abstract class Act {
     CueMotion? motion,
     RotateUnit unit,
     RotateAxis axis,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = RotateAct;
 
   const factory Act.rotateLayout({

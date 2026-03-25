@@ -16,6 +16,7 @@ class RotateAct extends TweenAct<double> {
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
     this.unit = RotateUnit.degrees,
+    super.delay,
   }) : super.tween();
 
   const RotateAct.flipX({

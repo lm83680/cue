@@ -59,10 +59,11 @@ class ActorState extends State<Actor> {
     final acts = _acts.map((e) => e.$1);
     final actKeys = acts.map((e) => e.key).toSet();
 
+
     for (final entry in List.of(_animations.entries)) {
       if (!actKeys.contains(entry.key)) {
         if (_animations.remove(entry.key) case final cacheEntry?) {
-          scope.timeline.release(cacheEntry.trackConfig);
+          scope.timeline.release(cacheEntry.releaseToken);
         }
       }
     }
@@ -80,7 +81,7 @@ class ActorState extends State<Actor> {
           implicitFrom: implicitFrom,
         ),
       );
-      if (existing?.trackConfig case final trackConfig?) {
+      if (existing?.releaseToken case final trackConfig?) {
         scope.timeline.release(trackConfig);
       }
       _animations[act.key] = _CacheEntry(act, animation);
@@ -119,8 +120,8 @@ class ActorState extends State<Actor> {
   }
 
   void _clearCache(CueScope scope) {
-    for (final animation in _animations.values) {
-      scope.timeline.release(animation.trackConfig);
+    for (final entry in _animations.values) {
+      scope.timeline.release(entry.releaseToken);
     }
     _animations.clear();
     _animationSnapshots.clear();
@@ -132,9 +133,6 @@ class ActorState extends State<Actor> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scope = CueScope.of(context);
-    if (_acts.isEmpty) {
-      _resolveActs(scope.mainConfig);
-    }
     if (_cachedScope?.timeline != scope.timeline) {
       _eventsDisposer?.call();
       _eventsDisposer = scope.timeline.addEventListener<TimelineEvent>((_) => _onWillAnimate());
@@ -178,7 +176,7 @@ class _CacheEntry {
   final Act act;
   final CueAnimation<Object?> animation;
   _CacheEntry(this.act, this.animation);
-  TrackConfig get trackConfig => animation.trackConfig;
+  ReleaseToken get releaseToken => animation.token;
   Object? get value => animation.value;
 }
 

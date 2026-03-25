@@ -8,6 +8,8 @@ abstract class CueAnimation<T> extends Animation<T> with AnimationWithParentMixi
   @override
   final CueTrack parent;
 
+  ReleaseToken get token;
+
   TrackConfig get trackConfig => parent.config;
 
   CueAnimation({required this.parent});
@@ -25,15 +27,24 @@ class CueAnimationImpl<T> extends CueAnimation<T> {
   @override
   final CueAnimtable<T> animtable;
 
-  CueAnimationImpl({required super.parent, required this.animtable});
+  @override
+  final ReleaseToken token;
+
+
+
+  CueAnimationImpl({required super.parent, required this.token, required this.animtable});
 }
 
 class DeferredCueAnimation<T> extends CueAnimation<T> {
   ActContext context;
+ 
+  @override
+  final ReleaseToken token;
 
   DeferredCueAnimation({
     required super.parent,
     required this.context,
+    required this.token,
   });
 
   CueAnimtable<T>? _animatable;

@@ -35,7 +35,7 @@ abstract class SlideAct extends Act {
     Duration delay,
   }) = _SlideEffect.keyframed;
 
-  const factory SlideAct.fromY({
+  const factory SlideAct.y({
     double from,
     double to,
     CueMotion? motion,

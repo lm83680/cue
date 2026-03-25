@@ -1,6 +1,7 @@
 part of 'base/act.dart';
 
 class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
+
   @override
   final ActKey key = const ActKey('Padding');
   
@@ -24,7 +25,7 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
   }
 
   @override
-  Widget apply(BuildContext context, Animation<EdgeInsetsGeometry> animation, Widget child) {
+  Widget apply(BuildContext context, CueAnimation<EdgeInsetsGeometry> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {

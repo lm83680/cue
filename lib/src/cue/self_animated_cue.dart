@@ -50,6 +50,23 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
       }
     }
   }
+
+  bool _devToolControlled = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (kDebugMode) {
+      final devToolScope = CueDebugTools.maybeOf(context);
+      final isDevToolControlled = devToolScope?.activeTargetId == _debugId && devToolScope?.isMinimized == false;
+      if (!_devToolControlled && isDevToolControlled) {
+        controller.stop();
+      } else if (_devToolControlled && !isDevToolControlled && widget.loop) {
+        controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
+      }
+      _devToolControlled = isDevToolControlled;
+    }
+  }
 }
 
 abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T> with SingleTickerProviderStateMixin {

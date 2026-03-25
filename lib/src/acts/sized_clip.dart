@@ -59,8 +59,8 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
       reverseMotion: context.reverseMotion,
       reverseType: reverse.type,
     );
-    final track = timline.trackFor(trackConfig);
-    return DeferredCueAnimation<Size?>(parent: track, context: context);
+    final (track, token) = timline.trackFor(trackConfig);
+    return DeferredCueAnimation<Size?>(parent: track, token: token, context: context);
   }
 
   @override

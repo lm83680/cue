@@ -14,7 +14,7 @@ abstract class AnimtableAct<R extends Object?, T extends Object?> extends Act {
   @override
   CueAnimation<R> buildAnimation(CueTimeline timline, ActContext context) {
     final (animtable, reverseAnimtable) = buildTweens(context);
-    final track = timline.trackFor(TrackConfig(
+    final (track, token) = timline.trackFor(TrackConfig(
       motion: context.motion,
       reverseMotion: context.reverseMotion,
       reverseType: reverse.type,
@@ -22,7 +22,7 @@ abstract class AnimtableAct<R extends Object?, T extends Object?> extends Act {
     CueAnimtable<R> effectiveAnimatable = reverseAnimtable == null
         ? animtable
         : DualAnimatable(forward: animtable, reverse: reverseAnimtable);
-    return CueAnimationImpl<R>(parent: track, animtable: effectiveAnimatable);
+    return CueAnimationImpl<R>(parent: track, token: token, animtable: effectiveAnimatable);
   }
 
   @override

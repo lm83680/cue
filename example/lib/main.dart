@@ -1,4 +1,7 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/delete_confirmation.dart';
+import 'package:example/examples/slack_style_fab.dart';
+import 'package:example/examples/smooth_toggle.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,10 +47,6 @@ class _OnChangeDemo extends StatefulWidget {
 }
 
 class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProviderStateMixin {
-  double slide = 1.0;
-  bool checked = false;
-  late final _controller = CueController(vsync: this, motion: .wobbly());
-
   Offset offset = Offset.zero;
 
   @override
@@ -62,91 +61,40 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: .center,
-            crossAxisAlignment: .center,
+            crossAxisAlignment: .end,
             children: [
-              // SmoothSwitch(),
-              // SlackStyleFab(),
-              // IndicatorToButton(),
-              Cue.onToggle(
-                toggled: checked,
-                // loop: true,
-                // reverseOnLoop: true,
-                motion: .smooth(),
-                child: Column(
-                  children: [
-                    // Actor(
-                    //   act: .compose([
-                    //     SlideAct.keyframedX(
-                    //       frames: Keyframes([
-                    //        .key(1, motion: .linear(150.ms)),
-                    //        .key(2, motion: .linear(150.ms)),
-                    //       ]),
-                    //       reverse: .mirror(delay: 300.ms)
-                    //     ),
-                    //   ]),
-                    //   child: Container(
-                    //     height: 50,
-                    //     width: 50,
-                    //     color: Colors.blue,
-                    //   ),
-                    // ),
-                    Actor(
-                      acts: [
-                        .sizedClip(
-                          from: .square(50),
-                          to: .square(100),
-                          clipGeometry: .superEllipse(BorderRadius.circular(16))
-                        ),
-                        // SizedBoxAct.keyframed(
-                        //   frames: Keyframes(
-                        //     [
-                        //       .key(Size(100, 100), motion: .none),
-                        //       .key(Size(200, 200), motion: .wobbly()),
-                        //       .key(Size(150, 150), motion: .wobbly()),
-                        //     ],
-                        //   ),
-                        // ),
-                        //  SlideAct.keyframedX(
-                        //     frames: Keyframes([
-                        //      .key(1, motion: .linear(150.ms)),
-                        //      .key(2, motion: .linear(150.ms)),
-                        //     ],),
-                        //     // reverse: .to(Keyframes([
-                        //     //   .key(1, motion: .linear(150.ms)),
-                        //     //   .key(-1, motion: .linear(150.ms)),
-                        //     // ]))
-                        //   ),
-                        // ScaleAct.keyframed(
-                        //   frames: Keyframes([
-                        //     .key(1, motion: .linear(150.ms)),
-                        //     .key(1.2, motion: .linear(150.ms)),
-                        //     .key(1, motion: .linear(150.ms)),
-                        //   ]),
-                        // ),
-                      ],
-                      child: Container(
-                        height: 100,
-                        width: 100,
-                        color: Colors.red,
-                      ),
-                    ),
-                    // SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          checked = !checked;
-                          // slide = checked ? 2.0 : 1.0;
-                        });
-                      },
-                      child: Text('Toggle'),
-                    ),
-                  ],
-                ),
-              ),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     showCueModalBottomSheet(
+              //       context: context,
+              //       showDragHandle: true,
+              //       enableDrag: true,
+              //       motion: .linear(780.ms),
+              //       builder: (context) => Container(
+              //         height: 320,
+              //         width: double.infinity,
+              //         margin: const EdgeInsets.only(bottom: 8.0),
+              //         decoration: BoxDecoration(
+              //           borderRadius: BorderRadius.circular(12.0),
+              //         ),
+              //         child: Center(child: Actor(
+              //          motion: .wobbly(),
+              //           acts: [
+              //             .fadeIn(),
+              //             .slideY(from: -8),
+              //             .zoomIn(from: .0),
+              //           ],
+              //           child: Text('Hello World!'))),
+              //       ),
+              //       // sheetAnimationStyle: .spring(damping: 20, stiffness: 200), --- IGNORE ---
+              //     );
+              //   },
+              //   child: Text('Show BottomSheet'),
+              // ),
 
-              // ThreeDotsAction(),
-              //  SlackStyleFab(),
+               SlackStyleFab(),
               //  DeleteConfirmationDialog(),
+              // SmoothSwitch(),
               //   GestureDetector(
               //     behavior: HitTestBehavior.translucent,
               //     onVerticalDragUpdate: (details) {

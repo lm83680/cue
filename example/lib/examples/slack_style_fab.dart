@@ -21,7 +21,7 @@ class SlackStyleFab extends StatelessWidget {
           barrierColor: Colors.black87,
           hideTriggerOnTransition: true,
           barrierDismissible: true,
-          motion: .wobbly(),
+          motion: .smooth(),
           triggerBuilder: (context, showModal2) {
             return GestureDetector(
               onLongPress: showModal2,
@@ -169,6 +169,7 @@ class _LongPressContent extends StatelessWidget {
       children: [
         for (var i = 0; i < 3; i++)
           Actor(
+            motion: .wobbly(),
             acts: [
               .translateFromGlobal(
                 offset: Offset(triggerRect.left - 64, triggerRect.top),

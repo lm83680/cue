@@ -70,6 +70,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     }
     _localT = 0.0;
     _activeSim = null;
+
     if (_value != value || _phase != phase) {
       _value = value;
       _phase = phase;

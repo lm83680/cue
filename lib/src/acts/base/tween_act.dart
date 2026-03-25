@@ -25,9 +25,8 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
     required Keyframes<T> this.frames,
     super.delay,
     this.from,
-    KFReverseBehavior<T> reverse = const KFReverseBehavior.mirror(),
-  }) : to = null,
-       super(reverse: reverse);
+    KFReverseBehavior<T> super.reverse = const KFReverseBehavior.mirror(),
+  }) : to = null;
 
   bool get isConstant => from != null && to != null && from == to;
 

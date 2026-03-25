@@ -38,8 +38,7 @@ class CueController extends AnimationController {
 
   @override
   set value(double newValue) {
-    final forward = newValue >= value;
-    setProgress(newValue, forward: forward);
+    setProgress(newValue.clamp(0, 1), forward: status.isForwardOrCompleted);
   }
 
   void setProgress(double newValue, {bool forward = true}) {
@@ -112,14 +111,15 @@ class CueController extends AnimationController {
     return super.animateWith(_timeline);
   }
 
-  @override
-  TickerFuture fling({
-    double velocity = 1.0,
-    SpringDescription? springDescription,
-    AnimationBehavior? animationBehavior,
-  }) {
-    throw UnsupportedError(
-      'fling is not supported by CueController. Use forward or reverse instead.',
-    );
-  }
+  // @override
+  // TickerFuture fling({
+  //   double velocity = 1.0,
+  //   SpringDescription? springDescription,
+  //   AnimationBehavior? animationBehavior,
+  // }) {
+  //   super.fling()
+  //   throw UnsupportedError(
+  //     'fling is not supported by CueController. Use forward or reverse instead.',
+  //   );
+  // }
 }

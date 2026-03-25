@@ -1,5 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/core/curves.dart';
+import 'package:cue/src/widgets/cue_modals.dart';
 import 'package:flutter/material.dart';
 
 @optionalTypeArgs
@@ -20,6 +20,7 @@ class CueModalTransition extends StatefulWidget {
     this.motion = .defaultTime,
     this.reverseMotion,
     this.hideTriggerOnTransition = false,
+    this.useRootNavigator = true,
   });
 
   final ModalContentBuilder builder;
@@ -32,6 +33,7 @@ class CueModalTransition extends StatefulWidget {
   final CueMotion? reverseMotion;
   final String barrierLabel;
   final bool hideTriggerOnTransition;
+  final bool useRootNavigator;
 
   @override
   State<CueModalTransition> createState() => _CueModalTransitionState();
@@ -39,17 +41,23 @@ class CueModalTransition extends StatefulWidget {
 
 class _CueModalTransitionState extends State<CueModalTransition> {
   final GlobalKey _triggerKey = GlobalKey();
-  bool _isModalOpen = false;
   final LayerLink _link = LayerLink();
+  final _openModalKey = ValueNotifier<Object?>(null);
 
   @override
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
       link: _link,
-      child: Visibility.maintain(
-        key: _triggerKey,
-        visible: !_isModalOpen || !widget.hideTriggerOnTransition,
+      child: ListenableBuilder(
+        listenable: _openModalKey,
         child: widget.triggerBuilder(context, _showModel),
+        builder: (context, child) {
+          return Visibility.maintain(
+            key: _triggerKey,
+            visible: _openModalKey.value == null || !widget.hideTriggerOnTransition,
+            child: child!,
+          );
+        },
       ),
     );
   }
@@ -59,37 +67,41 @@ class _CueModalTransitionState extends State<CueModalTransition> {
     final renderBox = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
     final triggerOffset = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
     final triggerRect = triggerOffset & (renderBox?.size ?? Size.zero);
-    final model = _ModalRoute<T>(
+    final modalKey = Object();
+    _openModalKey.value = modalKey;
+    assert(debugCheckHasMaterialLocalizations(context));
+    final CapturedThemes themes = InheritedTheme.capture(
+      from: context,
+      to: Navigator.of(context, rootNavigator: widget.useRootNavigator).context,
+    );
+
+    final model = CueDialogRoute<T>(
       barrierDismissible: widget.barrierDismissible,
       barrierLabel: widget.barrierLabel,
       barrierColor: widget.barrierColor,
-      transitionBuilder: (context, anim, _, child) => child,
       motion: widget.motion,
       reverseMotion: widget.reverseMotion,
+      hideOnPushNext: widget.hideTriggerOnTransition,
       onAnimationStatusChanged: (status) {
-        if (mounted) {
-          setState(() {
-            _isModalOpen = !status.isDismissed;
-          });
+        if (status.isDismissed && mounted && _openModalKey.value == modalKey) {
+          _openModalKey.value = null;
         }
       },
-      pageBuilder: (context,anim, _) {
-        return _ModelContent(
-          backdrop: widget.backdrop,
-          alignment: widget.alignment,
-          builder: widget.builder,
-          barrierDismissible: widget.barrierDismissible,
-          triggerRect: triggerRect,
-          link: _link,
+      pageBuilder: (context, anim, _) {
+        return themes.wrap(
+          _ModelContent(
+            backdrop: widget.backdrop,
+            alignment: widget.alignment,
+            builder: widget.builder,
+            barrierDismissible: widget.barrierDismissible,
+            triggerRect: triggerRect,
+            link: _link,
+          ),
         );
       },
     );
-    if (widget.hideTriggerOnTransition) {
-      setState(() {
-        _isModalOpen = true;
-      });
-    }
-    return Navigator.of(context).push<T>(model);
+
+    return Navigator.of(context, rootNavigator: widget.useRootNavigator).push<T>(model);
   }
 }
 
@@ -173,55 +185,5 @@ class _ModalPositionDelegate extends SingleChildLayoutDelegate {
   @override
   bool shouldRelayout(_ModalPositionDelegate oldDelegate) {
     return triggerRect != oldDelegate.triggerRect || alignment != oldDelegate.alignment;
-  }
-}
-
-class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
-  _ModalRoute({
-    required super.pageBuilder,
-    super.barrierDismissible,
-    super.barrierLabel,
-    super.barrierColor,
-    super.transitionBuilder,
-    required this.motion,
-    this.reverseMotion,
-    required this.onAnimationStatusChanged,
-  }) : super();
-
-  final CueMotion motion;
-  final CueMotion? reverseMotion;
-  final AnimationStatusListener onAnimationStatusChanged;
-
-  @override
-  Curve get barrierCurve => BoundedCurve(curve: Curves.easeIn);
-
-  @override
-  AnimationController createAnimationController() {
-    final ctrl = CueController(
-      motion: motion,
-      reverseMotion: reverseMotion,
-      vsync: navigator!,
-    );
-    ctrl.addStatusListener(onAnimationStatusChanged);
-    return ctrl;
-  }
- 
-  @override
-  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    return Cue(
-      timeline: (controller as CueController).timeline,
-      child: super.buildPage(context, animation, secondaryAnimation),
-    );
-  }
-
-  @override
-  void dispose() {
-    controller?.removeStatusListener(onAnimationStatusChanged);
-    super.dispose();
-  }
-
-  @override
-  Simulation? createSimulation({required bool forward}) {
-    return null;
   }
 }
