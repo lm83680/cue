@@ -1,7 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/slack_style_fab.dart';
-import 'package:example/examples/smooth_toggle.dart';
+import 'package:example/examples/indicator_to_button.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -57,8 +55,8 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
       // backgroundColor: Colors.blue,
       appBar: AppBar(),
       body: SizedBox.expand(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: .center,
             crossAxisAlignment: .end,
@@ -92,9 +90,10 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //   child: Text('Show BottomSheet'),
               // ),
 
-               SlackStyleFab(),
+              //  SlackStyleFab(),
               //  DeleteConfirmationDialog(),
-              // SmoothSwitch(),
+              // if(false)
+              // IndicatorToButton(),
               //   GestureDetector(
               //     behavior: HitTestBehavior.translucent,
               //     onVerticalDragUpdate: (details) {
@@ -125,32 +124,32 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //     ),
               //   ),
 
-              // for (var i = 0; i < 20; i++)
-              //   Cue.onScrollVisible(
-              //     key: ValueKey(i),
-              //     act: .compose([
-              //       .zoomIn(from: .75),
-              //       .slideY(from: 0, reverse: .to(1.1)),
-              //       .fadeOut(reverse: .exclusive()),
-              //     ],motion: .curved(.zero,curve:  Curves.easeInOut)),
-              //     child: Container(
-              //       height: 220,
-              //       width: double.infinity,
-              //       margin: const EdgeInsets.only(bottom: 8.0),
+              for (var i = 0; i < 20; i++)
+                Cue.onScrollVisible(
+                  key: ValueKey(i),
+                  acts:[
+                    // .zoomIn(from: .75),
+                    // .slideY(from: 0, reverse: .to(1.1)),
+                    .slideX(from: -1, reverse: .to(1)),
+                  ],
+                  child: Container(
+                    height: 220,
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 8.0),
 
-              //       decoration: BoxDecoration(
-              //         color: Colors.green,
-              //         borderRadius: BorderRadius.circular(12.0),
-              //         boxShadow: [
-              //           BoxShadow(
-              //             color: Colors.black.withOpacity(0.3),
-              //             blurRadius: 8.0,
-              //             offset: const Offset(0, 4),
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: .3),
+                          blurRadius: 8.0,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

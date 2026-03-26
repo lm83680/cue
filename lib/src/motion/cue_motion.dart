@@ -1,3 +1,4 @@
+import 'package:cue/cue.dart';
 import 'package:cue/src/motion/simulation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,10 @@ abstract class CueMotion {
 
   CueSimulation build(SimulationBuildData data);
 
-  CueSimulation buildBase([bool forward = true]) => build(SimulationBuildData.base(forward));
+  CueSimulation buildBase({bool forward = true, int? phase}) => switch (forward) {
+    true => build(SimulationBuildData.forward(phase: phase ?? 0)),
+    false => build(SimulationBuildData.reverse(phase: phase ?? totalPhases - 1)),
+  };
 
   bool get isTimed => this is TimedMotion;
 
@@ -162,10 +166,12 @@ class SegmentedMotion extends CueMotion {
   int get hashCode => Object.hashAll(motions);
 }
 
+@internal
 class DelayedMotion extends CueMotion {
   final CueMotion base;
   final Duration delay;
 
+  @internal
   const DelayedMotion(this.base, this.delay);
 
   @override
@@ -228,10 +234,60 @@ class SimulationBuildData {
     this.velocity,
     this.startProgress,
   }) : forward = false;
-
-  const SimulationBuildData.base([this.forward = true])
-    : phase = 0,
-      startValue = forward ? 0.0 : 1.0,
-      velocity = null,
-      startProgress = null;
 }
+
+sealed class CueDuration {
+  const CueDuration();
+
+  double inSeconds(Duration base);
+
+  const factory CueDuration.duration(Duration duration) = _FixedDuration;
+  const factory CueDuration.fr(double fraction) = _RelativeDuration;
+  const factory CueDuration.ms(double milliseconds) = _FixedDuration.milliseconds;
+  const factory CueDuration.seconds(double seconds) = _FixedDuration.seconds;
+}
+
+// extension CueDurationDouble on double {
+//   CueDuration get sec => _FixedDuration.seconds(this);
+//   CueDuration get fr => _RelativeDuration(this);
+// }
+
+// extension CueDurationInt on int {
+//   CueDuration get ms => _FixedDuration.milliseconds(toDouble());
+//   CueDuration get sec => _FixedDuration.seconds(toDouble());
+//   CueDuration get fr => _RelativeDuration(toDouble());
+// }
+
+class _FixedDuration extends CueDuration {
+  final Duration duration;
+  final double value;
+  final _CueDurationVariant _variant;
+
+  const _FixedDuration(this.duration) : value = 0.0, _variant = _CueDurationVariant.duration;
+
+  const _FixedDuration.milliseconds(this.value) : duration = Duration.zero, _variant = _CueDurationVariant.milliseconds;
+
+  const _FixedDuration.seconds(this.value) : duration = Duration.zero, _variant = _CueDurationVariant.seconds;
+
+  @override
+  double inSeconds(Duration base) {
+    return switch (_variant) {
+      _CueDurationVariant.duration => duration.inMicroseconds / Duration.microsecondsPerSecond,
+      _CueDurationVariant.milliseconds => value / Duration.millisecondsPerSecond,
+      _CueDurationVariant.seconds => value,
+    };
+  }
+}
+
+class _RelativeDuration extends CueDuration {
+  final double fraction;
+
+  const _RelativeDuration(this.fraction) : assert(fraction >= 0 && fraction <= 1, 'Fraction must be between 0 and 1');
+
+  @override
+  double inSeconds(Duration base) {
+    return base.inMicroseconds / Duration.microsecondsPerSecond * fraction;
+  }
+}
+
+enum _CueDurationVariant { milliseconds, seconds, duration }

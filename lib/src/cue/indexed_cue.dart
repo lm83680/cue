@@ -18,7 +18,7 @@ class _IndexedCue extends Cue {
 }
 
 class _IndexedCueState extends _CueState<_IndexedCue> {
-  final _progressTimeline = CueTimelineImpl.fromMotion(.none);
+  final _progressTimeline = CueTimelineImpl.fromMotion(.linear(Duration(seconds: 1)));
 
   @override
   String get debugName => 'IndexedCue';
@@ -41,8 +41,9 @@ class _IndexedCueState extends _CueState<_IndexedCue> {
   }
 
   void _updateAnimation() {
+    final forward = widget.controller.globalOffset < widget.index;
     final value = widget.controller.valueFor(widget.index);
-    _progressTimeline.setProgress(value, forward: value > _progressTimeline.progress);
+    _progressTimeline.setProgress(value, forward: forward);
   }
 
   @override

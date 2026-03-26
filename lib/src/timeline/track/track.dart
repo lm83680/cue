@@ -20,7 +20,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   bool _needsPrepare = false;
 
   late final CueSimulation _seekableSim = config.motion.buildBase();
-  late final CueSimulation _seekableReverseSim = config.reverseMotion.buildBase(false);
+  late final CueSimulation _seekableReverseSim = config.reverseMotion.buildBase(forward: false);
 
   @override
   double get forwardDuration => _seekableSim.duration;
@@ -206,6 +206,7 @@ abstract class CueTrack extends Animation<double> with AnimationLocalListenersMi
   CueMotion get reverseMotion => config.reverseMotion;
 
   double get forwardDuration;
+
   double get reverseDuration;
 
   void tick(double td);

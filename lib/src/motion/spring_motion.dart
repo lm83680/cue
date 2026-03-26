@@ -147,7 +147,7 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
 
   @override
   Duration get baseDuration {
-    final sim = build(SimulationBuildData.base(true));
+    final sim = buildBase();
     return Duration(milliseconds: (sim.duration * 1000).round());
   }
 }

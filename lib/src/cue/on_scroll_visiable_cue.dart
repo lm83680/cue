@@ -20,9 +20,9 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
   String get debugName => 'OnScrollVisibleCue';
 
   @override
-  CueTimeline get timeline => _seekableController.timeline;
+  CueTimeline get timeline => _progressTimeline;
 
-  late final _seekableController = CueController(vsync: this, value: 1.0, motion: .defaultTime);
+  late final _progressTimeline = CueTimelineImpl.fromMotion(.defaultTime);
 
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
@@ -56,7 +56,7 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
     super.didUpdateWidget(oldWidget);
     if (widget.enabled != oldWidget.enabled) {
       if (!widget.enabled) {
-        _seekableController.setProgress(1.0, forward: true);
+        _progressTimeline.setProgress(1.0, forward: true);
         _scrollPosition?.removeListener(_trackViiblity);
       } else {
         _subscribeToScrollPosition();
@@ -70,7 +70,6 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
     super.dispose();
   }
 
-  bool _fristFrame = true;
 
   AnimationStatus? _committedStatus;
   void _trackViiblity() async {
@@ -101,31 +100,26 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
     final scrollDirection = _scrollPosition!.userScrollDirection;
     final isScrollingForward = scrollDirection == ScrollDirection.forward || (scrollDirection == ScrollDirection.idle);
 
-    AnimationStatus status = _seekableController.status;
+    AnimationStatus status = _progressTimeline.status;
 
     if (visibleFraction == 0.0 || visibleFraction == 1.0) {
       _committedStatus = null;
       status = AnimationStatus.completed;
     } else if (_committedStatus == null) {
       // First frame mid-transition — commit direction now
-      if (visibleFraction > _seekableController.value) {
+      if (visibleFraction > _progressTimeline.progress) {
         _committedStatus = isScrollingForward ? AnimationStatus.reverse : AnimationStatus.forward;
-      } else if (visibleFraction < _seekableController.value) {
+      } else if (visibleFraction < _progressTimeline.progress) {
         _committedStatus = isScrollingForward ? AnimationStatus.forward : AnimationStatus.reverse;
       }
-      status = _committedStatus ?? _seekableController.status;
+      status = _committedStatus ?? _progressTimeline.status;
     } else {
       status = _committedStatus!;
     }
     final target = visibleFraction.clamp(0.0, 1.0);
 
-    if (_fristFrame) {
-      _fristFrame = false;
-      if (target != 0.0 && target != 1.0) {
-        await _seekableController.forward(from: target);
-      }
-    } else {
-      _seekableController.setProgress(target, forward: status.isForwardOrCompleted);
-    }
+    
+      _progressTimeline.setProgress(target, forward: status.isForwardOrCompleted);
+    
   }
 }

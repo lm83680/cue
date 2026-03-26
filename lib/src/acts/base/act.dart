@@ -75,6 +75,8 @@ abstract class Act {
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = TranslateAct.fromX;
 
   const factory Act.translateY({
@@ -256,6 +258,7 @@ abstract class Act {
     RotateUnit unit,
     RotateAxis axis,
     Duration delay,
+    AlignmentGeometry alignment,
     ReverseBehavior<double> reverse,
   }) = RotateAct;
 

@@ -110,9 +110,9 @@ class SegmentedSimulation extends Simulation with CueSimulation {
 
   List<CueSimulation> _buildSeekableSegments() {
     if (_forward) {
-      return List.unmodifiable(_motions.map((m) => m.buildBase(true)));
+      return List.unmodifiable(_motions.map((m) => m.buildBase()));
     }
-    return List.unmodifiable(_motions.reversed.map((m) => m.buildBase(false)));
+    return List.unmodifiable(_motions.reversed.map((m) => m.buildBase(forward: false)));
   }
 
   late final _seekableSegments = _buildSeekableSegments();
@@ -131,7 +131,7 @@ class SegmentedSimulation extends Simulation with CueSimulation {
         forward: forward,
         startValue: startValue,
         phase: initialPhase,
-        velocity: velocity,
+        velocity: velocity.abs(),
       ),
     );
     _duration = _current.duration;
@@ -186,6 +186,7 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     final localProgress = segmentDuration <= 0.0 ? 1.0 : (elapsed / segmentDuration).clamp(0.0, 1.0);
     final (value, _) = _seekableSegments[phase].valueAtProgress(localProgress);
     _phase = _forward ? phase : _motions.length - 1 - phase;
+
     return (value, _phase);
   }
 
@@ -234,29 +235,15 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
   late final double duration = calculateSettleDuration(spring: _spring, stepSize: samplingStepSize);
 
 
-
-  // double calculateSettleDuration({double stepSize = 1 / 60}) {
-  //   double t = 0.0;
-  //   final tolerance = this.tolerance;
-  //   while (t < 100.0) {
-  //     final x = this.x(t);
-  //     final v = dx(t);
-  //     if ((x - _end).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
-  //     t += stepSize;
-  //   }
-  //   return t;
-  // }
-
- double calculateSettleDuration({
-      double stepSize = 1 / 60,
-       required SpringDescription spring,
-    }) {
-     final omega0 = math.sqrt(spring.stiffness / spring.mass);
+  double calculateSettleDuration({
+    double stepSize = 1 / 60,
+    required SpringDescription spring,
+  }) {
+    final omega0 = math.sqrt(spring.stiffness / spring.mass);
     final zeta = spring.damping / (2 * math.sqrt(spring.stiffness * spring.mass));
     final amplitude = (_start - _end).abs();
 
     final estimate = math.max(0.0, -math.log(tolerance.distance / amplitude) / (zeta * omega0));
-    // double t = math.max(0.0, estimate - stepSize * 10);
     double t = (estimate / stepSize).floor() * stepSize;
     while (t < 100.0) {
       if (isDone(t)) return t;
@@ -264,6 +251,5 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
     }
 
     return t;
-    
   }
 }

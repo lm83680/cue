@@ -20,6 +20,7 @@ abstract class TranslateAct extends Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
+    Duration delay,
   }) = _AxisTranslate.horizontal;
 
   const factory TranslateAct.keyframedX({
@@ -107,6 +108,7 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
     super.to = 0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : _axis = Axis.horizontal,
        super.tween();
 

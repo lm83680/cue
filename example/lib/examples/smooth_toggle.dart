@@ -35,7 +35,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
         child: Actor(
           acts: [
             ScaleAct.keyframed(
-              frames: Keyframes.fractional([
+              frames: .fractional([
                   .key(1.1, at: .4),
                   .key(1.1, at: .6),
                   .key(1.0, at: 1.0),
@@ -61,10 +61,10 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
               children: [
                 PositionActor.keyframed(
                   frames: .fractional([
-                    .key(.fill(end: .5), at: .0),
-                    .key(.fill(end: 0, top: .15, bottom: .15), at: .45),
-                    .key(.fill(end: 0, top: .15, bottom: .15), at: .55),
-                    .key(.fill(start: .5), at: 1.0),
+                    .key(Position.fill(end: .5), at: .0),
+                    .key(Position.fill(end: 0, top: .15, bottom: .15), at: .45),
+                    .key(Position.fill(end: 0, top: .15, bottom: .15), at: .55),
+                    .key(Position.fill(start: .5), at: 1.0),
                   ]),
                   relativeTo: Size(width, height),
                   child: DecoratedBox(
@@ -81,6 +81,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                         shape: .circle,
                         color: .tween(from: trackColor, to: thumbColor),
                         motion: .linear(duration * .5), 
+                        reverse: .mirror(delay: duration * .5),
                         child: SizedBox.square(dimension: width * .16),
                       ),
                     ),
