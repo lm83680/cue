@@ -14,6 +14,7 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment?> {
   const AlignAct.keyframed({
     required super.frames,
     super.reverse,
+    super.delay,
   }) : super.keyframed();
 
   @override

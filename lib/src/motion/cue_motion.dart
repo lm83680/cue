@@ -22,7 +22,6 @@ abstract class CueMotion {
 
   bool get isSimulation => this is SimulationMotion;
 
-  @internal
   CueMotion delayed(double delay) => DelayedMotion(this, delay);
 
   const factory CueMotion.curved(
@@ -168,7 +167,7 @@ class SegmentedMotion extends CueMotion {
   int get hashCode => Object.hashAll(motions);
 }
 
-@internal
+@visibleForTesting
 class DelayedMotion extends CueMotion {
   final CueMotion base;
   final double delay;

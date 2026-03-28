@@ -15,3 +15,4 @@ export 'src/motion/animtable.dart';
 export 'src/motion/utils.dart';
 export 'src/widgets/cue_modals.dart';
 export 'src/widgets/cue_route_mixin.dart';
+export 'src/acts/custom_tween_act.dart';

@@ -4,7 +4,6 @@ import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class CueAnimation<T> extends Animation<T> with AnimationWithParentMixin<double> {
-
   @override
   final CueTrack parent;
 
@@ -13,6 +12,14 @@ abstract class CueAnimation<T> extends Animation<T> with AnimationWithParentMixi
   TrackConfig get trackConfig => parent.config;
 
   CueAnimation({required this.parent});
+
+  CueAnimationImpl<S> map<S>(S Function(T value) selector) {
+    return CueAnimationImpl<S>(
+      parent: parent,
+      token: token,
+      animtable: _MappedCueAnimtable<T, S>(animtable, selector),
+    );
+  }
 
   bool get isReverseOrDismissed =>
       parent.status == AnimationStatus.reverse || parent.status == AnimationStatus.dismissed;
@@ -30,14 +37,24 @@ class CueAnimationImpl<T> extends CueAnimation<T> {
   @override
   final ReleaseToken token;
 
-
-
   CueAnimationImpl({required super.parent, required this.token, required this.animtable});
+}
+
+class _MappedCueAnimtable<T, S> extends CueAnimtable<S> {
+  final CueAnimtable<T> parent;
+  final S Function(T value) selector;
+
+  _MappedCueAnimtable(this.parent, this.selector);
+
+  @override
+  S evaluate(CueTrack track) {
+    return selector(parent.evaluate(track));
+  }
 }
 
 class DeferredCueAnimation<T> extends CueAnimation<T> {
   ActContext context;
- 
+
   @override
   final ReleaseToken token;
 
@@ -63,4 +80,3 @@ class DeferredCueAnimation<T> extends CueAnimation<T> {
     _animatable = animatable;
   }
 }
-

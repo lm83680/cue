@@ -66,102 +66,135 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           padding: const EdgeInsets.all(32),
 
           child: Column(
-           mainAxisAlignment: .center,
-           crossAxisAlignment: .center,
-            children:  [
-          
-             ThreeDotsAction()
-                // ElevatedButton(
-                //   onPressed: () {
-                //     showCueModalBottomSheet(
-                //       context: context,
-                //       showDragHandle: true,
-                //       enableDrag: true,
-                //       motion: .linear(400.ms),
-                //       builder: (context) => Container(
-                //         height: 320,
-                //         width: double.infinity,
-                //         margin: const EdgeInsets.only(bottom: 8.0),
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(12.0),
-                //         ),
-                //         child: Center(child: Actor(
-                //          motion: .wobbly(),
-                //           acts: [
-                //             .fadeIn(),
-                //             .slideY(from: -8),
-                //             .zoomIn(from: .0),
-                //           ],
-                //           child: Text('Hello World!'))),
-                //       ),
-                //       // sheetAnimationStyle: .spring(damping: 20, stiffness: 200), --- IGNORE ---
-                //     );
-                //   },
-                //   child: Text('Show BottomSheet'),
-                // ),
-               
-                //  SlackStyleFab(),
-                //  DeleteConfirmationDialog(),
-                // if(false)
-                // IndicatorToButton(),
-                //   GestureDetector(
-                //     behavior: HitTestBehavior.translucent,
-                //     onVerticalDragUpdate: (details) {
-                //       setState(() {
-                //         offset += details.delta;
-                //       });
-                //        _animation.setAnimatable(null);
-                //     },
-                //     onVerticalDragEnd: (details) async{
-                //       final animtable = TweenAnimtable(Tween(begin: offset, end: Offset.zero));
-                //       _animation.setAnimatable(animtable);
-                //         _controller.value = 0;
-                //        await _controller.forward();
-                //       offset = Offset.zero;
-                //     },
-                //     child: ListenableBuilder(
-                //       listenable: _animation,
-                //       builder: (context, _) {
-                //         print('build with offset ${_animation.hasAnimatable ? _animation.value : offset}');
-                //         return Transform.translate(
-                //           offset: _animation.hasAnimatable ? _animation.value : offset,
-                //           child: FloatingActionButton(
-                //             onPressed: null,
-                //             child: Icon(Icons.abc),
-                //           ),
-                //         );
-                //       },
-                //     ),
-                //   ),
-                  // for (var i = 0; i < 100; i++)
-                  //   Cue.onScrollVisible(
-                  //     child: Actor(
-                  //       acts: [
-                  //         .slideX(from: -1, reverse: .to(1)),
-                  //         .scale(from: .5, to: 1.0),
-                  //       ],
-                  //       child: Container(
-                  //         height: 220,
-                  //         margin:  const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  //         width: double.infinity,
-                  //         decoration: BoxDecoration(
-                  //           color: Colors.white,
-                  //           borderRadius: BorderRadius.circular(12.0),
-                  //           boxShadow: [
-                  //             BoxShadow(
-                  //               color: Colors.black.withOpacity(0.1),
-                  //               blurRadius: 8,
-                  //               offset: const Offset(0, 4),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-              ],
-            ),
+            mainAxisAlignment: .center,
+            crossAxisAlignment: .center,
+            children: [
+              Cue.onMount(
+                child: Column(
+                  children: [
+                    TweenActor.keyframed(
+                      frames: Keyframes([
+                        .key(AnimatedValues(scale: .5, opacity: .0), motion: .none), // first frame, no motion
+                        .key(AnimatedValues(scale: 1.2, opacity: 1.0), motion: .wobbly()),
+                        .key(AnimatedValues(scale: 1.0, opacity: 1.0), motion: .curved(.3, curve: Curves.easeIn)),
+                      ]),
+                      builder: (context, animation) {
+                        return FadeTransition(
+                          opacity: animation.map((v) => v.opacity),
+                          child: ScaleTransition(
+                            scale: animation.map((v) => v.scale),
+                            child: Box(
+                              color: Colors.red,
+                              size: Size.square(50),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    TweenActor(
+                      from: 0.0,
+                      to: 1.5,
+                      builder: (context, animation) {
+                        return SlideTransition(
+                          position: animation.map((v) => Offset(v, 0)),
+                          child: Box(color: Colors.blue, size: Size.square(50)),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // ElevatedButton(
+              //   onPressed: () {
+              //     showCueModalBottomSheet(
+              //       context: context,
+              //       showDragHandle: true,
+              //       enableDrag: true,
+              //       motion: .linear(.4),
+              //       builder: (context) => Container(
+              //         height: 320,
+              //         width: double.infinity,
+              //         margin: const EdgeInsets.only(bottom: 8.0),
+              //         decoration: BoxDecoration(
+              //           borderRadius: BorderRadius.circular(12.0),
+              //         ),
+              //         child: Center(child: Actor(
+              //          motion: .wobbly(),
+              //          reverseMotion: .linear(.4),
+              //           acts: [
+              //             .fadeIn(),
+              //             .slideY(from: -8),
+              //             .zoomIn(from: .0),
+              //           ],
+              //           child: Text('Hello World!'))),
+              //       ),
+              //     );
+              //   },
+              //   child: Text('Show BottomSheet'),
+              // ),
+
+              //  SlackStyleFab(),
+              //  DeleteConfirmationDialog(),
+              // if(false)
+              // IndicatorToButton(),
+              //   GestureDetector(
+              //     behavior: HitTestBehavior.translucent,
+              //     onVerticalDragUpdate: (details) {
+              //       setState(() {
+              //         offset += details.delta;
+              //       });
+              //        _animation.setAnimatable(null);
+              //     },
+              //     onVerticalDragEnd: (details) async{
+              //       final animtable = TweenAnimtable(Tween(begin: offset, end: Offset.zero));
+              //       _animation.setAnimatable(animtable);
+              //         _controller.value = 0;
+              //        await _controller.forward();
+              //       offset = Offset.zero;
+              //     },
+              //     child: ListenableBuilder(
+              //       listenable: _animation,
+              //       builder: (context, _) {
+              //         print('build with offset ${_animation.hasAnimatable ? _animation.value : offset}');
+              //         return Transform.translate(
+              //           offset: _animation.hasAnimatable ? _animation.value : offset,
+              //           child: FloatingActionButton(
+              //             onPressed: null,
+              //             child: Icon(Icons.abc),
+              //           ),
+              //         );
+              //       },
+              //     ),
+              //   ),
+              // for (var i = 0; i < 100; i++)
+              //   Cue.onScrollVisible(
+              //     child: Actor(
+              //       acts: [
+              //         .slideX(from: -1, reverse: .to(1)),
+              //         .scale(from: .5, to: 1.0),
+              //       ],
+              //       child: Container(
+              //         height: 220,
+              //         margin:  const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              //         width: double.infinity,
+              //         decoration: BoxDecoration(
+              //           color: Colors.white,
+              //           borderRadius: BorderRadius.circular(12.0),
+              //           boxShadow: [
+              //             BoxShadow(
+              //               color: Colors.black.withOpacity(0.1),
+              //               blurRadius: 8,
+              //               offset: const Offset(0, 4),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+            ],
+          ),
         ),
-     
       ),
     );
   }
@@ -176,7 +209,7 @@ class Box extends StatelessWidget {
     return Container(
       height: size.height,
       width: size.width,
-      color:  color,
+      color: color,
     );
   }
 }
