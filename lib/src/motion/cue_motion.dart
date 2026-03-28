@@ -172,7 +172,7 @@ class SegmentedMotion extends CueMotion {
 class DelayedMotion extends CueMotion {
   final CueMotion base;
   final Duration delay;
-1  const DelayedMotion(this.base, this.delay);
+ const DelayedMotion(this.base, this.delay);
 
   @override
   CueMotion delayed(Duration delay) => DelayedMotion(base, delay + this.delay);
