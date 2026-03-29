@@ -4,6 +4,7 @@ import 'package:cue/cue.dart';
 import 'package:example/examples/delete_confirmation.dart';
 import 'package:example/examples/expanding_cards.dart';
 import 'package:example/examples/horizinally_expanding_cards.dart';
+import 'package:example/examples/indicator_to_button.dart';
 import 'package:example/examples/options_button.dart';
 import 'package:example/examples/slack_style_fab.dart';
 import 'package:example/examples/three_dots_action.dart';
@@ -130,32 +131,52 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //       },
               //     ),
               //   ),
-              for (var i = 0; i < 20; i++)
-                Cue.onScrollVisible(
-                  child: Actor(
-                    motion: .smooth(),
-                    acts: [
-                      // .slideX(from: -1, reverse: .to(1)), 
-                      // .scale(from: .5, to: 1.0,reverse: .to(.5), motion: .linear(.5)),  
-                    ],
-                    child: Container(
-                      height: 220,
-                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+              // Cue.onMount(
+              //   child: SizedBox(
+              //     width: 300,
+              //     height: 300,
+              //     child: Card(
+              //       clipBehavior: .antiAlias,
+              //       child: Actor(
+              //         acts: [
+              //           ParallaxAct(slide: .8),
+              //         ],
+              //         child: Image.network(
+              //           'https://picsum.photos/400/300?random=1',
+              //           fit: BoxFit.cover,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              IndicatorToButton(),
+              if (false)
+                for (var i = 0; i < 20; i++)
+                  Cue.onScrollVisible(
+                    child: Actor(
+                      motion: .smooth(),
+                      acts: [
+                        // .slideX(from: -1, reverse: .to(1)),
+                        // .scale(from: .5, to: 1.0,reverse: .to(.5), motion: .linear(.5)),
+                      ],
+                      child: Container(
+                        height: 220,
+                        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
             ],
           ),
         ),

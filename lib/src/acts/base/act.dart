@@ -13,6 +13,7 @@ import 'package:flutter/rendering.dart';
 part '../sized_clip.dart';
 part '../fractional_size.dart';
 part '../translate.dart';
+part '../parallax.dart';
 part '../decorate.dart';
 part '../color_tint.dart';
 part '../rotate.dart';
@@ -79,6 +80,15 @@ abstract class Act {
     ReverseBehavior<Offset> reverse,
     double delay,
   }) = TranslateAct;
+
+
+  const factory Act.parallax({
+    required double slide,
+    Axis axis,
+    CueMotion? motion,
+    double delay,
+    ReverseBehavior<double> reverse,
+  }) = ParallaxAct;
 
   const factory Act.translateX({
     double from,

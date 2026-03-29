@@ -32,23 +32,22 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                 controller: _cuePageController,
                 child: Actor(
                   acts: [
-                    .rotate(from: 2.5, alignment: .bottomCenter, reverse: .to(-2.5)),
+                    .rotate(
+                      from: 4.5,
+                      alignment: .bottomCenter,
+                      reverse: .to(-4.5),
+                    ),
                   ],
                   child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    elevation: .2, 
+                    elevation: .2,
                     clipBehavior: .antiAlias,
                     shape: RoundedSuperellipseBorder(borderRadius: .circular(32)),
-                    child: Transform.scale(
-                      scale: 1.4,
-                      child: Actor(
-                        acts: [
-                          .translateX(from: -40, delay: 1000.ms),
-                        ],
-                        child: Image.network(
-                          'https://picsum.photos/400/300?random=$index',
-                          fit: BoxFit.cover,
-                        ),
+                    child: Actor(
+                      acts: [.parallax(slide: .1,axis: .vertical, reverse: .to(-.1))],
+                      child: Image.network(
+                        'https://picsum.photos/400/300?random=$index',
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
