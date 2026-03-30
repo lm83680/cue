@@ -1,10 +1,10 @@
 part of 'base/act.dart';
 
 class RotateLayoutAct extends TweenAct<double> {
-
+  
   @override
   final ActKey key = const ActKey('RotateLayout');
-  
+
   final RotateUnit unit;
 
   const RotateLayoutAct({
@@ -55,41 +55,30 @@ class RotateLayoutAct extends TweenAct<double> {
 
   @override
   Widget apply(BuildContext ctx, Animation<double> animation, Widget child) {
-    return ListenableBuilder(
-      listenable: animation,
-      child: child,
-      builder: (context, child) {
-        return _RotateLayout(
-          radians: animation.value,
-          child: child,
-        );
-      },
-    );
+    return _RotateLayoutTranstion(animation: animation, child: child);
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is RotateLayoutAct && super == other &&
-        other.unit == unit;
+    return other is RotateLayoutAct && super == other && other.unit == unit;
   }
 
   @override
   int get hashCode => Object.hash(super.hashCode, unit);
-
 }
 
-class _RotateLayout extends SingleChildRenderObjectWidget {
-  final double radians;
+class _RotateLayoutTranstion extends SingleChildRenderObjectWidget {
+  final Animation<double> animation;
 
-  const _RotateLayout({
-    required this.radians,
+  const _RotateLayoutTranstion({
+    required this.animation,
     required super.child,
   });
 
   @override
   _RenderRotateLayout createRenderObject(BuildContext context) {
-    return _RenderRotateLayout(radians);
+    return _RenderRotateLayout(animation);
   }
 
   @override
@@ -97,21 +86,36 @@ class _RotateLayout extends SingleChildRenderObjectWidget {
     BuildContext context,
     _RenderRotateLayout renderObject,
   ) {
-    renderObject.radians = radians;
+    renderObject.animation = animation;
   }
 }
 
 class _RenderRotateLayout extends RenderProxyBox {
+  Animation<double> _animation;
   double _radians;
 
-  _RenderRotateLayout(this._radians);
+  _RenderRotateLayout(this._animation) : _radians = _animation.value {
+    _animation.addListener(_onAnimationChange);
+  }
 
-  double get radians => _radians;
-  set radians(double value) {
+  void _onAnimationChange() {
+    final value = _animation.value;
     if (_radians == value) return;
     _radians = value;
     markNeedsLayout();
   }
+
+  Animation<double> get animation => _animation;
+  set animation(Animation<double> value) {
+    if (_animation == value) return;
+    _animation.removeListener(_onAnimationChange);
+    _animation = value;
+    _radians = value.value;
+    _animation.addListener(_onAnimationChange);
+    markNeedsLayout();
+  }
+
+  double get radians => _radians;
 
   Matrix4 _paintTransform = Matrix4.identity();
 
@@ -159,5 +163,11 @@ class _RenderRotateLayout extends RenderProxyBox {
       (context, offset) => context.paintChild(child!, offset),
       oldLayer: layer is TransformLayer ? layer as TransformLayer? : null,
     );
+  }
+
+  @override
+  void detach() {
+    _animation.removeListener(_onAnimationChange);
+    super.detach();
   }
 }

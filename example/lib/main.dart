@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/horizinally_expanding_cards.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -51,6 +52,8 @@ class _DemoPageState extends State<DemoPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+
+            HorizontallyExpandingCards(),
             CueModalTransition(
               triggerBuilder: (context, open) {
                 return InkWell(
