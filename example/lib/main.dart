@@ -56,6 +56,7 @@ class _OnChangeDemo extends StatefulWidget {
 class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProviderStateMixin {
   Offset offset = Offset.zero;
   late final _controller = CueController(vsync: this, motion: .defaultTime);
+  bool _checked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,35 +70,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // ElevatedButton(
-              //   onPressed: () {
-              //     showCueModalBottomSheet(
-              //       context: context,
-              //       showDragHandle: true,
-              //       enableDrag: true,
-              //       motion: .linear(.4),
-              //       builder: (context) => Container(
-              //         height: 320,
-              //         width: double.infinity,
-              //         margin: const EdgeInsets.only(bottom: 8.0),
-              //         decoration: BoxDecoration(
-              //           borderRadius: BorderRadius.circular(12.0),
-              //         ),
-              //         child: Center(child: Actor(
-              //          motion: .wobbly(),
-              //          reverseMotion: .linear(.4),
-              //           acts: [
-              //             .fadeIn(),
-              //             .slideY(from: -8),
-              //             .zoomIn(from: .0),
-              //           ],
-              //           child: Text('Hello World!'))),
-              //       ),
-              //     );
-              //   },
-              //   child: Text('Show BottomSheet'),
-              // ),
-
               //  SlackStyleFab(),
               //  DeleteConfirmationDialog(),
               // if(false)
@@ -149,39 +121,79 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //     ),
               //   ),
               // ),
-              for (var i = 0; i < 20; i++)
-                Cue.onScroll(
-                  key: ValueKey(i),
-                  child: Container(
-                    height: 220,
-                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                    width: double.infinity,
-                    clipBehavior: .antiAlias,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+              Cue.onToggle(
+                motion: .linear(.5),
+                toggled: _checked,
+                child: Stack(
+                  children: [
+                    Actor(
+                      acts: [
+                        .rotate3D(
+                          from: .zero,
+                          to: Rotation3D(y: 180),
+                          perspective: 0.005,
+                        ),
+                        .fadeOut(motion: .curved(.5, curve: Threshold(0.5))),
+                      ],
+                      child: Box(
+                        size: Size(80, 80),
+                        color: Colors.blue,
+                      ),
+                    ),
+                    Actor(
+                      acts: [
+                        .rotate3D(
+                          from: Rotation3D(y: -180),
+                          to: .zero,
+                          perspective: 0.005,
+                        ),
+                        .fadeIn( motion: .curved(.5, curve: Threshold(0.5))),
+                      ],
+                      child: Box(
+                        size: Size(80, 80),
+                        color: Colors.red.withValues(alpha: .8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _checked = !_checked;
+                  });
+                },
+                child: Text('Toggle'),
+              ),
+              if (false)
+                for (var i = 0; i < 20; i++)
+                  Cue.onScrollVisible(
+                    child: Actor(
+                      acts: [
+                        .rotate3D(
+                          from: Rotation3D(x: -30, y: 0, z: 0),
+                          to: Rotation3D(x: 0, y: 0, z: 0),
+                          alignment: .center,
+                          perspective: .002,
                         ),
                       ],
-                    ),
-                    child: Actor(
-                      motion: .smooth(),
-                      acts: [
-                        // .slideX(from: -1),
-                        .scale(from: 1.0, to: 1.3),
-                        .parallax(slide: .3, axis: .vertical),
-                      ],
-                      child: Image.network(
-                        'https://picsum.photos/400/300?random=$i',
-                        fit: BoxFit.cover,
+                      child: Container(
+                        height: 180,
+                        width: 400,
+                        clipBehavior: .antiAlias,
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        alignment: .center,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: Text(
+                          'Item $i',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                ),
             ],
           ),
         ),

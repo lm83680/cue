@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 typedef ValueTransformer<R, T> = R Function(ActContext context, T value);
 
-abstract class TweenActBase<T extends Object?, R extends Object?> extends AnimtableAct<R, T> {
+abstract class TweenActBase<T extends Object?, R extends Object?> extends AnimtableAct<T, R> {
   final T? from;
   final T? to;
   final Keyframes<T>? frames;

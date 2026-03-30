@@ -2,7 +2,7 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/widgets.dart';
 
-abstract class AnimtableAct<R extends Object?, T extends Object?> extends Act {
+abstract class AnimtableAct<T extends Object?, R extends Object?> extends Act {
   final CueMotion? motion;
   final double delay;
   final ReverseBehaviorBase<T> reverse;
@@ -14,11 +14,13 @@ abstract class AnimtableAct<R extends Object?, T extends Object?> extends Act {
   @override
   CueAnimation<R> buildAnimation(CueTimeline timline, ActContext context) {
     final (animtable, reverseAnimtable) = buildTweens(context);
-    final (track, token) = timline.trackFor(TrackConfig(
-      motion: context.motion,
-      reverseMotion: context.reverseMotion,
-      reverseType: reverse.type,
-    ));
+    final (track, token) = timline.trackFor(
+      TrackConfig(
+        motion: context.motion,
+        reverseMotion: context.reverseMotion,
+        reverseType: reverse.type,
+      ),
+    );
     CueAnimtable<R> effectiveAnimatable = reverseAnimtable == null
         ? animtable
         : DualAnimatable(forward: animtable, reverse: reverseAnimtable);

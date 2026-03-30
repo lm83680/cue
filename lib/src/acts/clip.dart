@@ -5,26 +5,26 @@ abstract class ClipAct extends Act {
     BorderRadiusGeometry borderRadius,
     AlignmentGeometry alignment,
     bool useSuperellipse,
-     CueMotion? motion,
+    CueMotion? motion,
   }) = _ClipEffect;
 
   const factory ClipAct.circular({
     AlignmentGeometry alignment,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = _ClipEffect.circular;
 
   const factory ClipAct.width({
     double fromFactor,
     double toFactor,
     AlignmentGeometry alignment,
-     CueMotion? motion,
+    CueMotion? motion,
   }) = _AxisClipEffect.horizontal;
 
   const factory ClipAct.height({
     double fromFactor,
-     double toFactor,
+    double toFactor,
     AlignmentGeometry alignment,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = _AxisClipEffect.vertical;
 }
 
@@ -67,7 +67,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
       child: child,
     );
   }
-  
+
   @override
   ActKey get key => const ActKey('Clip');
 }
@@ -127,7 +127,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
       child: child,
     );
   }
-  
+
   @override
   ActKey get key => const ActKey('Clip');
 }
@@ -179,6 +179,7 @@ class ExpandingPathClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant ExpandingPathClipper oldClipper) {
     return oldClipper.progress != progress ||
         oldClipper.borderRadius != borderRadius ||
-        oldClipper.alignment != alignment;
+        oldClipper.alignment != alignment ||
+        oldClipper.useSuperellipse != useSuperellipse;
   }
 }

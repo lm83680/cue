@@ -281,6 +281,17 @@ abstract class Act {
     ReverseBehavior<double> reverse,
   }) = RotateAct;
 
+   const factory Act.rotate3D({
+    Rotation3D from,
+    Rotation3D to,
+    CueMotion? motion,
+    Rotate3DUnit unit,
+    double perspective,
+    AlignmentGeometry alignment,
+    double delay,
+    ReverseBehavior<Rotation3D> reverse,
+  }) = Rotate3DAct;
+
   const factory Act.rotateLayout({
     double from,
     double to,

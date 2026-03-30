@@ -249,6 +249,7 @@ class _ParallaxRenderTransform extends RenderProxyBox {
 
     child!.layout(expandedConstraints, parentUsesSize: true);
     size = constraints.constrain(child!.size);
+    print('ParallaxAct: child size = ${child!.size}, parent constraints = $constraints, final size = $size'); // Debug print
 
     _buildAnimationIfNeeded(child!.size, constraints);
     _onTick();
