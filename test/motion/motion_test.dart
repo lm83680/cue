@@ -5,44 +5,44 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('TimedMotion equality', () {
     test('equal instances with same duration', () {
-      const a = TimedMotion(0.3);
-      const b = TimedMotion(0.3);
-      expect(a, equals(b));
+      const a = TimedMotion(Duration(milliseconds: 300));
+      const b = TimedMotion(Duration(milliseconds: 300));
+      expect(a, equals(b)); 
       expect(a.hashCode, equals(b.hashCode));
     });
 
     test('unequal instances with different duration', () {
-      const a = TimedMotion(0.3);
-      const b = TimedMotion(0.5);
+      const a = TimedMotion(Duration(milliseconds: 300));
+      const b = TimedMotion(Duration(milliseconds: 500));
       expect(a, isNot(equals(b)));
     });
 
     test('equal instances with same curve', () {
-      final a = TimedMotion.curved(0.3, curve: Curves.easeIn);
-      final b = TimedMotion.curved(0.3, curve: Curves.easeIn);
+      final a = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.easeIn);
+      final b = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.easeIn);
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
     });
 
     test('unequal instances with different curve', () {
-      final a = TimedMotion.curved(0.3, curve: Curves.easeIn);
-      final b = TimedMotion.curved(0.3, curve: Curves.easeOut);
+      final a = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.easeIn);
+      final b = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.easeOut);
       expect(a, isNot(equals(b)));
     });
 
     test('linear vs curved are not equal', () {
-      const a = TimedMotion(0.3);
-      final b = TimedMotion.curved(0.3, curve: Curves.linear);
+      const a = TimedMotion(Duration(milliseconds: 300));
+      final b = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.linear);
       expect(a, isNot(equals(b)));
     });
 
     test('identical instances are equal', () {
-      const a = TimedMotion(0.3);
+      const a = TimedMotion(Duration(milliseconds: 300));
       expect(a, equals(a));
     });
 
     test('none is equal to zero duration linear', () {
-      expect(CueMotion.none, equals(const TimedMotion(0.0)));
+      expect(CueMotion.none, equals(const TimedMotion(Duration.zero)));
     });
   });
 
@@ -82,7 +82,7 @@ void main() {
       const a = Spring.custom(
         stiffness: 100,
         damping: 10,
-        tolerance: Tolerance(distance: 0.01),
+        tolerance: Tolerance(distance: 0.01), 
       );
       const b = Spring.custom(
         stiffness: 100,
@@ -115,12 +115,12 @@ void main() {
   group('SegmentedMotion equality', () {
     test('equal segmented motions with same list', () {
       const a = SegmentedMotion([
-        TimedMotion(0.2),
-        TimedMotion(0.3),
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
       ]);
       const b = SegmentedMotion([
-        TimedMotion(0.2),
-        TimedMotion(0.3),
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
       ]);
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
@@ -128,23 +128,23 @@ void main() {
 
     test('unequal segmented motions with different list', () {
       const a = SegmentedMotion([
-        TimedMotion(0.2),
-        TimedMotion(0.3),
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
       ]);
       const b = SegmentedMotion([
-        TimedMotion(0.2),
-        TimedMotion(0.4),
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 400)),
       ]);
       expect(a, isNot(equals(b)));
     });
 
     test('unequal segmented motions with different length', () {
       const a = SegmentedMotion([
-        TimedMotion(0.2),
+        TimedMotion(Duration(milliseconds: 200)),
       ]);
       const b = SegmentedMotion([
-        TimedMotion(0.2),
-        TimedMotion(0.3),
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
       ]);
       expect(a, isNot(equals(b)));
     });
@@ -159,73 +159,73 @@ void main() {
     test('nested segmented motions compare deeply', () {
       const a = SegmentedMotion([
         SegmentedMotion([
-          TimedMotion(0.1),
-          TimedMotion(0.2),
+          TimedMotion(Duration(milliseconds: 100)),
+          TimedMotion(Duration(milliseconds: 200)),
         ]),
       ]);
       const b = SegmentedMotion([
         SegmentedMotion([
-          TimedMotion(0.1),
-          TimedMotion(0.2),
+          TimedMotion(Duration(milliseconds: 100)),
+          TimedMotion(Duration(milliseconds: 200)),
         ]),
       ]);
       expect(a, equals(b));
     });
 
     test('identical segmented motion is equal', () {
-      const a = SegmentedMotion([TimedMotion(0.2)]);
+      const a = SegmentedMotion([TimedMotion(Duration(milliseconds: 200))]);
       expect(a, equals(a));
     });
   });
 
   group('DelayedMotion equality', () {
     test('equal delayed motions', () {
-      const a = DelayedMotion(TimedMotion(0.3), 0.1);
-      const b = DelayedMotion(TimedMotion(0.3), 0.1);
+      const a = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 100));
+      const b = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 100));
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
     });
 
     test('unequal delayed motions with different base', () {
-      const a = DelayedMotion(TimedMotion(0.3), 0.1);
-      const b = DelayedMotion(TimedMotion(0.5), 0.1);
+      const a = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 100));
+      const b = DelayedMotion(TimedMotion(Duration(milliseconds: 500)), Duration(milliseconds: 100));
       expect(a, isNot(equals(b)));
     });
 
     test('unequal delayed motions with different delay', () {
-      const a = DelayedMotion(TimedMotion(0.3), 0.1);
-      const b = DelayedMotion(TimedMotion(0.3), 0.2);
+      const a = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 100));
+      const b = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 200));
       expect(a, isNot(equals(b)));
     });
 
     test('delayed spring vs delayed timed are not equal', () {
-      const a = DelayedMotion(TimedMotion(0.3), 0.1);
-      const b = DelayedMotion(Spring.smooth(), 0.1);
+      const a = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 100));
+      const b = DelayedMotion(Spring.smooth(), Duration(milliseconds: 100));
       expect(a, isNot(equals(b)));
     });
 
     test('identical delayed motion is equal', () {
-      const a = DelayedMotion(TimedMotion(0.3), 0.1);
+      const a = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration(milliseconds: 100));
       expect(a, equals(a));
     });
   });
 
   group('Cross-type inequality', () {
     test('TimedMotion is not equal to Spring', () {
-      const a = TimedMotion(0.3);
+      const a = TimedMotion(Duration(milliseconds: 300));
       const b = Spring.smooth();
       expect(a, isNot(equals(b)));
     });
 
     test('TimedMotion is not equal to SegmentedMotion', () {
-      const a = TimedMotion(0.3);
-      const b = SegmentedMotion([TimedMotion(0.3)]);
+      const a = TimedMotion(Duration(milliseconds: 300));
+      const b = SegmentedMotion([TimedMotion(Duration(milliseconds: 300))]);
       expect(a, isNot(equals(b)));
     });
 
     test('TimedMotion is not equal to DelayedMotion', () {
-      const a = TimedMotion(0.3);
-      const b = DelayedMotion(TimedMotion(0.3), 0.0);
+      const a = TimedMotion(Duration(milliseconds: 300));
+      const b = DelayedMotion(TimedMotion(Duration(milliseconds: 300)), Duration.zero);
       expect(a, isNot(equals(b)));
     });
 

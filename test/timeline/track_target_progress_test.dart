@@ -1,7 +1,7 @@
 // Tests that verify track.prepare(target: ...) correctly reports progress
 // back to the target value, not always to 1.0 or 0.0
 
-import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +11,7 @@ void main() {
 
   group('CueTrack target progress —', () {
     test('animateTo(0.8) reports progress = 0.8 when done', () {
-      final motion = CueMotion.linear(0.3);
+      final motion = CueMotion.linear(300.ms);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 
       track.prepare(forward: true, from: 0.0, target: 0.8);
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('animateTo(0.5) from 0.2 reports correct progress', () {
-      final motion = CueMotion.linear(0.2);
+      final motion = CueMotion.linear(200.ms);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 
       track.prepare(forward: true, from: 0.2, target: 0.5);
@@ -47,7 +47,7 @@ void main() {
     });
 
     test('animateTo(0.3) reverse reports correct progress', () {
-      final motion = CueMotion.linear(0.2);
+      final motion = CueMotion.linear(200.ms);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 
       track.prepare(forward: false, from: 0.7, target: 0.3);
@@ -65,7 +65,7 @@ void main() {
     });
 
     test('target = null defaults to full range (forward to 1.0)', () {
-      final motion = CueMotion.linear(0.2);
+      final motion = CueMotion.linear(200.ms);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 
       track.prepare(forward: true, from: 0.0);
@@ -81,7 +81,7 @@ void main() {
     });
 
     test('target = null defaults to full range (reverse to 0.0)', () {
-      final motion = CueMotion.linear(0.2);
+      final motion = CueMotion.linear(200.ms);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 
       track.prepare(forward: false, from: 1.0);
@@ -97,7 +97,7 @@ void main() {
     });
 
     test('progress interpolates correctly during animation', () {
-      final motion = CueMotion.linear(0.1);
+      final motion = CueMotion.linear(200.ms);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 
       track.prepare(forward: true, from: 0.2, target: 0.7);
@@ -113,8 +113,8 @@ void main() {
 
     test('segmented motion with target reports correct progress', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(0.1),
-        CueMotion.linear(0.2),
+        CueMotion.linear(100.ms),
+        CueMotion.linear(200.ms),
       ]);
       final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
 

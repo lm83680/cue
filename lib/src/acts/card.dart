@@ -302,7 +302,7 @@ class CardActor extends StatelessWidget {
   final Widget? child;
   final CueMotion? motion;
   final ReverseBehavior<CardProps> reverse;
-  final double delay;
+  final Duration delay;
 
   const CardActor({
     super.key,
@@ -318,7 +318,7 @@ class CardActor extends StatelessWidget {
     this.child,
     this.motion,
     this.reverse = const ReverseBehavior.mirror(),
-    this.delay = 0.0,
+    this.delay = Duration.zero,
   }) : assert(
          shape == null || borderRadius == null,
          'Cannot specify both shape and borderRadius. '

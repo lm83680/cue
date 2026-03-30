@@ -43,7 +43,7 @@ abstract class Act {
     required double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = ScaleAct;
 
   const factory Act.zoomIn({
@@ -63,7 +63,7 @@ abstract class Act {
     required Stretch to,
     CueMotion? motion,
     ReverseBehavior<Stretch> reverse,
-    double delay,
+    Duration delay,
   }) = StretchAct;
 
   const factory Act.fractionalSize({
@@ -78,15 +78,14 @@ abstract class Act {
     Offset to,
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
-    double delay,
+    Duration delay,
   }) = TranslateAct;
-
 
   const factory Act.parallax({
     required double slide,
     Axis axis,
     CueMotion? motion,
-    double delay,
+    Duration delay,
     ReverseBehavior<double> reverse,
   }) = ParallaxAct;
 
@@ -94,7 +93,7 @@ abstract class Act {
     double from,
     double to,
     CueMotion? motion,
-    double delay,
+    Duration delay,
     ReverseBehavior<double> reverse,
   }) = TranslateAct.fromX;
 
@@ -135,7 +134,7 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = SlideAct.fromX;
 
   const factory Act.slideY({
@@ -143,7 +142,7 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = SlideAct.y;
 
   const factory Act.slideUp({
@@ -192,7 +191,7 @@ abstract class Act {
     EdgeInsetsGeometry from,
     EdgeInsetsGeometry to,
     CueMotion? motion,
-    double delay,
+    Duration delay,
     ReverseBehavior<EdgeInsetsGeometry> reverse,
   }) = PaddingAct;
 
@@ -232,7 +231,7 @@ abstract class Act {
     AnimatableValue<double>? height,
     AlignmentGeometry alignment,
     CueMotion? motion,
-    double delay,
+    Duration delay,
   }) = SizedBoxAct;
 
   const factory Act.sizedClip({
@@ -276,19 +275,19 @@ abstract class Act {
     CueMotion? motion,
     RotateUnit unit,
     RotateAxis axis,
-    double delay,
+    Duration delay,
     AlignmentGeometry alignment,
     ReverseBehavior<double> reverse,
   }) = RotateAct;
 
-   const factory Act.rotate3D({
+  const factory Act.rotate3D({
     Rotation3D from,
     Rotation3D to,
     CueMotion? motion,
     Rotate3DUnit unit,
     double perspective,
     AlignmentGeometry alignment,
-    double delay,
+    Duration delay,
     ReverseBehavior<Rotation3D> reverse,
   }) = Rotate3DAct;
 
@@ -314,7 +313,7 @@ abstract class Act {
     Offset? origin,
     CueMotion? motion,
     ReverseBehavior<Skew> reverse,
-    double delay,
+    Duration delay,
   }) = SkewAct;
 
   const factory Act.textStyle({
@@ -358,16 +357,16 @@ abstract class Act {
 class ActContext {
   final CueMotion motion;
   final CueMotion reverseMotion;
-  final double delay;
-  final double reverseDelay;
+  final Duration delay;
+  final Duration reverseDelay;
   final TextDirection textDirection;
   final Object? implicitFrom;
 
   const ActContext({
     required this.motion,
     required this.reverseMotion,
-    this.delay = 0.0,
-    this.reverseDelay = 0.0,
+    this.delay = Duration.zero,
+    this.reverseDelay = Duration.zero,
     this.textDirection = TextDirection.ltr,
     this.implicitFrom,
   });
@@ -377,8 +376,8 @@ class ActContext {
     Object? implicitFrom,
     CueMotion? motion,
     CueMotion? reverseMotion,
-    double? delay,
-    double? reverseDelay,
+    Duration? delay,
+    Duration? reverseDelay,
   }) {
     return ActContext(
       motion: motion ?? this.motion,

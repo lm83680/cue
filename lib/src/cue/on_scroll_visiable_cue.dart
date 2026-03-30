@@ -23,7 +23,7 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
   CueTimeline get timeline => _controller.timeline;
 
   late final _controller = CueController(
-    motion: .linear(1.0),
+    motion: const .linear(Duration(milliseconds: 300)),
     vsync: this,
     progressDriven: true,
   );

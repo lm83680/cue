@@ -78,7 +78,7 @@ sealed class Keyframes<T> {
 
   const factory Keyframes.fractional(
     List<FractionalKeyframe<T>> frames, {
-    double? duration,
+    Duration? duration,
   }) = FractionalKeyframes<T>;
 
   T get lastTarget;
@@ -143,7 +143,7 @@ final class MotionKeyframes<T> implements Keyframes<T> {
 
 final class FractionalKeyframes<T> implements Keyframes<T> {
   final List<FractionalKeyframe<T>> frames;
-  final double? duration;
+  final Duration? duration;
   const FractionalKeyframes(this.frames, {this.duration});
 
   @override
@@ -181,7 +181,7 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
     return frames.last.value;
   }
 
-  List<CueMotion> extractMotion({bool includeFirst = false, required double duration}) {
+  List<CueMotion> extractMotion({bool includeFirst = false, required Duration duration}) {
     // Remove duplicates (keep last) and track curves
     final Map<double, Curve?> frameCurves = {};
 
@@ -196,14 +196,15 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
 
     if (sortedTimes.isEmpty || (!includeFirst && sortedTimes.length < 2)) return [];
 
-
     final List<CueMotion> motions = [];
 
     // Add motion to first frame if requested
     if (includeFirst) {
       final firstTime = sortedTimes.first;
       final firstCurve = frameCurves[firstTime] ?? Curves.linear;
-      motions.add(CueMotion.curved(duration * firstTime, curve: firstCurve));
+      motions.add(
+        CueMotion.curved(Duration(milliseconds: (duration.inMilliseconds * firstTime).round()), curve: firstCurve),
+      );
     }
 
     // Add motions between consecutive frames
@@ -212,7 +213,7 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
       final nextTime = sortedTimes[i + 1];
       final weight = nextTime - currentTime;
       final curve = frameCurves[nextTime] ?? Curves.linear;
-      motions.add(CueMotion.curved(duration * weight, curve: curve));
+      motions.add(CueMotion.curved(Duration(milliseconds: (duration.inMilliseconds * weight).round()), curve: curve));
     }
 
     return motions;

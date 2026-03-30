@@ -10,7 +10,7 @@ void main() {
     group('Progress setting and normalization', () {
       test('setProgress correctly normalizes and stores progress value', () {
         // Create a track with a linear motion
-        final motion = CueMotion.linear(.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -29,7 +29,7 @@ void main() {
 
       test('setProgress converts normalized progress to correct animation value', () {
         // Create a track with a linear motion
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -48,7 +48,7 @@ void main() {
 
       test('setProgress with non-linear motion correctly maps progress to values', () {
         // Create a track with an easeIn motion
-        final motion = CueMotion.curved(0.3, curve: Curves.easeIn);
+        final motion = CueMotion.curved(300.ms, curve: Curves.easeIn);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -65,7 +65,7 @@ void main() {
 
       test('setProgress with reverse direction correctly maps values', () {
         // Create a track with a linear motion
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -83,8 +83,8 @@ void main() {
 
       test('setProgress with different forward and reverse motions', () {
         // Create a track with different forward and reverse motions
-        final forwardMotion = CueMotion.linear(0.3);
-        final reverseMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
+        final forwardMotion = CueMotion.linear(300.ms);
+        final reverseMotion = CueMotion.curved(500.ms, curve: Curves.easeInOut);
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
         final track = CueTrackImpl(config);
 
@@ -108,7 +108,7 @@ void main() {
       // The SpringMotion class has dependencies that are causing initialization issues
       test('setProgress with linear motion as proxy for spring', () {
         // Instead of a spring, use a linear motion for the test
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -138,7 +138,7 @@ void main() {
 
     group('valueAtProgress conversion', () {
       test('_valueAtProgress correctly maps progress to simulation value for linear motion', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -165,7 +165,7 @@ void main() {
       });
 
       test('_valueAtProgress correctly maps progress for curved motion', () {
-        final motion = CueMotion.curved(0.3, curve: Curves.easeInOut);
+        final motion = CueMotion.curved(300.ms, curve: Curves.easeInOut);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -194,7 +194,7 @@ void main() {
 
     group('Edge cases and validation', () {
       test('setProgress throws assertion error for out-of-range values', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -204,7 +204,7 @@ void main() {
       });
 
       test('setProgress handles edge values 0.0 and 1.0 correctly', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -230,7 +230,7 @@ void main() {
       });
 
       test('setProgress with very small increment works correctly', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -248,7 +248,7 @@ void main() {
 
     group('Track status and behavior', () {
       test('status updates correctly when progress changes', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -273,7 +273,7 @@ void main() {
       });
 
       test('isDone flag is correctly set', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -301,7 +301,7 @@ void main() {
 
     group('ReverseBehaviorType', () {
       test('reverseType.isExclusive controls forward animation', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion, reverseType: ReverseBehaviorType.exclusive);
         final track = CueTrackImpl(config);
 
@@ -315,7 +315,7 @@ void main() {
       });
 
       test('reverseType.isNone controls reverse animation', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion, reverseType: ReverseBehaviorType.none);
         final track = CueTrackImpl(config);
 
@@ -426,7 +426,7 @@ void main() {
 
       test('spring motion with custom parameters', () {
         final motion = CueMotion.spring(
-          duration: .4,
+          duration: 400.ms,
           bounce: 0.2,
         );
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -460,8 +460,8 @@ void main() {
 
     group('Delayed motions', () {
       test('forward motion with delay stays at 0 during delay period', () {
-        final baseMotion = CueMotion.linear(0.3);
-        final delayedMotion = baseMotion.delayed(0.1);
+        final baseMotion = CueMotion.linear(300.ms);
+        final delayedMotion = baseMotion.delayed(100.ms);
         final config = TrackConfig(motion: delayedMotion, reverseMotion: delayedMotion);
         final track = CueTrackImpl(config);
 
@@ -485,10 +485,10 @@ void main() {
       });
 
       test('forward with delay, reverse with no delay asymmetry', () {
-        final baseForwardMotion = CueMotion.linear(0.3);
-        final delayedForwardMotion = baseForwardMotion.delayed(0.1);
+        final baseForwardMotion = CueMotion.linear(300.ms);
+        final delayedForwardMotion = baseForwardMotion.delayed(100.ms);
 
-        final baseReverseMotion = CueMotion.linear(0.3);
+        final baseReverseMotion = CueMotion.linear(300.ms);
         // No delay on reverse
 
         final config = TrackConfig(
@@ -528,7 +528,7 @@ void main() {
 
       test('delayed spring motion with smooth preset', () {
         final baseMotion = CueMotion.smooth();
-        final delayedMotion = baseMotion.delayed(0.15);
+        final delayedMotion = baseMotion.delayed(150.ms);
         final config = TrackConfig(motion: delayedMotion, reverseMotion: delayedMotion);
         final track = CueTrackImpl(config);
 
@@ -552,7 +552,7 @@ void main() {
 
       test('delayed bouncy spring motion', () {
         final baseMotion = CueMotion.bouncy();
-        final delayedMotion = baseMotion.delayed(0.1);
+        final delayedMotion = baseMotion.delayed(100.ms);
         final config = TrackConfig(motion: delayedMotion, reverseMotion: delayedMotion);
         final track = CueTrackImpl(config);
 
@@ -564,13 +564,13 @@ void main() {
         expect(track.value, closeTo(1.0, 0.01));
 
         // Duration should include delay
-        expect(track.forwardDuration, greaterThan(0.1));
+        expect(track.forwardDuration, greaterThan(.1));
       });
 
       test('multiple delays can be chained', () {
-        final baseMotion = CueMotion.linear(.2);
-        final delayed1 = baseMotion.delayed(0.1);
-        final delayed2 = delayed1.delayed(0.05);
+        final baseMotion = CueMotion.linear(200.ms);
+        final delayed1 = baseMotion.delayed(100.ms);
+        final delayed2 = delayed1.delayed(50.ms);
 
         final config = TrackConfig(motion: delayed2, reverseMotion: delayed2);
         final track = CueTrackImpl(config);
@@ -592,10 +592,10 @@ void main() {
 
       test('delayed curved motion', () {
         final baseMotion = CueMotion.curved(
-          0.3,
+          300.ms,
           curve: Curves.easeInOut,
         );
-        final delayedMotion = baseMotion.delayed(0.1);
+        final delayedMotion = baseMotion.delayed(100.ms);
         final config = TrackConfig(motion: delayedMotion, reverseMotion: delayedMotion);
         final track = CueTrackImpl(config);
 
@@ -617,7 +617,7 @@ void main() {
 
     group('Edge cases with simulation validation', () {
       test('track value matches simulation valueAtProgress for linear motion', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -637,7 +637,7 @@ void main() {
       });
 
       test('track value matches simulation valueAtProgress for curved motion', () {
-        final motion = CueMotion.curved(.4, curve: Curves.easeInOut);
+        final motion = CueMotion.curved(400.ms, curve: Curves.easeInOut);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -675,8 +675,8 @@ void main() {
       });
 
       test('track value matches simulation valueAtProgress for delayed motion', () {
-        final baseMotion = CueMotion.linear(0.3);
-        final motion = baseMotion.delayed(0.1);
+        final baseMotion = CueMotion.linear(300.ms);
+        final motion = baseMotion.delayed(100.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -695,7 +695,7 @@ void main() {
       });
 
       test('track value matches simulation in reverse direction', () {
-        final motion = CueMotion.curved(0.3, curve: Curves.easeIn);
+        final motion = CueMotion.curved(300.ms, curve: Curves.easeIn);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -715,8 +715,8 @@ void main() {
       });
 
       test('track with different forward and reverse motions matches respective simulations', () {
-        final forwardMotion = CueMotion.linear(0.3);
-        final reverseMotion = CueMotion.curved(.5, curve: Curves.easeOut);
+        final forwardMotion = CueMotion.linear(300.ms);
+        final reverseMotion = CueMotion.curved(500.ms, curve: Curves.easeOut);
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
         final track = CueTrackImpl(config);
 
@@ -735,7 +735,7 @@ void main() {
 
       test('delayed spring motion matches simulation valueAtProgress', () {
         final baseMotion = CueMotion.bouncy();
-        final motion = baseMotion.delayed(0.15);
+        final motion = baseMotion.delayed(150.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -755,7 +755,7 @@ void main() {
       });
 
       test('progress boundary values are exact', () {
-        final motion = CueMotion.curved(0.3, curve: Curves.fastOutSlowIn);
+        final motion = CueMotion.curved(300.ms, curve: Curves.fastOutSlowIn);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -770,7 +770,7 @@ void main() {
       });
 
       test('monotonic progress produces monotonic values for linear motion', () {
-        final motion = CueMotion.linear(0.3);
+        final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -809,8 +809,8 @@ void main() {
       });
 
       test('delayed motion with zero delay behaves like base motion', () {
-        final baseMotion = CueMotion.linear(0.3);
-        final delayedMotion = baseMotion.delayed(0.0);
+        final baseMotion = CueMotion.linear(300.ms);
+        final delayedMotion = baseMotion.delayed(.zero);
 
         final baseConfig = TrackConfig(motion: baseMotion, reverseMotion: baseMotion);
         final baseTrack = CueTrackImpl(baseConfig);
@@ -855,8 +855,8 @@ void main() {
       });
 
       test('delayed motion progress mapping during delay transition', () {
-        final baseMotion = CueMotion.linear(0.3);
-        final motion = baseMotion.delayed(0.1);
+        final baseMotion = CueMotion.linear(300.ms);
+        final motion = baseMotion.delayed(100.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -918,8 +918,8 @@ void main() {
 
       test('delayed curved motion with extreme delay ratio', () {
         // Delay that's longer than the base animation
-        final baseMotion = CueMotion.curved(0.1, curve: Curves.easeIn);
-        final motion = baseMotion.delayed(.4);
+        final baseMotion = CueMotion.curved(100.ms, curve: Curves.easeIn);
+        final motion = baseMotion.delayed(400.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final track = CueTrackImpl(config);
 
@@ -943,7 +943,7 @@ void main() {
 
       test('spring motion with custom parameters matches simulation precisely', () {
         final motion = CueMotion.spring(
-          duration: 0.35,
+          duration: 350.ms,
           bounce: 0.15,
         );
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -964,8 +964,8 @@ void main() {
       });
 
       test('reverse motion with delay on forward only', () {
-        final forwardMotion = CueMotion.linear(0.3).delayed(.2);
-        final reverseMotion = CueMotion.linear(0.3); // No delay
+        final forwardMotion = CueMotion.linear(300.ms).delayed(60.ms);
+        final reverseMotion = CueMotion.linear(300.ms); // No delay
 
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
         final track = CueTrackImpl(config);
@@ -987,8 +987,8 @@ void main() {
 
     group('SegmentedMotion tests', () {
       test('two-segment linear motion maps progress and phase correctly', () {
-        final segment1 = CueMotion.linear(.2);
-        final segment2 = CueMotion.linear(0.3);
+        final segment1 = CueMotion.linear(200.ms);
+        final segment2 = CueMotion.linear(300.ms);
         final motion = SegmentedMotion([segment1, segment2]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1025,9 +1025,9 @@ void main() {
       });
 
       test('three-segment motion with different durations and phase transitions', () {
-        final segment1 = CueMotion.linear(0.1); // 100ms
-        final segment2 = CueMotion.linear(.2); // 200ms
-        final segment3 = CueMotion.linear(.2); // 200ms
+        final segment1 = CueMotion.linear(100.ms); // 100ms
+        final segment2 = CueMotion.linear(200.ms); // 200ms
+        final segment3 = CueMotion.linear(200.ms); // 200ms
         final motion = SegmentedMotion([segment1, segment2, segment3]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1074,8 +1074,8 @@ void main() {
       });
 
       test('segmented motion with curves validates against simulation', () {
-        final segment1 = CueMotion.curved(.2, curve: Curves.easeIn);
-        final segment2 = CueMotion.curved(0.3, curve: Curves.easeOut);
+        final segment1 = CueMotion.curved(200.ms, curve: Curves.easeIn);
+        final segment2 = CueMotion.curved(300.ms, curve: Curves.easeOut);
         final motion = SegmentedMotion([segment1, segment2]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1133,8 +1133,8 @@ void main() {
       });
 
       test('segmented motion in reverse direction', () {
-        final segment1 = CueMotion.linear(.2);
-        final segment2 = CueMotion.linear(0.3);
+        final segment1 = CueMotion.linear(200.ms);
+        final segment2 = CueMotion.linear(300.ms);
         final motion = SegmentedMotion([segment1, segment2]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1162,9 +1162,9 @@ void main() {
       });
 
       test('segmented motion with unequal durations tracks phases correctly', () {
-        final segment1 = CueMotion.linear(0.1); // 100ms
-        final segment2 = CueMotion.linear(.4); // 400ms
-        final segment3 = CueMotion.linear(0.1); // 100ms
+        final segment1 = CueMotion.linear(100.ms); // 100ms
+        final segment2 = CueMotion.linear(400.ms); // 400ms
+        final segment3 = CueMotion.linear(100.ms); // 100ms
         final motion = SegmentedMotion([segment1, segment2, segment3]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1208,8 +1208,8 @@ void main() {
       });
 
       test('segmented motion phase boundary precision', () {
-        final segment1 = CueMotion.linear(0.25);
-        final segment2 = CueMotion.linear(0.25);
+        final segment1 = CueMotion.linear(250.ms);
+        final segment2 = CueMotion.linear(250.ms);
         final motion = SegmentedMotion([segment1, segment2]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1234,8 +1234,8 @@ void main() {
       });
 
       test('segmented motion with delayed segments', () {
-        final segment1 = CueMotion.linear(.2).delayed(0.1);
-        final segment2 = CueMotion.linear(0.3);
+        final segment1 = CueMotion.linear(200.ms).delayed(100.ms);
+        final segment2 = CueMotion.linear(300.ms);
         final motion = SegmentedMotion([segment1, segment2]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1267,10 +1267,10 @@ void main() {
 
       test('four-segment complex motion with mixed types', () {
         final motion = SegmentedMotion([
-          CueMotion.linear(0.1),
-          CueMotion.curved(0.15, curve: Curves.easeIn),
+          CueMotion.linear(100.ms),
+          CueMotion.curved(150.ms, curve: Curves.easeIn),
           CueMotion.smooth(),
-          CueMotion.linear(0.1),
+          CueMotion.linear(100.ms),
         ]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1288,7 +1288,7 @@ void main() {
       });
 
       test('single segment behaves like non-segmented motion', () {
-        final singleSegment = CueMotion.linear(0.3);
+        final singleSegment = CueMotion.linear(300.ms);
         final segmentedMotion = SegmentedMotion([singleSegment]);
 
         final segmentedTrack = CueTrackImpl(TrackConfig(motion: segmentedMotion, reverseMotion: segmentedMotion));
@@ -1306,8 +1306,8 @@ void main() {
 
       test('segmented motion values match simulation across all segments', () {
         final motion = SegmentedMotion([
-          CueMotion.linear(.2),
-          CueMotion.linear(0.3),
+          CueMotion.linear(200.ms),
+          CueMotion.linear(300.ms),
         ]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1326,9 +1326,9 @@ void main() {
 
       test('mixed spring and timed segments with phase validation', () {
         final motion = SegmentedMotion([
-          CueMotion.linear(0.1),
+          CueMotion.linear(100.ms),
           CueMotion.smooth(),
-          CueMotion.curved(0.15, curve: Curves.fastOutSlowIn),
+          CueMotion.curved(150.ms, curve: Curves.fastOutSlowIn),
           CueMotion.bouncy(),
         ]);
 
@@ -1348,9 +1348,9 @@ void main() {
 
       test('reverse phase tracking matches simulation', () {
         final motion = SegmentedMotion([
-          CueMotion.linear(.2),
-          CueMotion.curved(0.3, curve: Curves.easeInOut),
-          CueMotion.linear(0.1),
+          CueMotion.linear(200.ms),
+          CueMotion.curved(300.ms, curve: Curves.easeInOut),
+          CueMotion.linear(100.ms),
         ]);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1366,7 +1366,7 @@ void main() {
       });
 
       test('many segments stress test', () {
-        final segments = List.generate(10, (_) => CueMotion.linear(0.05));
+        final segments = List.generate(10, (_) => CueMotion.linear(50.ms));
         final motion = SegmentedMotion(segments);
 
         final config = TrackConfig(motion: motion, reverseMotion: motion);
@@ -1406,14 +1406,14 @@ void main() {
       test('different forward and reverse segmented motions with same phase count', () {
         // Forward: 2 segments
         final forwardMotion = SegmentedMotion([
-          CueMotion.linear(.2), // 200ms
-          CueMotion.curved(0.3, curve: Curves.easeIn), // 300ms
+          CueMotion.linear(200.ms), // 200ms
+          CueMotion.curved(300.ms, curve: Curves.easeIn), // 300ms
         ]);
 
         // Reverse: 2 segments with different durations
         final reverseMotion = SegmentedMotion([
-          CueMotion.curved(.4, curve: Curves.easeOut), // 400ms
-          CueMotion.linear(0.1), // 100ms
+          CueMotion.curved(400.ms, curve: Curves.easeOut), // 400ms
+          CueMotion.linear(100.ms), // 100ms
         ]);
 
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
@@ -1472,15 +1472,15 @@ void main() {
       test('different forward and reverse segmented motions with different phase counts', () {
         // Forward: 3 segments
         final forwardMotion = SegmentedMotion([
-          CueMotion.linear(0.1),
-          CueMotion.linear(.2),
-          CueMotion.linear(0.3),
+          CueMotion.linear(100.ms),
+          CueMotion.linear(200.ms),
+          CueMotion.linear(300.ms),
         ]);
 
         // Reverse: 2 segments
         final reverseMotion = SegmentedMotion([
-          CueMotion.curved(.4, curve: Curves.easeInOut),
-          CueMotion.linear(.2),
+          CueMotion.curved(400.ms, curve: Curves.easeInOut),
+          CueMotion.linear(200.ms),
         ]);
 
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
@@ -1547,16 +1547,16 @@ void main() {
       test('forward 4 segments vs reverse 2 segments with phase tracking', () {
         // Forward: 4 small segments
         final forwardMotion = SegmentedMotion([
-          CueMotion.linear(0.1),
-          CueMotion.linear(0.1),
-          CueMotion.linear(0.1),
-          CueMotion.linear(0.1),
+          CueMotion.linear(100.ms),
+          CueMotion.linear(100.ms),
+          CueMotion.linear(100.ms),
+          CueMotion.linear(100.ms),
         ]);
 
         // Reverse: 2 large segments
         final reverseMotion = SegmentedMotion([
-          CueMotion.curved(0.3, curve: Curves.easeIn),
-          CueMotion.linear(0.1),
+          CueMotion.curved(300.ms, curve: Curves.easeIn),
+          CueMotion.linear(100.ms),
         ]);
 
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
@@ -1608,14 +1608,14 @@ void main() {
       test('forward single segment vs reverse multiple segments', () {
         // Forward: single segment
         final forwardMotion = SegmentedMotion([
-          CueMotion.curved(.5, curve: Curves.linear),
+          CueMotion.curved(500.ms, curve: Curves.linear),
         ]);
 
         // Reverse: 3 segments
         final reverseMotion = SegmentedMotion([
-          CueMotion.linear(.2),
+          CueMotion.linear(200.ms),
           CueMotion.smooth(),
-          CueMotion.linear(0.1),
+          CueMotion.linear(100.ms),
         ]);
 
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);
@@ -1652,8 +1652,8 @@ void main() {
       test('forward multiple segments vs reverse single segment', () {
         // Forward: 3 segments
         final forwardMotion = SegmentedMotion([
-          CueMotion.linear(0.1),
-          CueMotion.curved(.2, curve: Curves.easeInOut),
+          CueMotion.linear(100.ms),
+          CueMotion.curved(200.ms, curve: Curves.easeInOut),
           CueMotion.bouncy(),
         ]);
 
@@ -1697,15 +1697,15 @@ void main() {
       test('asymmetric segments with delays in forward and reverse', () {
         // Forward: 2 segments, first has delay
         final forwardMotion = SegmentedMotion([
-          CueMotion.linear(.2).delayed(0.1),
-          CueMotion.linear(0.3),
+          CueMotion.linear(200.ms).delayed(100.ms),
+          CueMotion.linear(300.ms),
         ]);
 
         // Reverse: 3 segments, no delays
         final reverseMotion = SegmentedMotion([
-          CueMotion.linear(.2),
-          CueMotion.linear(.2),
-          CueMotion.linear(.2),
+          CueMotion.linear(200.ms),
+          CueMotion.linear(200.ms),
+          CueMotion.linear(200.ms),
         ]);
 
         final config = TrackConfig(motion: forwardMotion, reverseMotion: reverseMotion);

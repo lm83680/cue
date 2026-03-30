@@ -9,7 +9,7 @@ abstract class CueMotion {
 
   int get totalPhases => 1;
 
-  double get baseDuration;
+  Duration get baseDuration;
 
   CueSimulation build(SimulationBuildData data);
 
@@ -22,21 +22,21 @@ abstract class CueMotion {
 
   bool get isSimulation => this is SimulationMotion;
 
-  CueMotion delayed(double delay) => DelayedMotion(this, delay);
+  CueMotion delayed(Duration delay) => DelayedMotion(this, delay);
 
   const factory CueMotion.curved(
-    double duration, {
+    Duration duration, {
     required Curve curve,
   }) = TimedMotion.curved;
 
-  const factory CueMotion.linear(double duration) = TimedMotion;
+  const factory CueMotion.linear(Duration duration) = TimedMotion;
 
-  static const none = TimedMotion(0.0);
+  static const none = TimedMotion(Duration.zero);
 
-  static const CueMotion defaultTime = TimedMotion(0.3);
+  static const CueMotion defaultTime = TimedMotion(Duration(milliseconds: 300));
 
   factory CueMotion.spring({
-    double duration,
+    Duration duration,
     double bounce,
   }) = Spring;
 
@@ -95,7 +95,7 @@ class TimedMotion extends CueMotion {
   const TimedMotion.curved(this.baseDuration, {required Curve this.curve});
 
   @override
-  final double baseDuration;
+  final Duration baseDuration;
 
   @override
   bool operator ==(Object other) =>
@@ -111,7 +111,7 @@ class TimedMotion extends CueMotion {
   @override
   CueSimulation build(SimulationBuildData data) {
     return CurvedSimulation(
-      baseDuration: baseDuration,
+      baseDuration: baseDuration.inMilliseconds / 1000.0,
       curve: curve ?? Curves.linear,
       from: data.startValue,
       to: data.endValue,
@@ -137,8 +137,8 @@ class SegmentedMotion extends CueMotion {
   const SegmentedMotion(this.motions);
 
   @override
-  double get baseDuration => motions.fold(
-    0.0,
+  Duration get baseDuration => motions.fold(
+    Duration.zero,
     (total, motion) => total + motion.baseDuration,
   );
 
@@ -170,25 +170,25 @@ class SegmentedMotion extends CueMotion {
 @visibleForTesting
 class DelayedMotion extends CueMotion {
   final CueMotion base;
-  final double delay;
+  final Duration delay;
   const DelayedMotion(this.base, this.delay);
 
   @override
-  CueMotion delayed(double delay) => DelayedMotion(base, delay + this.delay);
+  CueMotion delayed(Duration delay) => DelayedMotion(base, delay + this.delay);
 
   @override
-  double get baseDuration => base.baseDuration + delay;
+  Duration get baseDuration => base.baseDuration + delay;
 
   @override
   CueSimulation build(SimulationBuildData data) {
     final baseSim = base.build(data);
-     double delay = this.delay;
+    double delaySeconds = delay.inMilliseconds / Duration.millisecondsPerSecond;
     if (data.startProgress case final progress?) {
-      final totalDuration = delay + baseSim.duration;
+      final totalDuration = delaySeconds + baseSim.duration;
       final elapsedTime = data.forward ? progress * totalDuration : (1.0 - progress) * totalDuration;
-      delay = (delay - elapsedTime).clamp(0.0, double.infinity);
+      delaySeconds = (delaySeconds - elapsedTime).clamp(0.0, double.infinity);
     }
-    return DelayedSimulation(base: baseSim, delay: delay);
+    return DelayedSimulation(base: baseSim, delay: delaySeconds);
   }
 
   @override

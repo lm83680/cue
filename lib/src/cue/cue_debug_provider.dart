@@ -56,7 +56,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _controller = CueController(vsync: this, motion: .linear(0.3));
+    _controller = CueController(vsync: this, motion: .linear(300.ms));
   }
 
   void _startAutoPlay() {

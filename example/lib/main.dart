@@ -1,13 +1,6 @@
 import 'dart:math';
 
 import 'package:cue/cue.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/expanding_cards.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
-import 'package:example/examples/indicator_to_button.dart';
-import 'package:example/examples/options_button.dart';
-import 'package:example/examples/slack_style_fab.dart';
-import 'package:example/examples/three_dots_action.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -122,7 +115,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //   ),
               // ),
               Cue.onToggle(
-                motion: .linear(.5),
+                motion: .linear(500.ms),
                 toggled: _checked,
                 child: Stack(
                   children: [
@@ -133,7 +126,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                           to: Rotation3D(y: 180),
                           perspective: 0.005,
                         ),
-                        .fadeOut(motion: .curved(.5, curve: Threshold(0.5))),
+                        .fadeOut(motion: .curved(500.ms, curve: Threshold(0.5))),
                       ],
                       child: Box(
                         size: Size(80, 80),
@@ -147,7 +140,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                           to: .zero,
                           perspective: 0.005,
                         ),
-                        .fadeIn( motion: .curved(.5, curve: Threshold(0.5))),
+                        .fadeIn( motion: .curved(500.ms, curve: Threshold(0.5))),
                       ],
                       child: Box(
                         size: Size(80, 80),

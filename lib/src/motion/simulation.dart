@@ -145,11 +145,11 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     _duration = _current.duration;
     if (_forward) {
       for (int i = initialPhase + 1; i <= this.endPhase; i++) {
-        _duration += motions[i].baseDuration;
+        _duration += motions[i].baseDuration.inMilliseconds / 1000.0;
       }
     } else {
       for (int i = this.endPhase; i < initialPhase; i++) {
-        _duration += motions[i].baseDuration;
+        _duration += motions[i].baseDuration.inMilliseconds / 1000.0;
       }
     }
   }

@@ -7,9 +7,9 @@
 // 4. Phase advancement stops at endPhase
 // 5. Backward compatibility: null endPhase behaves as before (runs to last phase)
 
-import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/cue.dart';
 import 'package:cue/src/motion/simulation.dart';
-import 'package:cue/src/motion/spring_motion.dart';
+import 'package:cue/src/motion/utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -18,9 +18,9 @@ void main() {
   group('SegmentedSimulation with endPhase —', () {
     // Helper to create a 3-segment motion for testing
     List<CueMotion> create3SegmentMotion() => [
-      CueMotion.linear(.1),
-      CueMotion.linear(.2),
-      CueMotion.linear(.3),
+      CueMotion.linear(100.ms),
+      CueMotion.linear(200.ms),
+      CueMotion.linear(300.ms),
     ];
 
     test('default endPhase (null) runs to last phase — forward', () {
@@ -261,9 +261,9 @@ void main() {
 
     test('SegmentedMotion.build passes endPhase correctly', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(0.1),
-        CueMotion.linear(0.2),
-        CueMotion.linear(0.3),
+        CueMotion.linear(100.ms),
+        CueMotion.linear(200.ms),
+        CueMotion.linear(300.ms),
       ]);
 
       // Build with endPhase = 1
@@ -297,8 +297,8 @@ void main() {
 
     test('SegmentedMotion.build defaults endPhase when null', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(0.1),
-        CueMotion.linear(0.2),
+        CueMotion.linear(100.ms),
+        CueMotion.linear(200.ms),
       ]);
 
       // Build without endPhase
@@ -318,8 +318,8 @@ void main() {
 
     test('reverse with default endPhase from SegmentedMotion.build', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(0.1),
-        CueMotion.linear(0.2),
+        CueMotion.linear(100.ms),
+        CueMotion.linear(200.ms),
       ]);
 
       final sim =
@@ -392,9 +392,9 @@ void main() {
 
     test('endValue via SimulationBuildData', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(0.1),
-        CueMotion.linear(0.2),
-        CueMotion.linear(0.3),
+        CueMotion.linear(100.ms),
+        CueMotion.linear(200.ms),
+        CueMotion.linear(300.ms),
       ]);
 
       final sim =
@@ -441,7 +441,7 @@ void main() {
       // Should include smooth + bouncy durations only
       final smoothDuration = const Spring.smooth().baseDuration;
       final bouncyDuration = const Spring.bouncy().baseDuration;
-      expect(sim.duration, closeTo(smoothDuration + bouncyDuration, 0.01));
+      expect(sim.duration, closeTo((smoothDuration + bouncyDuration).inMilliseconds / Duration.millisecondsPerSecond, 0.01));
 
       // Run simulation
       double t = 0.0;

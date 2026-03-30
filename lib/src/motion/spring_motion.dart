@@ -130,11 +130,11 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
   });
 
   factory Spring({
-    double duration = 0.5,
+    Duration duration = const Duration(milliseconds: 500),
     double bounce = 0,
   }) {
     final desc = SpringDescription.withDurationAndBounce(
-      duration: Duration(milliseconds: (duration * 1000).round()),
+      duration: duration,
       bounce: bounce,
     );
     return Spring.custom(
@@ -145,5 +145,5 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
   }
 
   @override
-  double get baseDuration => buildBase().duration;
+  Duration get baseDuration => Duration(milliseconds: (buildBase().duration * 1000).round());
 }

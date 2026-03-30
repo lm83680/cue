@@ -63,7 +63,7 @@ class SlackStyleFab extends StatelessWidget {
               acts: [
                 .padding(
                   to: .symmetric(horizontal: 16, vertical: 12),
-                  delay: .1,
+                  delay: 100.ms,
                 ),
               ],
               child: Column(
@@ -139,7 +139,7 @@ class SlackStyleFab extends StatelessWidget {
                               .slideX(to: -2),
                               .rotate(to: 90),
                             ],
-                            delay: .1,
+                            delay: 100.ms,
                             child: Icon(Icons.add, size: 24),
                           ),
                         ],

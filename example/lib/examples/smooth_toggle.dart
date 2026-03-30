@@ -17,7 +17,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     final width = height * 2;
     final trackColor = theme.colorScheme.surface;
     final thumbColor = theme.colorScheme.onSurface;
-    const duration = 0.3;
+    const duration =Duration(milliseconds: 300);
     return Cue.onToggle(
       toggled: _toggled,
       motion: .linear(duration),

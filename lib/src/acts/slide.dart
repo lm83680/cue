@@ -6,7 +6,7 @@ abstract class SlideAct extends Act {
     Offset to,
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
-    double delay,
+    Duration delay,
   }) = _SlideEffect;
 
   const factory SlideAct.up({
@@ -32,7 +32,7 @@ abstract class SlideAct extends Act {
   const factory SlideAct.keyframed({
     required Keyframes<Offset> frames,
     KFReverseBehavior<Offset> reverse,
-    double delay,
+    Duration delay,
   }) = _SlideEffect.keyframed;
 
   const factory SlideAct.y({
@@ -40,13 +40,13 @@ abstract class SlideAct extends Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = _AxisSlideEffect.tweenY;
 
   const factory SlideAct.keyframedY({
     required Keyframes<double> frames,
     KFReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = _AxisSlideEffect.keyframedY;
 
   const factory SlideAct.fromX({
@@ -54,13 +54,13 @@ abstract class SlideAct extends Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = _AxisSlideEffect.tweenX;
 
   const factory SlideAct.keyframedX({
     required Keyframes<double> frames,
     KFReverseBehavior<double> reverse,
-    double delay,
+    Duration delay,
   }) = _AxisSlideEffect.keyframedX;
 }
 

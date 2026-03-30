@@ -8,8 +8,8 @@ class Actor extends StatefulWidget {
   final Widget child;
   final CueMotion? motion;
   final CueMotion? reverseMotion;
-  final double delay;
-  final double reverseDelay;
+  final Duration delay;
+  final Duration reverseDelay;
 
   const Actor({
     super.key,
@@ -17,8 +17,8 @@ class Actor extends StatefulWidget {
     required this.child,
     this.motion,
     this.reverseMotion,
-    this.delay = 0.0,
-    this.reverseDelay = 0.0,
+    this.delay = Duration.zero,
+    this.reverseDelay = Duration.zero,
   });
 
   @override
@@ -183,8 +183,8 @@ abstract class SingleActorBase<T> extends StatelessWidget {
   final Widget child;
   final ReverseBehavior<T> reverse;
   final CueMotion? motion;
-  final double delay;
-  final double reverseDelay;
+  final Duration delay;
+  final Duration reverseDelay;
   final CueMotion? reverseMotion;
 
   final Keyframes<T>? frames;
@@ -200,9 +200,9 @@ abstract class SingleActorBase<T> extends StatelessWidget {
     required T from,
     required T to,
     this.motion,
-    this.delay = 0.0,
+    this.delay = Duration.zero,
     this.reverseMotion,
-    this.reverseDelay = 0.0,
+    this.reverseDelay = Duration.zero,
     this.reverse = const ReverseBehavior.mirror(),
   }) : frames = null,
        _from = from,
@@ -213,8 +213,8 @@ abstract class SingleActorBase<T> extends StatelessWidget {
     super.key,
     required this.child,
     this.reverse = const ReverseBehavior.mirror(),
-    this.delay = 0.0,
-    this.reverseDelay = 0.0,
+    this.delay = Duration.zero,
+    this.reverseDelay = Duration.zero,
   }) : _from = null,
        _to = null,
        motion = null,
@@ -240,8 +240,8 @@ extension ActorExtenstion on Widget {
     List<Act> acts, {
     CueMotion? motion,
     CueMotion? reverseMotion,
-    double delay = 0.0,
-    double reverseDelay = 0.0,
+    Duration delay = Duration.zero,
+    Duration reverseDelay = Duration.zero,
   }) {
     return Actor(
       motion: motion,
