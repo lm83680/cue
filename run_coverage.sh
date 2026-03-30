@@ -3,6 +3,15 @@
 # Coverage script for cue
 # Runs Flutter tests with coverage and generates an HTML report (if lcov/genhtml available)
 
+
+# Parse arguments
+OPEN_HTML=false
+for arg in "$@"; do
+    if [[ "$arg" == "--open" ]]; then
+        OPEN_HTML=true
+    fi
+done
+
 set -e
 
 echo "🧪 Running tests with coverage for cue"
@@ -37,13 +46,15 @@ if command -v genhtml >/dev/null 2>&1; then
     echo "✅ HTML coverage report generated at: coverage/html/index.html"
     echo ""
 
-    # Open the report in the default browser (macOS/Linux)
-    if [[ "${OSTYPE:-}" == "darwin"* ]]; then
-        echo "🌐 Opening coverage report in browser..."
-        open coverage/html/index.html || true
-    elif [[ "${OSTYPE:-}" == "linux-gnu"* ]]; then
-        echo "🌐 Opening coverage report in browser..."
-        xdg-open coverage/html/index.html || true
+    # Open the report in the default browser (macOS/Linux) only if --open is passed
+    if [ "$OPEN_HTML" = true ]; then
+      if [[ "${OSTYPE:-}" == "darwin"* ]]; then
+          echo "🌐 Opening coverage report in browser..."
+          open coverage/html/index.html || true
+      elif [[ "${OSTYPE:-}" == "linux-gnu"* ]]; then
+          echo "🌐 Opening coverage report in browser..."
+          xdg-open coverage/html/index.html || true
+      fi
     fi
 else
     echo ""
