@@ -54,6 +54,7 @@ class _DemoPageState extends State<DemoPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Cue.onMount(
+              repeat: true,
               acts: [
                 PathMotionAct.circular(radius: 80)
               ],

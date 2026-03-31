@@ -65,12 +65,12 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     } else {
       double startValue = _controller.value;
       if (_overlayData.value.forward) {
-          if (startValue == 1.0) {
+        if (startValue == 1.0) {
           startValue = 0.0;
         }
         _controller.forward(from: startValue);
       } else {
-          if (startValue == 0.0) {
+        if (startValue == 0.0) {
           startValue = 1.0;
         }
         _controller.reverse(from: startValue);
@@ -79,15 +79,14 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   }
 
   VoidCallback attachDebugTarget(BuildContext context, {required String id, required CueTrack track}) {
-
-      _overlayData.value = _overlayData.value.copyWith(activeTargetId: id);
-      _controller.timeline.resetTracks(
-        TrackConfig(
-          motion: track.motion,
-          reverseMotion: track.reverseMotion,
-        ),
-      );
-      _controller.setProgress(track.progress, forward: _overlayData.value.forward);
+    _overlayData.value = _overlayData.value.copyWith(activeTargetId: id);
+    _controller.timeline.resetTracks(
+      TrackConfig(
+        motion: track.motion,
+        reverseMotion: track.reverseMotion,
+      ),
+    );
+    _controller.setProgress(track.progress, forward: _overlayData.value.forward);
 
     void deattachCallback() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -310,6 +309,42 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                       FontFeature.tabularFigures(),
                                                     ],
                                                   ),
+                                                ),
+                                                SizedBox(
+                                                  width: 8,
+                                                  height: 12,
+                                                  child: VerticalDivider(
+                                                    thickness: 1.2,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 4),
+                                                Builder(
+                                                  builder: (context) {
+                                                    final duration = _data.forward
+                                                        ? widget.controller.timeline.forwardDuration
+                                                        : widget.controller.timeline.reverseDuration;
+
+                                                    final progress = _data.forward
+                                                        ? widget.controller.value
+                                                        : 1 - widget.controller.value;
+
+                                                    final durationInSeconds = duration * progress;
+
+                                                    final durationInMs = durationInSeconds * 1000;
+                                                    final maxChars = ( duration * 1000).toStringAsFixed(0).length;
+                                                    print(maxChars);
+
+                                                    return Text(
+                                                      '${durationInMs.toStringAsFixed(0).padLeft(maxChars, '0')}ms',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontFamily: 'monospace',
+                                                        fontFeatures: [
+                                                          FontFeature.tabularFigures(),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                               ],
                                             ),

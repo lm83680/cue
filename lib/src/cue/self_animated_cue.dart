@@ -7,17 +7,17 @@ class SelfAnimatedCue extends Cue {
     this.motion = CueMotion.defaultTime,
     this.reverseMotion,
     super.debugLabel,
-    this.loop = false,
-    this.reverseOnLoop = false,
-    this.loopCount,
+    this.repeat = false,
+    this.reverseOnRepeat = false,
+    this.repeatCount,
     super.acts,
   }) : super._();
 
   final CueMotion motion;
   final CueMotion? reverseMotion;
-  final bool loop;
-  final int? loopCount;
-  final bool reverseOnLoop;
+  final bool repeat;
+  final int? repeatCount;
+  final bool reverseOnRepeat;
 
   @override
   State<StatefulWidget> createState() => SelfAnimatedCueState();
@@ -29,8 +29,8 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
 
   @override
   void onControllerReady() async {
-    if (widget.loop) {
-      controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
+    if (widget.repeat) {
+      controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
     } else {
       controller.forward();
     }
@@ -39,12 +39,12 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.loop != oldWidget.loop ||
-        widget.reverseOnLoop != oldWidget.reverseOnLoop ||
-        widget.loopCount != oldWidget.loopCount) {
+    if (widget.repeat != oldWidget.repeat ||
+        widget.reverseOnRepeat != oldWidget.reverseOnRepeat ||
+        widget.repeatCount != oldWidget.repeatCount) {
       controller.stop();
-      if (widget.loop) {
-        controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
+      if (widget.repeat) {
+        controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
       } else {
         controller.forward();
       }
@@ -61,8 +61,8 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
       final isDevToolControlled = devToolScope?.activeTargetId == _debugId && devToolScope?.isMinimized == false;
       if (!_devToolControlled && isDevToolControlled) {
         controller.stop();
-      } else if (_devToolControlled && !isDevToolControlled && widget.loop) {
-        controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
+      } else if (_devToolControlled && !isDevToolControlled && widget.repeat) {
+        controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
       }
       _devToolControlled = isDevToolControlled;
     }

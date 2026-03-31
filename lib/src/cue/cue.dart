@@ -44,9 +44,9 @@ abstract class Cue extends StatefulWidget {
     String? debugLabel,
     CueMotion motion,
     CueMotion? reverseMotion,
-    bool loop,
-    bool reverseOnLoop,
-    int? loopCount,
+    bool repeat,
+    bool reverseOnRepeat,
+    int? repeatCount,
     List<Act>? acts,
     required Widget child,
   }) = SelfAnimatedCue;

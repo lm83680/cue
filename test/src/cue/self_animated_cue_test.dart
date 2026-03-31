@@ -20,16 +20,16 @@ void main() {
       final state = tester.state<SelfAnimatedCueState>(find.byType(SelfAnimatedCue));
       // Should have called controller.forward()
       // (We can't check private controller state, but no error = pass)
-      expect(state.widget.loop, isFalse);
+      expect(state.widget.repeat, isFalse);
     });
 
     testWidgets('repeats on mount if looping', (tester) async {
       final widget = Cue.onMount(loop: true, loopCount: 2, reverseOnLoop: true, child: const SizedBox());
       await tester.pumpWidget(MaterialApp(home: widget));
       final state = tester.state<SelfAnimatedCueState>(find.byType(SelfAnimatedCue));
-      expect(state.widget.loop, isTrue);
-      expect(state.widget.loopCount, 2);
-      expect(state.widget.reverseOnLoop, isTrue);
+      expect(state.widget.repeat, isTrue);
+      expect(state.widget.repeatCount, 2);
+      expect(state.widget.reverseOnRepeat, isTrue);
     });
   });
 }
