@@ -44,10 +44,10 @@ class DemoPage extends StatefulWidget {
   State<DemoPage> createState() => _DemoPageState();
 }
 
-class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin {
+class _DemoPageState extends State<DemoPage> with TickerProviderStateMixin {
 
   late final _controller = CueController(vsync: this, motion: .wobbly());
-  late final _animation = _controller.createRetargetable(initialValue: Offset(50, 50));
+  late final _animation = _controller.createAnimation(tween: Tween(begin: Offset.zero, end: const Offset(200, 0)));
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +55,13 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
       appBar: AppBar(title: const Text('Cue Demo')),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTapDown: (details) {
-          _animation.retarget(details.localPosition);
+        onTap: () {
+          print('Tapped at ${DateTime.now()}');
+          _controller.fling(velocity: .5);
         },
         child: Stack(
           alignment: Alignment.center,
           children: [
-
             AnimatedBuilder(
               animation: _animation,
               builder: (context, _) {

@@ -2,6 +2,8 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
+import 'package:flutter/rendering.dart';
 
 class CueController extends AnimationController {
   final CueTimeline _timeline;
@@ -49,7 +51,7 @@ class CueController extends AnimationController {
     CueMotion? motion,
     CueMotion? reverseMotion,
     ReverseBehaviorType reverseType = ReverseBehaviorType.mirror,
-    required Animatable<T> animtable,
+    required Animatable<T> tween,
   }) {
     final (track, token) = obtainTrack(
       motion: motion,
@@ -59,7 +61,7 @@ class CueController extends AnimationController {
     return CueAnimationImpl<T>(
       parent: track,
       token: token,
-      animtable: TweenAnimtable<T>(animtable),
+      animtable: TweenAnimtable<T>(tween),
     );
   }
 
@@ -86,6 +88,32 @@ class CueController extends AnimationController {
   void dispose() {
     _timeline.dispose();
     super.dispose();
+  }
+
+  @override
+  set duration(Duration? value) {
+    throw UnsupportedError(
+      'Cannot set duration on CueController. Duration is derived from the timeline.',
+    );
+  }
+
+  @override
+  set reverseDuration(Duration? value) {
+    throw UnsupportedError(
+      'Cannot set reverseDuration on CueController. reverseDuration is derived from the timeline.',
+    );
+  }
+
+  @override
+  Duration get duration {
+    final microseconds = _timeline.forwardDuration * Duration.microsecondsPerSecond;
+    return Duration(microseconds: microseconds.round());
+  }
+
+  @override
+  Duration get reverseDuration {
+    final microseconds = _timeline.reverseDuration * Duration.microsecondsPerSecond;
+    return Duration(microseconds: microseconds.round());
   }
 
   @override
@@ -159,7 +187,7 @@ class CueController extends AnimationController {
   TickerFuture repeat({double? min, double? max, bool reverse = false, int? count, Duration? period}) {
     if (period != null) {
       throw UnsupportedError(
-        'CueController does does not support time-based repetitio because physics-based animations is a first-class citizen. You may only specify count and reverse parameters. Received: period: $period, min: $min, max: $max',
+        'CueController does does not support time-based repetitio because physics-based animations is a first-class citizen. You may only specify count and reverse parameters. Received: period: $period',
       );
     }
     assert(min == null || (min >= 0.0 && min <= 1.0), 'The "min" value must be between 0.0 and 1.0. Received: $min');
@@ -173,16 +201,14 @@ class CueController extends AnimationController {
 
   @override
   TickerFuture animateTo(double target, {bool? forward, Duration? duration, Curve curve = Curves.linear}) {
-    // if (duration != null) {
-    //   throw UnsupportedError(
-    //     'animateTo with duration is not supported by CueController. CueController is designed for physics-based animations and does not support time-based animations. Received: duration: $duration',
-    //   );
-    // }
-    // if (curve != Curves.linear) {
-    //   throw UnsupportedError(
-    //     'animateTo with curve is not supported by CueController. CueController is designed to run muliple tracks, each with its own motion configuration, and does not support global curves. Received: curve: $curve',
-    //   );
-    // }
+    if (duration != null || curve != Curves.linear) {
+      assert(() {
+        debugPrint(
+          'CueController: duration and curve parameters in animateTo are ignored. Configure motion per track instead.',
+        );
+        return true;
+      }());
+    }
     assert(target >= 0.0 && target <= 1.0, 'The target value must be between 0.0 and 1.0. Received: $target');
     if (target == value) {
       return TickerFuture.complete();
@@ -198,15 +224,39 @@ class CueController extends AnimationController {
     }
   }
 
-  // @override
-  // TickerFuture fling({
-  //   double velocity = 1.0,
-  //   SpringDescription? springDescription,
-  //   AnimationBehavior? animationBehavior,
-  // }) {
-  //   super.fling()
-  //   throw UnsupportedError(
-  //     'fling is not supported by CueController. Use forward or reverse instead.',
-  //   );
-  // }
+  @override
+  TickerFuture fling({
+    double velocity = 1.0,
+    SpringDescription? springDescription,
+    AnimationBehavior? animationBehavior,
+  }) {
+    springDescription ??= SpringDescription.withDampingRatio(
+      mass: 1.0,
+      stiffness: 500.0,
+    );
+    final forward = velocity > 0.0;
+    final tolarence = Tolerance(velocity: double.infinity, distance: 0.01);
+    final double target = velocity < 0.0 ? 0.0 - tolarence.distance : 1.0 + tolarence.distance;
+    final AnimationBehavior behavior = animationBehavior ?? this.animationBehavior;
+    final double scale = switch (behavior) {
+      // This is arbitrary (it was chosen because it worked for the drawer widget).
+      AnimationBehavior.normal when SemanticsBinding.instance.disableAnimations => 200.0,
+      AnimationBehavior.normal || AnimationBehavior.preserve => 1.0,
+    };
+    final simulation = SpringSimulation(springDescription, value, target, velocity * scale)..tolerance = tolarence;
+    assert(
+      simulation.type != SpringType.underDamped,
+      'The specified spring simulation is of type SpringType.underDamped.\n'
+      'An underdamped spring results in oscillation rather than a fling. '
+      'Consider specifying a different springDescription, or use animateWith() '
+      'with an explicit SpringSimulation if an underdamped spring is intentional.',
+    );
+    void listener() => timeline.setProgress(value.clamp(0, 1), forward: forward);
+    addListener(listener);
+    if (forward) {
+      return super.animateWith(simulation)..whenComplete(() => removeListener(listener));
+    } else {
+      return super.animateBackWith(simulation)..whenComplete(() => removeListener(listener));
+    }
+  }
 }
