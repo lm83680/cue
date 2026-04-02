@@ -44,7 +44,6 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
           clipBehavior == other.clipBehavior &&
           from == other.from &&
           to == other.to &&
-          _reverse == other._reverse &&
           clipGeometry == other.clipGeometry &&
           frames == other.frames &&
           delay == other.delay &&

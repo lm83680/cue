@@ -44,6 +44,7 @@ abstract class Act {
     CueMotion? motion,
     ReverseBehavior<double> reverse,
     Duration delay,
+    AlignmentGeometry alignment,
   }) = ScaleAct;
 
   const factory Act.zoomIn({
@@ -52,6 +53,7 @@ abstract class Act {
     CueMotion? motion,
     Duration delay,
     ReverseBehavior<double> reverse,
+    AlignmentGeometry alignment,
   }) = ScaleAct.zoomIn;
 
   const factory Act.zoomOut({
@@ -60,6 +62,7 @@ abstract class Act {
     CueMotion? motion,
     Duration delay,
     ReverseBehavior<double> reverse,
+    AlignmentGeometry alignment,
   }) = ScaleAct.zoomOut;
 
   const factory Act.stretch({

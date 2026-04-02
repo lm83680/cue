@@ -21,6 +21,7 @@ mixin CueModalRouteMixin<T extends Object?> on ModalRoute<T> {
     if (onAnimationStatusChanged != null) {
       ctrl.addStatusListener(onAnimationStatusChanged!);
     }
+    willDisposeAnimationController = false;
     return ctrl;
   }
 
@@ -48,11 +49,15 @@ mixin CueModalRouteMixin<T extends Object?> on ModalRoute<T> {
     }
   }
 
+ 
+
   @override
-  void dispose() {
+  void dispose() async{
     if (onAnimationStatusChanged != null) {
+        onAnimationStatusChanged!.call(AnimationStatus.dismissed);
       controller?.removeStatusListener(onAnimationStatusChanged!);
     }
+    controller?.dispose();
     _isCurrentNotifer.dispose();
     super.dispose();
   }
@@ -62,5 +67,3 @@ mixin CueModalRouteMixin<T extends Object?> on ModalRoute<T> {
     return null;
   }
 }
-
- 

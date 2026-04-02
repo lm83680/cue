@@ -80,13 +80,17 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
 
   VoidCallback attachDebugTarget(BuildContext context, {required String id, required CueTrack track}) {
     _overlayData.value = _overlayData.value.copyWith(activeTargetId: id);
-    _controller.timeline.resetTracks(
-      TrackConfig(
-        motion: track.motion,
-        reverseMotion: track.reverseMotion,
-      ),
-    );
-    _controller.setProgress(track.progress, forward: _overlayData.value.forward);
+
+    if (_controller.timeline.mainTrackConfig != track.config) {
+      _controller.timeline.resetTracks(
+        TrackConfig(
+          motion: track.motion,
+          reverseMotion: track.reverseMotion,
+        ),
+      );
+    }
+
+    _controller.setProgress(0.0, forward: _overlayData.value.forward);
 
     void deattachCallback() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -230,7 +234,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                 child: SafeArea(
                   minimum: .only(top: 16),
                   child: IconTheme(
-                    data: theme.iconTheme.copyWith(color: theme.primaryColor, size: 20),
+                    data: theme.iconTheme.copyWith(color: theme.colorScheme.primary, size: 20),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Material(
@@ -288,8 +292,8 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             style: IconButton.styleFrom(
                                               iconSize: 28,
                                               foregroundColor: !_data.forward
-                                                  ? theme.primaryColor.withValues(alpha: .4)
-                                                  : theme.primaryColor,
+                                                  ? theme.colorScheme.primary.withValues(alpha: .4)
+                                                  : theme.colorScheme.primary,
                                             ),
                                             onPressed: () {
                                               _dataNotifier.value = _data.copyWith(forward: true);
@@ -329,7 +333,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                         : 1 - widget.controller.value;
                                                     final durationInSeconds = duration * progress;
                                                     final durationInMs = durationInSeconds * 1000;
-                                                    final maxChars = ( duration * 1000).toStringAsFixed(0).length;
+                                                    final maxChars = (duration * 1000).toStringAsFixed(0).length;
                                                     return Text(
                                                       '${durationInMs.toStringAsFixed(0).padLeft(maxChars, '0')}ms',
                                                       style: const TextStyle(
@@ -410,8 +414,8 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             style: IconButton.styleFrom(
                                               iconSize: 28,
                                               foregroundColor: _data.forward
-                                                  ? theme.primaryColor.withValues(alpha: .4)
-                                                  : theme.primaryColor,
+                                                  ? theme.colorScheme.primary.withValues(alpha: .4)
+                                                  : theme.colorScheme.primary,
                                             ),
                                             onPressed: () {
                                               _dataNotifier.value = _data.copyWith(forward: false);
