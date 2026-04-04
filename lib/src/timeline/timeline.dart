@@ -5,7 +5,22 @@ import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 
 class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixin {
-  CueTimelineImpl(TrackConfig config) : super({config: TrackEntry(CueTrackImpl(config))});
+  @override
+  final TrackConfig defaultConfig;
+
+  @override
+  Map<TrackConfig, TrackEntry> get tracks => _tracks;
+
+  late final Map<TrackConfig, TrackEntry> _tracks;
+
+  CueTimelineImpl(this.defaultConfig) {
+    _tracks = {
+      defaultConfig: TrackEntry(buildTrack(defaultConfig)),
+    };
+  }
+
+  @override
+  CueTrack get mainTrack => _tracks[defaultConfig]!.track;
 
   factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion}) {
     final config = TrackConfig(motion: motion, reverseMotion: reverseMotion ?? motion);
@@ -23,9 +38,6 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   double _cycleOffset = 0.0;
   int _listenres = 0;
   RepeatConfig? _repeatConfig;
-
-  @override
-  CueTrack get mainTrack => tracks.values.first.track;
 
   double? _forwardDuration;
   double? _reverseDuration;
@@ -64,17 +76,18 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   }
 
   @override
-  void resetTracks(TrackConfig main) {
-    tracks.clear();
+  void resetTracks(TrackConfig newDefaultConfig) {
+    // Note: defaultConfig is final so we can't change it.
+    // This implementation clears extra tracks but doesn't change the main track.
+    _tracks.clear();
     _forwardDuration = null;
     _reverseDuration = null;
-    tracks[main] = TrackEntry(buildTrack(main));
+    // Recreate default track
+    _tracks[defaultConfig] = TrackEntry(buildTrack(defaultConfig));
   }
 
   @override
   (CueTrack track, ReleaseToken token) obtainTrack(TrackConfig config) {
-    if (config == mainTrackConfig) return (mainTrack, ReleaseToken(config, this));
-
     final entry = tracks.putIfAbsent(
       config,
       () => TrackEntry(buildTrack(config)),
@@ -82,9 +95,9 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     _forwardDuration = null;
     _reverseDuration = null;
     entry.track.prepare(
-      forward: mainTrack.isForwardOrCompleted,
-      from: mainTrack.progress,
-      exteranlVelocity: mainTrack.velocity,
+      forward: status.isForwardOrCompleted,
+      from: progress,
+      exteranlVelocity: dx(_lastT),
     );
     final token = ReleaseToken(config, this);
     entry.addToken(token);
@@ -93,11 +106,10 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   @override
   void release(ReleaseToken token) {
-    if (token.config == mainTrackConfig) return;
     final entry = tracks[token.config];
     if (entry == null) return;
     entry.removeToken(token);
-    if (entry.canRelease) {
+    if (token.config != defaultConfig && entry.canRelease) {
       tracks.remove(token.config);
       _forwardDuration = null;
       _reverseDuration = null;
@@ -110,7 +122,23 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   AnimationStatus _status = AnimationStatus.dismissed;
 
   @override
-  void setProgress(double value, {bool forward = true , bool forceLinear = false}) {
+  double get progress {
+    if (tracks.isEmpty) {
+      return 0.0;
+    }
+    final isForward = status.isForwardOrCompleted;
+    var longest = tracks.values.first;
+    for (final entry in tracks.values) {
+      if ((isForward ? entry.track.forwardDuration : entry.track.reverseDuration) >
+          (isForward ? longest.track.forwardDuration : longest.track.reverseDuration)) {
+        longest = entry;
+      }
+    }
+    return longest.track.progress.clamp(0.0, 1.0);
+  }
+
+  @override
+  void setProgress(double value, {bool forward = true, bool forceLinear = false}) {
     _repeatConfig = null;
     if (forward) {
       _setForwardProgress(value, forceLinear: forceLinear);
@@ -219,13 +247,27 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   }
 
   @override
-  double dx(double time) => mainTrack.velocity;
+  double dx(double time) {
+    if (tracks.isEmpty) {
+      return 0.0;
+    }
+    double maxVelocity = 0.0;
+    for (final entry in tracks.values) {
+      final velocity = entry.track.velocity;
+      if (velocity.abs() > maxVelocity.abs()) {
+        maxVelocity = velocity;
+      }
+    }
+    return maxVelocity;
+  }
 
   @override
   bool isDone(double time) {
+    if (tracks.isEmpty) {
+      return true;
+    }
     final cycleDone = tracks.values.every((entry) => entry.track.isDone);
     if (!cycleDone) return false;
-
 
     final config = _repeatConfig;
 
@@ -244,7 +286,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     _lastT = 0.0;
 
     if (config.reverse) {
-      if (mainTrack.isForwardOrCompleted) {
+      if (status.isForwardOrCompleted) {
         _prepareInternal(false, config.target, config.from ?? 0.0);
       } else {
         _prepareInternal(true, config.from ?? 0.0, config.target);
@@ -283,11 +325,13 @@ abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> 
 
   void willAnimate({required bool forward});
 
-  void setProgress(double value, {bool forward = true , bool forceLinear = false});
+  void setProgress(double value, {bool forward = true, bool forceLinear = false});
 
   void reset();
 
   (CueTrack, ReleaseToken) obtainTrack(TrackConfig config);
+
+  (CueTrack, ReleaseToken) obtainDefaultTrack() => obtainTrack(defaultConfig);
 
   void release(ReleaseToken token);
 
@@ -297,34 +341,23 @@ abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> 
 
   double get reverseDuration;
 
-  double get progress {
-    final isForward = status.isForwardOrCompleted;
-    var longest = tracks.values.first;
-    for (final entry in tracks.values) {
-      if ((isForward ? entry.track.forwardDuration : entry.track.reverseDuration) >
-          (isForward ? longest.track.forwardDuration : longest.track.reverseDuration)) {
-        longest = entry;
-      }
-    }
-    return longest.track.progress.clamp(0.0, 1.0);
-  }
+  double get progress;
 
-  final Map<TrackConfig, TrackEntry> tracks;
-
-  CueTimeline(this.tracks);
+  Map<TrackConfig, TrackEntry> get tracks;
 
   CueTrack buildTrack(TrackConfig config);
 
-  TrackConfig get mainTrackConfig => tracks.keys.first;
+  TrackConfig get defaultConfig;
 
   CueTrack get mainTrack;
+
+  void resetTracks(TrackConfig newDefaultConfig);
 
   @override
   void dispose();
 
-  void resetTracks(TrackConfig main);
-
   void addStatusListener(AnimationStatusListener listener);
+
   void removeStatusListener(AnimationStatusListener listener);
 }
 

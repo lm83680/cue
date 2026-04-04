@@ -1,5 +1,8 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/bottom_bar.dart';
+import 'package:example/examples/delete_confirmation.dart';
 import 'package:example/examples/draggable_panel.dart';
+import 'package:example/examples/ios_context_menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       home: const DemoPage(),
       builder: (context, child) {
         if (kDebugMode) {
@@ -43,7 +46,14 @@ class _DemoPageState extends State<DemoPage> {
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar: AppBar(title: const Text('Demo')),
-      body: DraggablePanel(),
+      body: SizedBox.expand(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(child: IosContextMenu()),
+          ],
+        ),
+      ),
     );
   }
 }

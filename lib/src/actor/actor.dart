@@ -96,7 +96,7 @@ class ActorState extends State<Actor> {
         widget.motion != oldWidget.motion ||
         widget.reverseMotion != oldWidget.reverseMotion) {
       final scope = CueScope.of(context);
-      _resolveActs(scope.controller.timeline.mainTrackConfig);
+      _resolveActs(scope.controller.timeline.defaultConfig);
       _setupAnimations(scope);
     }
   }
@@ -137,7 +137,7 @@ class ActorState extends State<Actor> {
       _eventsDisposer = scope.controller.addEventListener<TimelineEvent>((_) => _onWillAnimate());
     }
     if (_cachedScope?.controller != scope.controller ) {
-      _resolveActs(scope.controller.timeline.mainTrackConfig);
+      _resolveActs(scope.controller.timeline.defaultConfig);
       _clearCache(scope);
       _setupAnimations(scope);
     }

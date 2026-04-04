@@ -127,7 +127,7 @@ void main() {
         final controller = _createController(motion: motion);
 
         final newMotion = CueMotion.linear(500.ms);
-        controller.updateMotion(newMotion);
+        controller.updateDefaultMotion(newMotion);
 
         expect(controller.timeline.mainTrack.motion, equals(newMotion));
         expect(controller.timeline.mainTrack.reverseMotion, equals(newMotion));
@@ -139,7 +139,7 @@ void main() {
 
         final newMotion = CueMotion.linear(500.ms);
         final newReverse = CueMotion.linear(200.ms);
-        controller.updateMotion(newMotion, reverseMotion: newReverse);
+        controller.updateDefaultMotion(newMotion, reverseMotion: newReverse);
 
         expect(controller.timeline.mainTrack.motion, equals(newMotion));
         expect(controller.timeline.mainTrack.reverseMotion, equals(newReverse));
@@ -150,7 +150,7 @@ void main() {
         final controller = _createController(motion: motion);
         final originalTimeline = controller.timeline;
 
-        controller.updateMotion(motion);
+        controller.updateDefaultMotion(motion);
 
         expect(controller.timeline, same(originalTimeline));
       });
@@ -160,7 +160,7 @@ void main() {
         final controller = _createController(motion: motion);
         final originalTimeline = controller.timeline;
 
-        controller.updateMotion(motion, reverseMotion: motion);
+        controller.updateDefaultMotion(motion, reverseMotion: motion);
 
         expect(controller.timeline, same(originalTimeline));
       });

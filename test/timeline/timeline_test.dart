@@ -13,7 +13,7 @@ void main() {
         final timeline = CueTimelineImpl(config);
 
         expect(timeline.mainTrack, isNotNull);
-        expect(timeline.mainTrackConfig, equals(config));
+        expect(timeline.defaultConfig, equals(config));
         expect(timeline.tracks.length, equals(1));
       });
 
@@ -613,7 +613,7 @@ void main() {
         timeline.resetTracks(newConfig);
 
         expect(timeline.tracks.length, equals(1));
-        expect(timeline.mainTrackConfig, equals(newConfig));
+        expect(timeline.defaultConfig, equals(newConfig));
         expect(timeline.forwardDuration, equals(0.4));
       });
     });

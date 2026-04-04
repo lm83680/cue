@@ -39,6 +39,8 @@ class _BottomBarState extends State<BottomBar> {
                     children: [
                       Cue.onChange(
                         value: _activeTab,
+                         // this will have cue behave as an implicitly animated widget
+                         // still the animation will trigger only when the value changes, and it will animate from the current position ignoring any provided 'from' value
                         fromCurrentValue: true,
                         motion: Spring.smooth(),
                         acts: [.slideX(to: slideStep * _activeTab)],

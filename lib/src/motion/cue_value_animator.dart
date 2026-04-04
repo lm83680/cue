@@ -2,7 +2,6 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:flutter/material.dart';
 
-
 class CueValueAnimator<T> extends Animation<T> with AnimationWithParentMixin<double> {
   final CueController _controller;
 
@@ -21,7 +20,7 @@ class CueValueAnimator<T> extends Animation<T> with AnimationWithParentMixin<dou
          motion: delay == Duration.zero ? motion : motion.delayed(delay),
        );
 
-  CueTrack get _track => _controller.timeline.mainTrack;
+  late final CueTrack _track = _controller.timeline.obtainDefaultTrack().$1;
 
   late CueAnimtable<T> _animatable;
 
@@ -35,7 +34,7 @@ class CueValueAnimator<T> extends Animation<T> with AnimationWithParentMixin<dou
     _track.setProgress(0.0, alwaysNotify: true);
   }
 
-  void animateTo(T newTarget,{double? velocity}) {
+  void animateTo(T newTarget, {double? velocity}) {
     final currentValue = _animatable.evaluate(_track);
     _animatable = TweenAnimtable<T>(_tweenBuilder(begin: currentValue, end: newTarget));
     _controller.forward(from: 0.0, velocity: velocity);

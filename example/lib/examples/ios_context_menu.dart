@@ -13,7 +13,6 @@ class IosContextMenu extends StatelessWidget {
     return ListView.builder(
       itemCount: 10,
       itemBuilder: (context, index) {
-
         final imageCard = Align(
           alignment: .centerLeft,
           child: SizedBox(
@@ -21,6 +20,7 @@ class IosContextMenu extends StatelessWidget {
             height: 360,
             child: Card(
               clipBehavior: Clip.antiAlias,
+              elevation: 0,
               shape: RoundedSuperellipseBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(color: theme.dividerColor.withValues(alpha: .3), width: 1),
@@ -106,6 +106,7 @@ class IosContextMenu extends StatelessWidget {
                               clipBehavior: Clip.antiAlias,
                               color: theme.cardColor.withValues(alpha: .80),
                               margin: const EdgeInsets.only(right: 16, left: 16, bottom: 4),
+                              elevation: 0,
                               shape: RoundedSuperellipseBorder(
                                 borderRadius: BorderRadius.circular(32),
                                 side: BorderSide(color: theme.dividerColor.withValues(alpha: .3), width: .5),

@@ -71,7 +71,7 @@ abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<
   void didUpdateWidget(covariant T oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.motion != motion || oldWidget.reverseMotion != reverseMotion) {
-      controller.updateMotion(motion, reverseMotion: reverseMotion);
+      controller.updateDefaultMotion(motion, reverseMotion: reverseMotion);
     }
     if (oldWidget.onEnd != widget.onEnd) {
       _updateStatusListener();

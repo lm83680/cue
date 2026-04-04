@@ -8,7 +8,7 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 
 class CueController extends AnimationController {
-  final CueTimeline _timeline;
+  late CueTimeline _timeline;
 
   CueTimeline get timeline => _timeline;
 
@@ -26,12 +26,15 @@ class CueController extends AnimationController {
          ),
        ),
        super.unbounded();
-
-  void updateMotion(CueMotion newMotion, {CueMotion? reverseMotion}) {
-    final mainTrack = timeline.mainTrack;
-    if (newMotion != mainTrack.motion || reverseMotion != mainTrack.reverseMotion) {
-      timeline.resetTracks(TrackConfig(motion: newMotion, reverseMotion: reverseMotion ?? newMotion));
-    }
+       
+  void updateDefaultMotion(CueMotion newMotion, {CueMotion? reverseMotion}) {
+    _timeline.dispose();
+    _timeline = CueTimelineImpl(
+      TrackConfig(
+        motion: newMotion,
+        reverseMotion: reverseMotion ?? _timeline.defaultConfig.reverseMotion,
+      ),
+    );
   }
 
   (CueTrack, ReleaseToken) obtainTrack({
@@ -39,11 +42,11 @@ class CueController extends AnimationController {
     CueMotion? reverseMotion,
     ReverseBehaviorType reverseType = ReverseBehaviorType.mirror,
   }) {
-    final mainConfig = timeline.mainTrack.config;
+    final defaultConfig = timeline.defaultConfig;
     return timeline.obtainTrack(
       TrackConfig(
-        motion: motion ?? mainConfig.motion,
-        reverseMotion: reverseMotion ?? mainConfig.reverseMotion,
+        motion: motion ?? defaultConfig.motion,
+        reverseMotion: reverseMotion ?? defaultConfig.reverseMotion,
         reverseType: reverseType,
       ),
     );
@@ -58,11 +61,11 @@ class CueController extends AnimationController {
     Duration delay = Duration.zero,
     TweenBuilder<T>? tweenBuilder,
   }) {
-    final mainConfig = timeline.mainTrack.config;
+    final defaultConfig = timeline.defaultConfig;
     final context = TweenActBase.resolveMotion(
       ActContext(
-        motion: motion ?? mainConfig.motion,
-        reverseMotion: reverseMotion ?? mainConfig.reverseMotion,
+        motion: motion ?? defaultConfig.motion,
+        reverseMotion: reverseMotion ?? defaultConfig.reverseMotion,
       ),
       delay: delay,
       reverse: reverse,
@@ -98,12 +101,11 @@ class CueController extends AnimationController {
     Duration delay = Duration.zero,
     TweenBuilder<T>? tweenBuilder,
   }) {
-    final mainConfig = timeline.mainTrack.config;
-
+    final defaultConfig = timeline.defaultConfig;
     final context = TweenActBase.resolveMotion(
       ActContext(
-        motion: mainConfig.motion,
-        reverseMotion: mainConfig.reverseMotion,
+        motion: defaultConfig.motion,
+        reverseMotion: defaultConfig.reverseMotion,
       ),
       delay: delay,
       reverse: reverse,
@@ -190,12 +192,23 @@ class CueController extends AnimationController {
   }
 
   EventDisposer addEventListener<T extends TimelineEvent>(ValueChanged<T> listener) {
-   return timeline.addEventListener(listener);
+    return timeline.addEventListener(listener);
   }
 
- 
+  ReleaseToken? _viewReleaseToken;
+
+  // you should not directly call this method to obain a track
+  // this only exists for unowned apis that access the view for default animation
+  // calling this might remove the track from the timeline if it was previously obtained, which mean it won't tick anymore.
   @override
-  Animation<double> get view => _timeline.mainTrack;
+  Animation<double> get view {
+    if (_viewReleaseToken != null) {
+      _viewReleaseToken!.release();
+    }
+    final (track, token) = timeline.obtainDefaultTrack();
+    _viewReleaseToken = token;
+    return track;
+  }
 
   @override
   TickerFuture forward({double? from, double? velocity}) {

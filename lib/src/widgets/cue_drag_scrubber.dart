@@ -47,9 +47,10 @@ class CueDragScrubber extends StatefulWidget {
     this.releaseMode = CueDragReleaseMode.fling,
     this.forceLinearScrubing = true,
     this.hitTestBehavior,
+    this.onAnimationEnd,
     this.scrubDirection = CueScrubDirection.auto,
   });
-
+  final ValueChanged<bool>? onAnimationEnd;
   final HitTestBehavior? hitTestBehavior;
   final bool forceLinearScrubing;
   final CueScrubDirection scrubDirection;
@@ -78,23 +79,36 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   double _startProgress = 0;
   double _startOffset = 0;
 
-  /// Resolves the controller from the widget prop first, then from [CueScope].
-  /// Throws if neither is available.
-  CueController _resolveController() {
-    if (widget.controller != null) return widget.controller!;
-    final scope = CueScope.maybeOf(context);
-    assert(
-      scope != null,
-      'CueDragScrubber requires either a controller prop or a CueScope ancestor.',
-    );
-    return scope!.controller;
+  CueController? _controller;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller = widget.controller ?? CueScope.maybeOf(context)?.controller;
+    if (controller == null) {
+      throw FlutterError('CueDragScrubber requires either a controller prop or a CueScope ancestor.');
+    }
+    if (_controller != controller) {
+      _controller?.removeStatusListener(_handleAnimationStatus);
+      _controller = controller;
+      if (widget.onAnimationEnd != null) {
+        _controller!.addStatusListener(_handleAnimationStatus);
+      }
+    }
+  }
+
+  void _handleAnimationStatus(AnimationStatus status) {
+    if (status.isCompleted || status.isDismissed) {
+      widget.onAnimationEnd?.call(status.isCompleted);
+    }
   }
 
   double _primaryOffset(Offset o) => widget.axis == Axis.vertical ? o.dy : o.dx;
   bool _scrubForward = true;
 
   void _onDragStart(DragStartDetails d) {
-    final controller = _resolveController();
+    assert(_controller != null);
+    final controller = _controller!;
     _scrubForward = switch (widget.scrubDirection) {
       CueScrubDirection.auto => controller.status.isForwardOrCompleted,
       CueScrubDirection.forward => true,
@@ -106,7 +120,8 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   }
 
   void _onDragUpdate(DragUpdateDetails d) {
-    final controller = _resolveController();
+    assert(_controller != null);
+    final controller = _controller!;
     final delta = _primaryOffset(d.localPosition) - _startOffset;
     final progress = (_startProgress + delta / widget.distance).clamp(0.0, 1.0);
     controller.setProgress(
@@ -117,7 +132,8 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   }
 
   void _onDragEnd(DragEndDetails d) {
-    final controller = _resolveController();
+    assert(_controller != null);
+    final controller = _controller!;
     switch (widget.releaseMode) {
       case CueDragReleaseMode.none:
         break;
@@ -142,6 +158,12 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
     } else {
       controller.reverse();
     }
+  }
+
+  @override
+  void dispose() {
+    _controller?.removeStatusListener(_handleAnimationStatus);
+    super.dispose();
   }
 
   @override
