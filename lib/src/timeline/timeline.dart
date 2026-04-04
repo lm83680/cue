@@ -19,9 +19,6 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     };
   }
 
-  @override
-  CueTrack get mainTrack => _tracks[defaultConfig]!.track;
-
   factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion}) {
     final config = TrackConfig(motion: motion, reverseMotion: reverseMotion ?? motion);
     return CueTimelineImpl(config);
@@ -348,8 +345,6 @@ abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> 
   CueTrack buildTrack(TrackConfig config);
 
   TrackConfig get defaultConfig;
-
-  CueTrack get mainTrack;
 
   void resetTracks(TrackConfig newDefaultConfig);
 
