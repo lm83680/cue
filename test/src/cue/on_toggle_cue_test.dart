@@ -65,7 +65,6 @@ void main() {
         ),
       );
       final state = tester.state(find.byType(OnToggleCue)) as SelfAnimatedCueState;
-     print(state.controller.status);
       expect(state.controller.status, equals(AnimationStatus.reverse));
     });
 
