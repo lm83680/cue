@@ -8,6 +8,7 @@
 // 5. Backward compatibility: null endPhase behaves as before (runs to last phase)
 
 import 'package:cue/cue.dart';
+import 'package:cue/src/motion/cue_motion.dart';
 import 'package:cue/src/motion/simulation.dart';
 import 'package:flutter_test/flutter_test.dart';
 

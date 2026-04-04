@@ -2,6 +2,7 @@
 // back to the target value, not always to 1.0 or 0.0
 
 import 'package:cue/cue.dart';
+import 'package:cue/src/motion/cue_motion.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -233,14 +233,12 @@ abstract class Act {
 
   const factory Act.focus({
     double from,
-    double to,
     CueMotion? motion,
     Duration delay,
     ReverseBehavior<double> reverse,
   }) = BlurAct.focus;
 
   const factory Act.unfocus({
-    double from,
     double to,
     CueMotion? motion,
     Duration delay,

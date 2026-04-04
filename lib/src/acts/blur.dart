@@ -21,19 +21,17 @@ class BlurAct extends TweenAct<double> {
 
   const BlurAct.focus({
     super.from = 10.0,
-    super.to = 0.0,
     super.motion,
     super.reverse,
     super.delay,
-  }) : super.tween();
+  }) : super.tween(to: 0.0);
 
   const BlurAct.unfocus({
-    super.from = 0.0,
     super.to = 10.0,
     super.motion,
     super.reverse,
     super.delay,
-  }) : super.tween();
+  }) : super.tween(from: 0.0);
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {

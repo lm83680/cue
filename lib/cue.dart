@@ -7,7 +7,7 @@ export 'src/cue/cue_debug_provider.dart';
 export 'src/motion/spring_motion.dart';
 export 'src/acts/base/act.dart';
 export 'src/actor/actor.dart';
-export 'src/motion/cue_motion.dart';
+export 'src/motion/cue_motion.dart' hide DelayedMotion, SegmentedMotion;
 export 'src/acts/base/tween_act.dart' hide CueTweenBuildHelper;
 export 'src/motion/cue_controller.dart';
 export 'src/motion/cue_value_animator.dart';

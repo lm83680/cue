@@ -1,4 +1,3 @@
-
 import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
@@ -49,9 +48,8 @@ void main() {
     });
 
     test('focus constructor with custom values', () {
-      const act = BlurAct.focus(from: 20.0, to: 5.0);
+      const act = BlurAct.focus(from: 20.0,);
       expect(act.from, equals(20.0));
-      expect(act.to, equals(5.0));
     });
 
     test('unfocus constructor defaults', () {
@@ -61,8 +59,7 @@ void main() {
     });
 
     test('unfocus constructor with custom values', () {
-      const act = BlurAct.unfocus(from: 5.0, to: 20.0);
-      expect(act.from, equals(5.0));
+      const act = BlurAct.unfocus(to: 20.0);
       expect(act.to, equals(20.0));
     });
 
@@ -216,7 +213,7 @@ void main() {
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config , timeline),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -240,7 +237,7 @@ void main() {
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config , timeline),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 

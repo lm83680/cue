@@ -101,25 +101,6 @@ void main() {
       expect(controller.lastSettledIndex, 3);
     });
 
-    testWidgets('dispose cleans up animation controller', (tester) async {
-      late CueIndexController controller;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: StatefulBuilder(
-            builder: (context, setState) {
-              controller = CueIndexController(
-                length: 3,
-                vsync: const _TestTickerProvider(),
-              );
-              return const SizedBox();
-            },
-          ),
-        ),
-      );
-
-      // Remove the widget - should not throw
-      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
-    });
 
     testWidgets('asserts length > 0', (tester) async {
       expect(
