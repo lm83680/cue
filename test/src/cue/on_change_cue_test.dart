@@ -4,8 +4,6 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/cue/cue.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('OnChangeCue', () {
     testWidgets('creates with default skipFirstAnimation true', (tester) async {
       await tester.pumpWidget(
@@ -163,8 +161,9 @@ void main() {
         ),
       );
 
-      final state = tester.state(find.byType(OnChangeCue)) as dynamic;
-      expect(state.controller.timeline.mainTrack.motion, equals(motion));
+      final state = tester.state(find.byType(OnChangeCue)) as SelfAnimatedCueState;
+      final track = state.controller.timeline.obtainDefaultTrack().$1;
+      expect(track.motion, equals(motion));
     });
   });
 }

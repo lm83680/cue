@@ -124,8 +124,9 @@ void main() {
         ),
       );
 
-      final state = tester.state(find.byType(OnHoverCue)) as dynamic;
-      expect(state.controller.timeline.mainTrack.motion, equals(motion));
+      final state = tester.state(find.byType(OnHoverCue)) as SelfAnimatedCueState;
+      final track = state.controller.timeline.obtainDefaultTrack().$1;
+      expect(track.motion, equals(motion));
     });
 
     testWidgets('onEnd callback is wired', (tester) async {

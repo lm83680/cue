@@ -27,12 +27,12 @@ class CueController extends AnimationController {
        ),
        super.unbounded();
        
-  void updateDefaultMotion(CueMotion newMotion, {CueMotion? reverseMotion}) {
+  void rebuildTimeline(CueMotion newMotion, {CueMotion? reverseMotion}) {
     _timeline.dispose();
     _timeline = CueTimelineImpl(
       TrackConfig(
         motion: newMotion,
-        reverseMotion: reverseMotion ?? _timeline.defaultConfig.reverseMotion,
+        reverseMotion: reverseMotion ?? newMotion,
       ),
     );
   }

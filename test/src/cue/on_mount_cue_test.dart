@@ -76,7 +76,7 @@ void main() {
 
       final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
       expect(state.widget.reverseMotion, equals(reverseMotion));
-      expect(state.controller.timeline.mainTrack.reverseMotion, equals(reverseMotion));
+      expect(state.controller.timeline.obtainDefaultTrack().$1.reverseMotion, equals(reverseMotion));
     });
 
     testWidgets('onEnd callback is wired up', (tester) async {

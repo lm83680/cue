@@ -56,15 +56,17 @@ void main() {
         final controller = _createController(motion: motion);
 
         expect(controller.timeline, isNotNull);
-        expect(controller.timeline.mainTrack.motion, equals(motion));
-        expect(controller.timeline.mainTrack.reverseMotion, equals(motion));
+        final defaultTrack = controller.timeline.obtainDefaultTrack().$1;
+        expect(defaultTrack.motion, equals(motion));
+        expect(defaultTrack.reverseMotion, equals(motion));
       });
 
       test('uses motion as reverseMotion when not provided', () {
         final motion = CueMotion.linear(300.ms);
         final controller = _createController(motion: motion);
-
-        expect(controller.timeline.mainTrack.reverseMotion, equals(motion));
+        final defaultTrack = controller.timeline.obtainDefaultTrack().$1;
+        expect(defaultTrack.motion, equals(motion));  
+        expect(defaultTrack.reverseMotion, equals(motion));
       });
 
       test('uses separate reverseMotion when provided', () {
@@ -74,9 +76,11 @@ void main() {
           motion: motion,
           reverseMotion: reverseMotion,
         );
-
-        expect(controller.timeline.mainTrack.motion, equals(motion));
-        expect(controller.timeline.mainTrack.reverseMotion, equals(reverseMotion));
+        final defaultTrack = controller.timeline.obtainDefaultTrack().$1;
+        expect(defaultTrack.motion, equals(motion));
+        expect(defaultTrack.reverseMotion, equals(reverseMotion));  
+        expect(defaultTrack.motion, equals(motion));
+        expect(defaultTrack.reverseMotion, equals(reverseMotion));
       });
 
       test('starts with value 0.0 by default', () {
@@ -127,10 +131,11 @@ void main() {
         final controller = _createController(motion: motion);
 
         final newMotion = CueMotion.linear(500.ms);
-        controller.updateDefaultMotion(newMotion);
+        controller.rebuildTimeline(newMotion);
+        final defaultTrack = controller.timeline.obtainDefaultTrack().$1;
 
-        expect(controller.timeline.mainTrack.motion, equals(newMotion));
-        expect(controller.timeline.mainTrack.reverseMotion, equals(newMotion));
+        expect(defaultTrack.motion, equals(newMotion));
+        expect(defaultTrack.reverseMotion, equals(newMotion));
       });
 
       test('updates with separate reverseMotion', () {
@@ -139,30 +144,19 @@ void main() {
 
         final newMotion = CueMotion.linear(500.ms);
         final newReverse = CueMotion.linear(200.ms);
-        controller.updateDefaultMotion(newMotion, reverseMotion: newReverse);
+        controller.rebuildTimeline(newMotion, reverseMotion: newReverse);
+        final defaultTrack = controller.timeline.obtainDefaultTrack().$1;
 
-        expect(controller.timeline.mainTrack.motion, equals(newMotion));
-        expect(controller.timeline.mainTrack.reverseMotion, equals(newReverse));
+        expect(defaultTrack.motion, equals(newMotion));
+        expect(defaultTrack.reverseMotion, equals(newReverse));
       });
 
-      test('does not update when motion is the same', () {
+      test('rebuilds timeline with same motion, creates a fresh timeline', () {
         final motion = CueMotion.linear(300.ms);
         final controller = _createController(motion: motion);
         final originalTimeline = controller.timeline;
-
-        controller.updateDefaultMotion(motion);
-
-        expect(controller.timeline, same(originalTimeline));
-      });
-
-      test('does not update when only reverseMotion differs but is same', () {
-        final motion = CueMotion.linear(300.ms);
-        final controller = _createController(motion: motion);
-        final originalTimeline = controller.timeline;
-
-        controller.updateDefaultMotion(motion, reverseMotion: motion);
-
-        expect(controller.timeline, same(originalTimeline));
+        controller.rebuildTimeline(motion, reverseMotion: motion);
+        expect(controller.timeline, isNot(same(originalTimeline)));
       });
     });
 
@@ -369,11 +363,11 @@ void main() {
     });
 
     group('view', () {
-      test('view returns mainTrack', () {
+      test('view returns default track', () {
         final motion = CueMotion.linear(300.ms);
         final controller = _createController(motion: motion);
 
-        expect(controller.view, same(controller.timeline.mainTrack));
+        expect(controller.view, same(controller.timeline.obtainDefaultTrack().$1));
       });
     });
 

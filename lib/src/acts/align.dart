@@ -1,6 +1,6 @@
 part of 'base/act.dart';
 
-class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment?> {
+class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment> {
   
   @override
   final ActKey key = const ActKey('Align');
@@ -20,22 +20,22 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment?> {
   }) : super.keyframed();
 
   @override
-  Alignment? transform(ActContext ctx, AlignmentGeometry? value) {
-    return value?.resolve(ctx.textDirection);
+  Alignment transform(ActContext ctx, AlignmentGeometry? value) {
+    return value?.resolve(ctx.textDirection) ?? Alignment.center;
   }
 
   @override
-  Animatable<Alignment?> createSingleTween(Alignment? from, Alignment? to) {
+  Animatable<Alignment> createSingleTween(Alignment from, Alignment to) {
     return AlignmentTween(begin: from, end: to);
   }
 
   @override
-  Widget apply(BuildContext context, Animation<AlignmentGeometry?> animation, Widget child) {
+  Widget apply(BuildContext context, Animation<AlignmentGeometry> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
         return Align(
-          alignment: animation.value ?? Alignment.center,
+          alignment: animation.value,
           child: child,
         );
       },

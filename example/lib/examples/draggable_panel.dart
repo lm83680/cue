@@ -105,7 +105,7 @@ class _DraggablePanelState extends State<DraggablePanel> {
                               .slideUp(),
                               .focus(),
                               .fadeIn(),
-                              .zoomIn(from: 1.3),
+                              .scale(from: 1.3),
                               .clipHeight(),
                             ],
                             child: Column(

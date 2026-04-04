@@ -60,7 +60,7 @@ class OptionsButton extends StatelessWidget {
                       Actor(
                         acts: [
                           .focus(),
-                          .zoomIn(from: .8),
+                          .scale(from: .8),
                           .fadeIn(),
                           .slideUp(),
                         ],
@@ -72,7 +72,7 @@ class OptionsButton extends StatelessWidget {
                                 Actor(
                                   acts: [
                                     .translateY(from: 10 * (i + 1)),
-                                    .zoomIn(from: i * -.1),
+                                    .scale(from: i * -.1),
                                   ],
                                   child: Card(
                                     clipBehavior: .hardEdge,

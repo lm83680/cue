@@ -16,22 +16,18 @@ class ScaleAct extends TweenAct<double> {
   }) : super.tween();
 
   const ScaleAct.zoomIn({
-    super.from = 0.0,
-    super.to = 1.0,
     super.motion,
     super.reverse,
     this.alignment,
     super.delay,
-  }) : super.tween();
+  }) : super.tween(from: 0.0, to: 1.0);
 
   const ScaleAct.zoomOut({
-    super.from = 1.0,
-    super.to = 0.0,
     super.motion,
     super.reverse,
     this.alignment,
     super.delay,
-  }) : super.tween();
+  }) : super.tween(from: 1.0, to: 0.0);
 
   const ScaleAct.keyframed({
     required super.frames,

@@ -48,7 +48,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                       Actor(
                         acts: [
                           .fadeIn(),
-                          .zoomIn(from: .5),
+                          .scale(from: .5),
                           .blur(from: 10),
                         ],
                         child: Padding(

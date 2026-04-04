@@ -79,7 +79,7 @@ class _BottomBarState extends State<BottomBar> {
                                         acts: [
                                           .clipWidth(),
                                           .fadeIn(),
-                                          .zoomIn(from: .7),
+                                          .scale(from: .7),
                                         ],
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),

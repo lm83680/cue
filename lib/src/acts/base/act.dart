@@ -48,8 +48,6 @@ abstract class Act {
   }) = ScaleAct;
 
   const factory Act.zoomIn({
-    double from,
-    double to,
     CueMotion? motion,
     Duration delay,
     ReverseBehavior<double> reverse,
@@ -57,8 +55,6 @@ abstract class Act {
   }) = ScaleAct.zoomIn;
 
   const factory Act.zoomOut({
-    double from,
-    double to,
     CueMotion? motion,
     Duration delay,
     ReverseBehavior<double> reverse,

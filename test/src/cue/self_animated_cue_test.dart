@@ -18,7 +18,7 @@ void main() {
 
         final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
         expect(state.controller, isA<CueController>());
-        expect(state.controller.timeline.mainTrack.motion, equals(motion));
+        expect(state.controller.timeline.obtainDefaultTrack().$1.motion, equals(motion));
       });
 
       testWidgets('timeline getter returns controller timeline', (tester) async {
@@ -63,7 +63,7 @@ void main() {
         );
 
         final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
-        expect(state.controller.timeline.mainTrack.motion, equals(motion2));
+        expect(state.controller.timeline.obtainDefaultTrack().$1.motion, equals(motion2));
       });
 
       testWidgets('updates reverseMotion when widget changes', (tester) async {
@@ -92,7 +92,7 @@ void main() {
         );
 
         final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
-        expect(state.controller.timeline.mainTrack.reverseMotion, equals(reverse2));
+        expect(state.controller.timeline.obtainDefaultTrack().$1.reverseMotion, equals(reverse2));
       });
 
       testWidgets('does not update when motion stays the same', (tester) async {

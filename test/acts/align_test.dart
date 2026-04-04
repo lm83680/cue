@@ -77,13 +77,6 @@ void main() {
       expect(result, isA<Alignment>());
     });
 
-    test('transform returns null for null input', () {
-      const act = AlignAct();
-      final ctx = actContext;
-      final result = act.transform(ctx, null);
-      expect(result, isNull);
-    });
-
     test('createSingleTween returns AlignmentTween', () {
       const act = AlignAct();
       final tween = act.createSingleTween(Alignment.topLeft, Alignment.bottomRight);
@@ -93,14 +86,6 @@ void main() {
       expect(tween.end, equals(Alignment.bottomRight));
     });
 
-    test('createSingleTween with null values', () {
-      const act = AlignAct();
-      final tween = act.createSingleTween(null, Alignment.center);
-
-      expect(tween, isA<AlignmentTween>());
-      expect((tween as AlignmentTween).begin, isNull);
-      expect(tween.end, equals(Alignment.center));
-    });
 
     testWidgets('apply wraps child in Align widget', (tester) async {
       const act = AlignAct(from: Alignment.topLeft, to: Alignment.bottomRight);
@@ -108,7 +93,7 @@ void main() {
 
       track.setProgress(0.0);
 
-      final animation = CueAnimationImpl<Alignment?>(
+      final animation = CueAnimationImpl<Alignment>(
         parent: track,
         token: ReleaseToken(track.config, timeline),
         animtable: animtable,
@@ -133,7 +118,7 @@ void main() {
 
       track.setProgress(0.5);
 
-      final animation = CueAnimationImpl<Alignment?>(
+      final animation = CueAnimationImpl<Alignment>(
         parent: track,
         token: ReleaseToken(track.config, timeline),
         animtable: animtable,
@@ -152,27 +137,6 @@ void main() {
       expect(alignWidget.alignment, equals(Alignment.center));
     });
 
-    testWidgets('apply defaults to Alignment.center when animation value is null', (tester) async {
-      const act = AlignAct();
-
-      final animation = CueAnimationImpl<Alignment?>(
-        parent: track,
-        token: ReleaseToken(track.config, timeline),
-        animtable: AlwaysStoppedAnimatable<Alignment?>(null),
-      );
-
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: Builder(
-            builder: (context) => act.apply(context, animation, const SizedBox()),
-          ),
-        ),
-      );
-
-      final alignWidget = tester.widget<Align>(find.byType(Align));
-      expect(alignWidget.alignment, equals(Alignment.center));
-    });
 
     test('equality', () {
       const act1 = AlignAct(

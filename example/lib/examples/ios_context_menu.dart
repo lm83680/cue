@@ -132,7 +132,7 @@ class IosContextMenu extends StatelessWidget {
                                           motion: .wobbly(),
                                           reverseMotion: .snappy(),
                                           acts: [
-                                            .zoomIn(from: .5),
+                                            .scale(from: .5),
                                             .rotate(from: -50, delay: 10.ms * i),
                                           ],
                                           child: Padding(
