@@ -3,13 +3,13 @@ import 'dart:ui';
 import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 
-class _CustomTweenAct<T extends Object?> extends TweenAct<T> {
+class CustomTweenAct<T extends Object?> extends TweenAct<T> {
   @override
   final ActKey key = const ActKey('TweenActor');
   final Widget Function(BuildContext context, CueAnimation<T> animation) builder;
 
   final Animatable<T>? tweenBuilder;
-  const _CustomTweenAct({
+  const CustomTweenAct({
     super.from,
     super.to,
     super.motion,
@@ -25,7 +25,7 @@ class _CustomTweenAct<T extends Object?> extends TweenAct<T> {
     if (tweenBuilder != null) {
       return tweenBuilder!;
     } else if (from is Lerpable) {
-      return _InlineFnTween<T>(
+      return InlineFnTween<T>(
         begin: from,
         end: to,
         lerpFn: (t) => from.lerpTo(to as Lerpable?, t) as T,
@@ -42,7 +42,7 @@ class _CustomTweenAct<T extends Object?> extends TweenAct<T> {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is _CustomTweenAct<T> &&
+    return other is CustomTweenAct<T> &&
         super == other &&
         builder == other.builder &&
         tweenBuilder == other.tweenBuilder;
@@ -77,7 +77,7 @@ class TweenActor<T extends Object?> extends SingleActorBase<T> {
   }) : super.keyframes(child: const SizedBox.shrink());
 
   @override
-  Act get act => _CustomTweenAct<T>(
+  Act get act => CustomTweenAct<T>(
     from: from,
     to: to,
     frames: frames,
@@ -128,10 +128,11 @@ abstract class Lerpable<T extends Lerpable<T>> {
   T lerpTo(covariant T? end, double t);
 }
 
-class _InlineFnTween<T extends Object?> extends Tween<T> {
+@visibleForTesting
+class InlineFnTween<T extends Object?> extends Tween<T> {
   final T Function(double t) lerpFn;
 
-  _InlineFnTween({required this.lerpFn, super.begin, super.end});
+  InlineFnTween({required this.lerpFn, super.begin, super.end});
 
   @override
   T lerp(double t) => lerpFn(t);

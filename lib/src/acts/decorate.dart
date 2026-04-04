@@ -12,6 +12,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
   final BoxShape shape;
   final DecorationPosition position;
   final Keyframes<Decoration>? frames;
+  final DecorationImage? image;
 
   const DecoratedBoxAct({
     this.color,
@@ -20,6 +21,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
     this.boxShadow,
     this.gradient,
     super.motion,
+    this.image,
     ReverseBehavior<Decoration> super.reverse = const ReverseBehavior.mirror(),
     this.position = DecorationPosition.background,
     this.shape = BoxShape.rectangle,
@@ -31,12 +33,13 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
     KFReverseBehavior<Decoration> super.reverse = const KFReverseBehavior.mirror(),
     super.delay,
     this.position = DecorationPosition.background,
+    this.shape = BoxShape.rectangle,
+    this.image,
   }) : color = null,
        borderRadius = null,
        border = null,
        boxShadow = null,
-       gradient = null,
-       shape = BoxShape.rectangle;
+       gradient = null;
 
   @override
   (CueAnimtable<Decoration>, CueAnimtable<Decoration>?) buildTweens(ActContext context) {
@@ -47,6 +50,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
       boxShadow: boxShadow?.from,
       gradient: gradient?.from,
       shape: shape,
+      image: image,
     );
     final to = BoxDecoration(
       color: color?.to,
@@ -55,6 +59,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
       boxShadow: boxShadow?.to,
       gradient: gradient?.to,
       shape: shape,
+      image: image,
     );
     final builder = CueTweenBuildHelper<Decoration>(
       from: from,
@@ -87,11 +92,22 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
         other.boxShadow == boxShadow &&
         other.gradient == gradient &&
         other.shape == shape &&
+        other.image == image &&
         other.position == position;
   }
 
   @override
-  int get hashCode => Object.hash(super.hashCode, color, borderRadius, border, boxShadow, gradient, shape, position);
+  int get hashCode => Object.hash(
+    super.hashCode,
+    color,
+    borderRadius,
+    border,
+    boxShadow,
+    gradient,
+    shape,
+    position,
+    image,
+  );
 
   @override
   ActContext resolve(ActContext context) {
@@ -118,6 +134,7 @@ class DecoratedBoxActor extends StatelessWidget {
   final DecorationPosition position;
   final Duration delay;
   final ReverseBehavior<Decoration> reverse;
+  final DecorationImage? image;
 
   const DecoratedBoxActor({
     super.key,
@@ -132,6 +149,7 @@ class DecoratedBoxActor extends StatelessWidget {
     this.reverseMotion,
     this.position = DecorationPosition.background,
     this.delay = Duration.zero,
+    this.image,
     this.reverse = const ReverseBehavior.mirror(),
   });
 
@@ -150,6 +168,7 @@ class DecoratedBoxActor extends StatelessWidget {
           motion: motion,
           delay: delay,
           reverse: reverse,
+          image: image,
         ),
       ],
       child: child ?? const SizedBox.shrink(),

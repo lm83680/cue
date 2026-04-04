@@ -153,6 +153,74 @@ void main() {
       expect(act.delay, equals(const Duration(milliseconds: 200)));
     });
 
+    test('constructor with surfaceTintColor', () {
+      const act = CardAct(
+        surfaceTintColor: AnimatableValue(from: Colors.blue, to: Colors.green),
+      );
+      expect(act.surfaceTintColor?.from, equals(Colors.blue));
+      expect(act.surfaceTintColor?.to, equals(Colors.green));
+    });
+
+    test('constructor with shadowColor', () {
+      const act = CardAct(
+        shadowColor: AnimatableValue.fixed(Colors.red),
+      );
+      expect(act.shadowColor.from, equals(Colors.red));
+    });
+
+    test('constructor with shape', () {
+      const act = CardAct(
+        shape: AnimatableValue.fixed(RoundedRectangleBorder()),
+      );
+      expect(act.shape, isNotNull);
+    });
+
+    test('constructor with borderOnForeground', () {
+      const act = CardAct(borderOnForeground: false);
+      expect(act.borderOnForeground, isFalse);
+    });
+
+    test('constructor with semanticContainer', () {
+      const act = CardAct(semanticContainer: false);
+      expect(act.semanticContainer, isFalse);
+    });
+
+    test('constructor with reverse', () {
+      const reverse = ReverseBehavior<CardProps>.mirror();
+      const act = CardAct(reverse: reverse);
+      expect(act.reverse, reverse);
+    });
+
+    test('constructor with all parameters', () {
+      final motion = CueMotion.linear(400.ms);
+      const elevation = AnimatableValue(from: 0.0, to: 8.0);
+      const color = AnimatableValue(from: Colors.white, to: Colors.grey);
+      const borderRadius = AnimatableValue(
+        from: BorderRadius.zero,
+        to: BorderRadius.all(Radius.circular(12)),
+      );
+      const delay = Duration(milliseconds: 100);
+      final act = CardAct(
+        motion: motion,
+        elevation: elevation,
+        color: color,
+        borderRadius: borderRadius,
+        delay: delay,
+        clipBehavior: Clip.antiAlias,
+        borderOnForeground: false,
+        semanticContainer: false,
+      );
+      
+      expect(act.motion, equals(motion));
+      expect(act.elevation, equals(elevation));
+      expect(act.color, equals(color));
+      expect(act.borderRadius, equals(borderRadius));
+      expect(act.delay, equals(delay));
+      expect(act.clipBehavior, equals(Clip.antiAlias));
+      expect(act.borderOnForeground, isFalse);
+      expect(act.semanticContainer, isFalse);
+    });
+
     test('keyframed constructor', () {
       final frames = FractionalKeyframes<CardProps>([
         FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
@@ -160,6 +228,28 @@ void main() {
       ]);
       final act = CardAct.keyframed(frames: frames);
       expect(act.frames, equals(frames));
+    });
+
+    test('keyframed constructor with delay', () {
+      final frames = FractionalKeyframes<CardProps>([
+        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+      ]);
+      const delay = Duration(milliseconds: 150);
+      final act = CardAct.keyframed(frames: frames, delay: delay);
+      expect(act.frames, equals(frames));
+      expect(act.delay, equals(delay));
+    });
+
+    test('keyframed constructor with reverse', () {
+      final frames = FractionalKeyframes<CardProps>([
+        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+      ]);
+      const reverse = KFReverseBehavior<CardProps>.mirror();
+      final act = CardAct.keyframed(frames: frames, reverse: reverse);
+      expect(act.frames, equals(frames));
+      expect(act.reverse, reverse);
     });
 
     test('assert fails when both shape and borderRadius are provided', () {
@@ -183,6 +273,28 @@ void main() {
       expect(reverseAnimtable, isNull);
     });
 
+    test('resolve returns ActContext', () {
+      const act = CardAct(
+        elevation: AnimatableValue(from: 0.0, to: 8.0),
+      );
+      
+      final resolved = act.resolve(actContext);
+
+      expect(resolved, isA<ActContext>());
+    });
+
+    test('resolve with keyframed', () {
+      final frames = FractionalKeyframes<CardProps>([
+        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+      ]);
+      final act = CardAct.keyframed(frames: frames);
+      
+      final resolved = act.resolve(actContext);
+
+      expect(resolved, isA<ActContext>());
+    });
+
     test('equality', () {
       const act1 = CardAct(
         elevation: AnimatableValue(from: 0.0, to: 8.0),
@@ -194,6 +306,23 @@ void main() {
       );
       const act3 = CardAct(
         elevation: AnimatableValue(from: 0.0, to: 4.0),
+      );
+
+      expect(act1, equals(act2));
+      expect(act1, isNot(equals(act3)));
+    });
+
+    test('equality with different properties', () {
+      const act1 = CardAct(
+        clipBehavior: Clip.hardEdge,
+        borderOnForeground: false,
+      );
+      const act2 = CardAct(
+        clipBehavior: Clip.hardEdge,
+        borderOnForeground: false,
+      );
+      const act3 = CardAct(
+        clipBehavior: Clip.antiAlias,
       );
 
       expect(act1, equals(act2));
