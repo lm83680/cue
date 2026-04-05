@@ -275,5 +275,556 @@ void main() {
         expect(act, same(act));
       });
     });
+
+    group('render object updates', () {
+      testWidgets('updates driver when changed', (tester) async {
+        final act = ParallaxAct(slide: 0.5);
+        
+        track.setProgress(0.5);
+        final animation1 = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(context, animation1, const SizedBox(width: 300, height: 200));
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Update with new animation
+        final animation2 = createDeferredAnimation(track, actContext);
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(context, animation2, const SizedBox(width: 300, height: 200));
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('updates slide when changed', (tester) async {
+        final act1 = ParallaxAct(slide: 0.3);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        final widget1 = Directionality(
+          textDirection: TextDirection.ltr,
+          child: SizedBox(
+            width: 400,
+            height: 200,
+            child: Builder(
+              builder: (context) {
+                return act1.apply(context, animation, const SizedBox(width: 300, height: 200));
+              },
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(widget1);
+        
+        final act2 = ParallaxAct(slide: 0.7);
+        final widget2 = Directionality(
+          textDirection: TextDirection.ltr,
+          child: SizedBox(
+            width: 400,
+            height: 200,
+            child: Builder(
+              builder: (context) {
+                return act2.apply(context, animation, const SizedBox(width: 300, height: 200));
+              },
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(widget2);
+        await tester.pump();
+      });
+
+      testWidgets('updates axis when changed', (tester) async {
+        final act = ParallaxAct(slide: 0.5);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 400,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 300),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Update axis
+        final act2 = ParallaxAct(slide: 0.5, axis: Axis.vertical);
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 400,
+              child: Builder(
+                builder: (context) {
+                  return act2.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 300),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('handles zero-sized child', (tester) async {
+        final act = ParallaxAct(slide: 0.5);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation, const SizedBox.shrink());
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+    });
+
+    group('animation lifecycle', () {
+      testWidgets('attaches and detaches listener', (tester) async {
+        final act = ParallaxAct(slide: 0.5);
+        
+        track.setProgress(0);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Tick animation at multiple points
+        track.setProgress(0.25);
+        await tester.pump();
+
+        track.setProgress(0.5);
+        await tester.pump();
+
+        track.setProgress(0.75);
+        await tester.pump();
+
+        track.setProgress(1.0);
+        await tester.pump();
+      });
+
+      testWidgets('hits test handles parallax offset', (tester) async {
+        final act = ParallaxAct(slide: 0.5);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    GestureDetector(
+                      onTap: () {},
+                      child: const SizedBox(width: 300, height: 200),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+        // The widget should be pumpable without errors
+        expect(find.byType(SizedBox), findsWidgets);
+      });
+    });
+
+    group('reverse behavior', () {
+      testWidgets('with exclusive reverse', (tester) async {
+        const reverse = ReverseBehavior<double>.exclusive();
+        final act = ParallaxAct(
+          slide: 0.5,
+          reverse: reverse,
+          axis: Axis.horizontal,
+        );
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('with none reverse', (tester) async {
+        const reverse = ReverseBehavior<double>.none();
+        final act = ParallaxAct(
+          slide: 0.5,
+          reverse: reverse,
+          axis: Axis.vertical,
+        );
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 200,
+              height: 400,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 200, height: 300),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('setter called with same value returns early', (tester) async {
+        final act = ParallaxAct(slide: 0.5, axis: Axis.horizontal);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Update with same slide value - setter should return early
+        final act2 = ParallaxAct(slide: 0.5, axis: Axis.horizontal);
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act2.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('updates reverse behavior when changed', (tester) async {
+        const reverse1 = ReverseBehavior<double>.mirror();
+        final act1 = ParallaxAct(
+          slide: 0.5,
+          reverse: reverse1,
+        );
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act1.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Update reverse behavior
+        const reverse2 = ReverseBehavior<double>.exclusive();
+        final act2 = ParallaxAct(
+          slide: 0.5,
+          reverse: reverse2,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act2.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 300, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('handles child with gesture detection', (tester) async {
+        final act = ParallaxAct(slide: 0.5);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        int tapCount = 0;
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    GestureDetector(
+                      onTap: () {
+                        tapCount++;
+                      },
+                      child: const SizedBox(width: 300, height: 200),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('large negative slide value', (tester) async {
+        final act = ParallaxAct(slide: -0.8, axis: Axis.horizontal);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 600, height: 200),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('paint and hitTest with parallax offset', (tester) async {
+        final act = ParallaxAct(slide: 0.5, axis: Axis.horizontal);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    GestureDetector(
+                      onTap: () {},
+                      child: const SizedBox(width: 300, height: 200, child: Text('Tap me')),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+        expect(find.text('Tap me'), findsOneWidget);
+      });
+
+      testWidgets('zero-width child triggers caching', (tester) async {
+        final act = ParallaxAct(slide: 0.5, axis: Axis.horizontal);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 0, height: 200, child: Text('Skip')),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('zero-height child triggers caching', (tester) async {
+        final act = ParallaxAct(slide: 0.5, axis: Axis.vertical);
+        
+        track.setProgress(0.5);
+        final animation = createDeferredAnimation(track, actContext);
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 200,
+              height: 400,
+              child: Builder(
+                builder: (context) {
+                  return act.apply(
+                    context,
+                    animation,
+                    const SizedBox(width: 200, height: 0, child: Text('Skip')),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+    });
   });
 }

@@ -1,5 +1,6 @@
-
 import 'package:cue/cue.dart';
+import 'package:cue/src/timeline/track/track.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -7,7 +8,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final motion = CueMotion.linear(300.ms);
   final actContext = ActContext(motion: motion, reverseMotion: motion);
- 
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('PathMotionAct', () {
     group('key', () {
@@ -181,6 +183,267 @@ void main() {
         final act1 = PathMotionAct(path: path, autoRotate: true);
         final act2 = PathMotionAct(path: path, autoRotate: false);
         expect(act1, isNot(act2));
+      });
+
+      test('different alignment values are not equal', () {
+        final path = Path()..lineTo(100, 0);
+        final act1 = PathMotionAct(path: path, alignment: Alignment.center);
+        final act2 = PathMotionAct(path: path, alignment: Alignment.topLeft);
+        expect(act1, isNot(act2));
+      });
+    });
+
+    group('buildTweens', () {
+      test('throws error on empty path', () {
+        final emptyPath = Path();
+        final act = PathMotionAct(path: emptyPath);
+
+        expect(
+          () => act.buildTweens(actContext),
+          throwsException,
+        );
+      });
+
+      test('throws error on path with multiple metrics', () {
+        final multiPath = Path()
+          ..lineTo(100, 0)
+          ..moveTo(200, 0)
+          ..lineTo(300, 0);
+        final act = PathMotionAct(path: multiPath);
+
+        expect(
+          () => act.buildTweens(actContext),
+          throwsException,
+        );
+      });
+
+      test('creates tween for valid linear path', () {
+        final path = Path()..lineTo(100, 0);
+        final act = PathMotionAct(path: path);
+
+        final (animatable, reverseAnimatable) = act.buildTweens(actContext);
+        expect(animatable, isNotNull);
+        expect(reverseAnimatable, isNull);
+      });
+
+      test('creates tween for circular path', () {
+        final act = PathMotionAct.circular(radius: 50);
+        final (animatable, reverseAnimatable) = act.buildTweens(actContext);
+        expect(animatable, isNotNull);
+        expect(reverseAnimatable, isNull);
+      });
+
+      test('creates tween for arc path', () {
+        final act = PathMotionAct.arc(
+          radius: 50,
+          sweepAngle: 180,
+        );
+        final (animatable, reverseAnimatable) = act.buildTweens(actContext);
+        expect(animatable, isNotNull);
+        expect(reverseAnimatable, isNull);
+      });
+    });
+
+    group('apply', () {
+      testWidgets('renders child widget on linear path', (tester) async {
+        final path = Path()..lineTo(100, 0);
+        final act = PathMotionAct(path: path);
+
+        final (animatable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation, const Text('Path Motion'));
+              },
+            ),
+          ),
+        );
+
+        expect(find.text('Path Motion'), findsOneWidget);
+      });
+
+      testWidgets('renders with autoRotate enabled', (tester) async {
+        final act = PathMotionAct.circular(
+          radius: 50,
+          autoRotate: true,
+        );
+
+        final (animatable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(
+                  context,
+                  animation,
+                  const SizedBox(width: 50, height: 50),
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('renders with custom alignment', (tester) async {
+        final path = Path()..lineTo(100, 0);
+        final act = PathMotionAct(
+          path: path,
+          alignment: Alignment.topLeft,
+        );
+
+        final (animatable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(
+                  context,
+                  animation,
+                  const SizedBox(width: 50, height: 50),
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+
+      testWidgets('renders arc path animation', (tester) async {
+        final act = PathMotionAct.arc(
+          radius: 50,
+          sweepAngle: 180,
+          autoRotate: true,
+        );
+
+        final (animatable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(
+                  context,
+                  animation,
+                  const SizedBox(width: 50, height: 50),
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+      });
+    });
+
+    group('path transform evaluation', () {
+      test('circular path at different progress values', () {
+        final act = PathMotionAct.circular(
+          radius: 50,
+          autoRotate: true,
+          startAngle: 45,
+        );
+
+        final (animatable, _) = act.buildTweens(actContext);
+        
+        // Test at different progress values
+        track.setProgress(0);
+        final animation0 = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+        expect(animation0.value, isA<Matrix4>());
+
+        track.setProgress(0.25);
+        final animation25 = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+        expect(animation25.value, isA<Matrix4>());
+
+        track.setProgress(0.5);
+        final animation50 = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+        expect(animation50.value, isA<Matrix4>());
+
+        track.setProgress(1.0);
+        final animation100 = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+        expect(animation100.value, isA<Matrix4>());
+      });
+
+      test('linear path motion without autoRotate', () {
+        final path = Path()..lineTo(100, 0);
+        final act = PathMotionAct(path: path, autoRotate: false);
+
+        final (animatable, _) = act.buildTweens(actContext);
+        
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+        expect(animation.value, isA<Matrix4>());
+      });
+
+      test('arc path with start offset', () {
+        final act = PathMotionAct.arc(
+          radius: 50,
+          sweepAngle: 360,
+          startOffset: 90,
+        );
+
+        final (animatable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Matrix4>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animatable,
+        );
+        expect(animation.value, isA<Matrix4>());
       });
     });
   });

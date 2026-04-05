@@ -20,8 +20,9 @@ abstract class CueMotion {
 
   CueMotion delayed(Duration delay) => DelayedMotion(this, delay);
 
-  const factory CueMotion.curved(Duration duration, {required Curve curve}) = TimedMotion.curved;
   const factory CueMotion.linear(Duration duration) = TimedMotion;
+  const factory CueMotion.threshold(Duration duration, double breakpoint) = _ThresholdMotion;
+  const factory CueMotion.curved(Duration duration, {required Curve curve}) = TimedMotion.curved;
   const factory CueMotion.easeIn(Duration duration) = TimedMotion.easeIn;
   const factory CueMotion.easeOut(Duration duration) = TimedMotion.easeOut;
   const factory CueMotion.easeInOut(Duration duration) = TimedMotion.easeInOut;
@@ -127,6 +128,15 @@ abstract class CueMotion {
   }) = Spring.effectFast;
 }
 
+class _ThresholdMotion extends TimedMotion {
+  final double breakpoint;
+
+  @override
+  Curve get curve => Threshold(breakpoint);
+
+  const _ThresholdMotion(super.duration, this.breakpoint);
+}
+
 class TimedMotion extends CueMotion {
   final Curve? curve;
   const TimedMotion(this.baseDuration) : curve = null;
@@ -137,6 +147,8 @@ class TimedMotion extends CueMotion {
   const TimedMotion.easeOutBack(this.baseDuration) : curve = Curves.easeOutBack;
   const TimedMotion.easeInBack(this.baseDuration) : curve = Curves.easeInBack;
   const TimedMotion.fastOutSlowIn(this.baseDuration) : curve = Curves.fastOutSlowIn;
+  const factory TimedMotion.threshold(Duration duration, double breakpoint) = _ThresholdMotion;
+
   @override
   final Duration baseDuration;
 

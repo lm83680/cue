@@ -10,6 +10,7 @@ class Actor extends StatefulWidget {
   final CueMotion? reverseMotion;
   final Duration delay;
   final Duration reverseDelay;
+  final bool addRepaintBoundary;
 
   const Actor({
     super.key,
@@ -19,6 +20,7 @@ class Actor extends StatefulWidget {
     this.reverseMotion,
     this.delay = Duration.zero,
     this.reverseDelay = Duration.zero,
+    this.addRepaintBoundary = false,
   });
 
   @override
@@ -136,7 +138,7 @@ class ActorState extends State<Actor> {
       _eventsDisposer?.call();
       _eventsDisposer = scope.controller.addEventListener<TimelineEvent>((_) => _onWillAnimate());
     }
-    if (_cachedScope?.controller != scope.controller ) {
+    if (_cachedScope?.controller != scope.controller) {
       _resolveActs(scope.controller.timeline.defaultConfig);
       _clearCache(scope);
       _setupAnimations(scope);
@@ -156,6 +158,9 @@ class ActorState extends State<Actor> {
           'Animation for act $act not found. This should not happen as animations are set up in initState and didUpdateWidget.',
         );
       }
+    }
+    if (widget.addRepaintBoundary) {
+      return RepaintBoundary(child: current);
     }
     return current;
   }
