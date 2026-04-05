@@ -1,5 +1,22 @@
 part of 'cue.dart';
 
+/// {@template cue.on_hover}
+/// A [Cue] that animates on mouse hover.
+///
+/// Animates forward when the cursor enters and reverses when it exits.
+/// Wraps [child] in a [MouseRegion] internally.
+///
+/// [cursor] sets the pointer cursor. [opaque] controls whether the region
+/// absorbs pointer events from widgets below (default `false`).
+///
+/// ```dart
+/// Cue.onHover(
+///   motion: Spring.smooth(damping: 23),
+///   acts: [.scale(from: 1.0, to: 1.05)],
+///   child: MyButton(),
+/// )
+/// ```
+/// {@endtemplate}
 class OnHoverCue extends SelfAnimatedCue {
   const OnHoverCue({
     super.key,

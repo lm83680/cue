@@ -1,5 +1,34 @@
 part of 'cue.dart';
 
+/// {@template cue.on_scroll_visible}
+/// A [Cue] that plays its animation once when the widget scrolls into the viewport.
+///
+/// The animation plays forward when revealed and stays complete — it does not
+/// reverse when the widget scrolls back out.
+///
+/// [enabled] can be set to `false` to skip the reveal (jumps to completed state).
+///
+/// Must be inside a [Scrollable]. Does not support nested scrollables or
+/// general-purpose visibility detection outside scroll views.
+///
+/// ## Scrub mode vs. play mode
+///
+/// Until the widget is revealed, the controller is in **scrub mode**: scroll
+/// position drives progress directly, like seeking through a pre-baked
+/// animation. [Actor] delays still apply — they shift when each element
+/// appears within the 0–1 range.
+///
+/// Once the widget enters the viewport the controller switches to **play
+/// mode** and the animation completes using the configured motion (spring or
+/// timed). The motion specs have no effect while scrubbing.
+///
+/// ```dart
+/// Cue.onScrollVisible(
+///   acts: [.fadeIn(), .slideY(from: 0.2)],
+///   child: MyWidget(),
+/// )
+/// ```
+/// {@endtemplate}
 class OnScrollVisibleCue extends Cue {
   const OnScrollVisibleCue({
     super.key,

@@ -1,5 +1,29 @@
 part of 'cue.dart';
 
+/// {@template cue.on_toggle}
+/// A [Cue] driven by a boolean [toggled] value.
+///
+/// Animates forward when [toggled] becomes `true` and reverses when it
+/// becomes `false`. The natural fit for any UI component with two states:
+///
+/// - expand / collapse
+/// - open / close
+/// - on / off
+/// - selected / unselected
+/// - visible / hidden
+///
+/// [skipFirstAnimation] (defaults to `true`) makes the controller jump to the
+/// correct end state on the first build without playing the animation.
+///
+/// ```dart
+/// Cue.onToggle(
+///   toggled: isExpanded,
+///   motion: .smooth(),
+///   acts: [.rotate(to: 180), .fadeIn()],
+///   child: Icon(Icons.expand_more),
+/// )
+/// ```
+/// {@endtemplate}
 class OnToggleCue extends SelfAnimatedCue {
   const OnToggleCue({
     super.key,
@@ -21,6 +45,7 @@ class OnToggleCue extends SelfAnimatedCue {
 }
 
 class _ToggledStageState extends SelfAnimatedCueState<OnToggleCue> {
+  
   @override
   String get debugName => 'ToggledCue';
 

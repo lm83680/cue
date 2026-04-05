@@ -1,5 +1,22 @@
 part of 'cue.dart';
 
+/// {@template cue.on_focus}
+/// A [Cue] that animates when the widget gains or loses keyboard focus.
+///
+/// Animates forward on focus gained and reverses on focus lost.
+/// Wraps [child] in a [Focus] widget internally.
+///
+/// Provide a [focusNode] to manage focus externally. If omitted, one is
+/// created and disposed automatically.
+///
+/// ```dart
+/// Cue.onFocus(
+///   motion: Spring.smooth(damping: 23),
+///   acts: [.scale(from: 1.0, to: 1.02)],
+///   child: MyTextField(),
+/// )
+/// ```
+/// {@endtemplate}
 class OnFocusCue extends SelfAnimatedCue {
   const OnFocusCue({
     super.key,

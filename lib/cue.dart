@@ -3,7 +3,7 @@ export 'src/cue/cue.dart'
     show Cue, CueScope, CuePageController, CueTabController, CueIndexController, IndexedCueController, SelfAnimatedCue;
 export 'src/motion/animations.dart';
 export 'src/core/keyframes.dart';
-export 'src/cue/cue_debug_provider.dart';
+export 'src/cue/debug/cue_dev_tools.dart';
 export 'src/motion/spring_motion.dart';
 export 'src/acts/base/act.dart' hide PathClipAct, AxisClipAct;
 export 'src/actor/actor.dart';
@@ -16,5 +16,5 @@ export 'src/motion/animtable.dart';
 export 'src/motion/utils.dart';
 export 'src/widgets/cue_modals.dart';
 export 'src/widgets/cue_route_mixin.dart';
-export 'src/acts/custom_tween_act.dart';
+export 'src/acts/custom_tween_act.dart' hide CustomTweenAct;
 export 'src/widgets/cue_drag_scrubber.dart';

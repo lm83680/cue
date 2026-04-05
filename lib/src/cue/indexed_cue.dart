@@ -1,5 +1,70 @@
 part of 'cue.dart';
 
+/// {@template cue.indexed}
+/// A [Cue] driven by an [IndexedCueController] at a specific [index].
+///
+/// Primarily intended for use with [PageView] via [CuePageController], though
+/// it works with any [IndexedCueController] implementation (see also
+/// [CueTabController] and [CueIndexController]).
+///
+/// Each [IndexedCue] listens to a shared [IndexedCueController] and maps the
+/// controller's global offset to a per-item 0–1 progress. Items below the
+/// offset animate forward; at or above it they animate in reverse.
+///
+/// ## Scrub mode vs. play mode
+///
+/// When the [IndexedCueController] sets its offset directly (scrubbing — e.g.
+/// while the user drags between pages), each item's controller is in **scrub
+/// mode**: the offset is mapped to a 0–1 progress value and the motion is
+/// scrubbed as a timeline rather than played in real time. The motion you
+/// configure still shapes the animation curve — it just gets seeked through
+/// instead of ticked forward.
+///
+/// When the controller plays forward or reverse (play mode — e.g. after the
+/// drag ends and the page snaps), the motion specs and [Actor] delays take
+/// effect — delays shift when each item enters and exits, producing the
+/// staggered sequence.
+///
+/// ## Example — PageView with per-page Actor tree
+///
+/// Place a single [Cue.indexed] at the root of each page. Multiple [Actor]s
+/// anywhere in that page's subtree are all driven by the same per-page
+/// controller:
+///
+/// ```dart
+/// final controller = CuePageController();
+///
+/// PageView(
+///   controller: controller,
+///   children: [
+///     for (int i = 0; i < pages.length; i++)
+///       Cue.indexed(
+///         controller: controller,
+///         index: i,
+///         motion: .smooth(),
+///         child: Column(
+///           children: [
+///             Actor(
+///               acts: [.fadeIn(), .slideY(from: 0.2)],
+///               child: PageTitle(pages[i]),
+///             ),
+///             Actor(
+///               acts: [.fadeIn(), .slideY(from: 0.2)],
+///               delay: 60.ms,
+///               child: PageBody(pages[i]),
+///             ),
+///             Actor(
+///               acts: [.fadeIn(), .scale(from: 0.9)],
+///               delay: 120.ms,
+///               child: PageFooter(pages[i]),
+///             ),
+///           ],
+///         ),
+///       ),
+///   ],
+/// )
+/// ```
+/// {@endtemplate}
 class IndexedCue extends Cue {
   const IndexedCue({
     super.key,
@@ -62,19 +127,66 @@ class _IndexedCueState extends CueState<IndexedCue> with SingleTickerProviderSta
   CueController get controller => _controller;
 }
 
+ 
+/// The controller protocol for [IndexedCue].
+///
+/// Exposes a [globalOffset] — a fractional index value (e.g. `1.5` means
+/// halfway between item 1 and item 2) — that each [IndexedCue] uses to
+/// compute its own 0–1 animation progress.
+///
+/// Three concrete implementations are provided:
+///
+/// | Class | Use with |
+/// |---|---|
+/// | [CuePageController] | [PageView] |
+/// | [CueTabController] | [TabBarView] / [TabController] |
+/// | [CueIndexController] | Custom index-driven UI |
+///
+/// Implement this mixin to integrate [IndexedCue] with any other
+/// index-based controller.
 mixin IndexedCueController implements Listenable {
+  /// The index the controller is currently animating **toward**.
+  ///
+  /// While animating, this is the target page/tab. When idle it equals
+  /// [currentIndex].
   int get destinationIndex;
 
+  /// The index where the controller was **before** the current animation started.
+  ///
+  /// Used together with [destinationIndex] to normalize per-item progress
+  /// when jumping multiple indices at once.
   int get lastSettledIndex;
 
+  /// The index nearest to the current [globalOffset], rounded to the closest integer.
   int get currentIndex;
 
+  /// Whether to animate **all** items simultaneously during a transition,
+  /// or only the departing and arriving items.
+  ///
+  /// Defaults to `false` — only [lastSettledIndex] and [destinationIndex]
+  /// receive a non-zero progress value while animating, which keeps
+  /// off-screen items at their resting state and avoids unnecessary repaints.
+  ///
+  /// Set to `true` when items are partially visible (e.g. a [PageView] with
+  /// `viewportFraction < 1`) so that surrounding pages also animate.
   bool get animateAll => false;
 
+  /// Whether the controller is currently mid-animation.
   bool get isAnimating;
 
+  /// The fractional index position — e.g. `1.5` while halfway between index 1
+  /// and index 2, `2.0` when settled on index 2.
+  ///
+  /// This is the primary value [IndexedCue] reads on every notification to
+  /// compute each item's progress.
   double get globalOffset;
 
+  /// Returns the 0–1 animation progress for [targetIndex] given the current
+  /// [globalOffset].
+  ///
+  /// When [animateAll] is `false` and the controller [isAnimating], only
+  /// [lastSettledIndex] and [destinationIndex] receive a non-zero value;
+  /// all other indices return `0.0`.
   double valueFor(int targetIndex) {
     if (!animateAll && isAnimating) {
       final isRelevant = targetIndex == lastSettledIndex || targetIndex == destinationIndex;
@@ -84,8 +196,24 @@ mixin IndexedCueController implements Listenable {
     return calculateOffsetFor(targetIndex);
   }
 
+  /// The [Listenable] that [IndexedCue] subscribes to for progress updates.
+  ///
+  /// Defaults to `this`. Override when the controller wraps an inner
+  /// animation object whose tick rate should drive updates — e.g.
+  /// [CueTabController] returns `animation` so updates fire every frame
+  /// during a tab transition rather than only at discrete index changes.
   Listenable get tickListenable => this;
 
+  /// Core offset-to-progress mapping for [targetIndex].
+  ///
+  /// When [isDestination] is `false`, progress is `1 - distance` clamped to
+  /// `[0, 1]` — the item fades/slides in as [globalOffset] approaches it and
+  /// out as it moves away.
+  ///
+  /// When [isDestination] is `true` and the jump spans more than one index,
+  /// progress is normalized across the full travel distance so the active and
+  /// destination items animate in parallel regardless of how many pages are
+  /// skipped.
   double calculateOffsetFor(int targetIndex, {bool isDestination = false}) {
     final distance = (globalOffset - targetIndex).abs();
     if (!isDestination) return (1.0 - distance).clamp(0.0, 1.0);

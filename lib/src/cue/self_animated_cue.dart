@@ -1,5 +1,14 @@
 part of 'cue.dart';
 
+/// Base class for [Cue] variants that own and manage their [CueController].
+///
+/// [SelfAnimatedCue] creates a [CueController] internally using [motion] and
+/// [reverseMotion], and drives it in response to some trigger (toggling,
+/// hovering, mounting, etc.).
+///
+/// Supports optional looping via [repeat], [reverseOnRepeat], and [repeatCount],
+/// as well as an [onEnd] callback that fires when the animation completes in
+/// either direction.
 abstract class SelfAnimatedCue extends Cue {
   const SelfAnimatedCue({
     super.key,
@@ -22,6 +31,13 @@ abstract class SelfAnimatedCue extends Cue {
   final ValueChanged<bool>? onEnd;
 }
 
+/// Base [State] for [SelfAnimatedCue] subclasses.
+///
+/// Creates and owns the [CueController], wires up the [onEnd] status listener,
+/// and rebuilds the timeline when [motion] or [reverseMotion] change.
+///
+/// Subclasses override [onControllerReady] to start their animation logic
+/// once the controller has been initialised.
 abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<T> with SingleTickerProviderStateMixin {
   
   @override

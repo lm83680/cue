@@ -104,59 +104,6 @@ void main() {
         expect(find.byType(MatrixTransition), findsOneWidget);
       });
 
-      testWidgets('flipX constructor rotates around X axis', (tester) async {
-        final act = RotateAct.flipX();
-        expect(act.axis, RotateAxis.x);
-        expect(act.unit, RotateUnit.radians);
-        expect(act.from, 0);
-        expect(act.to, math.pi);
-
-        final (animtable, _) = act.buildTweens(actContext);
-        track.setProgress(0.5);
-        final animation = CueAnimationImpl<double>(
-          parent: track,
-          token: ReleaseToken(track.config, timeline),
-          animtable: animtable,
-        );
-
-        await tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: Builder(
-              builder: (context) => act.apply(context, animation, const SizedBox()),
-            ),
-          ),
-        );
-
-        expect(find.byType(MatrixTransition), findsOneWidget);
-      });
-
-      testWidgets('flipY constructor rotates around Y axis', (tester) async {
-        final act = RotateAct.flipY();
-        expect(act.axis, RotateAxis.y);
-        expect(act.unit, RotateUnit.radians);
-        expect(act.from, 0);
-        expect(act.to, math.pi);
-
-        final (animtable, _) = act.buildTweens(actContext);
-        track.setProgress(0.5);
-        final animation = CueAnimationImpl<double>(
-          parent: track,
-          token: ReleaseToken(track.config, timeline),
-          animtable: animtable,
-        );
-
-        await tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: Builder(
-              builder: (context) => act.apply(context, animation, const SizedBox()),
-            ),
-          ),
-        );
-
-        expect(find.byType(MatrixTransition), findsOneWidget);
-      });
 
       test('constructor with alignment', () {
         const act = RotateAct(alignment: Alignment.topLeft);
@@ -435,6 +382,58 @@ void main() {
         ]);
         final act = Rotate3DAct.keyframed(frames: frames);
         expect(act.frames, frames);
+      });
+
+      testWidgets('flipX constructor rotates around Y axis (horizontal flip)', (tester) async {
+        final act = Rotate3DAct.flipX();
+        expect(act.from, Rotation3D.zero);
+        expect(act.to, const Rotation3D(y: 180));
+        expect(act.unit, Rotate3DUnit.degrees);
+
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Rotation3D>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(Transform), findsOneWidget);
+      });
+
+      testWidgets('flipY constructor rotates around X axis (vertical flip)', (tester) async {
+        final act = Rotate3DAct.flipY();
+        expect(act.from, Rotation3D.zero);
+        expect(act.to, const Rotation3D(x: 180));
+        expect(act.unit, Rotate3DUnit.degrees);
+
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<Rotation3D>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(Transform), findsOneWidget);
       });
     });
 

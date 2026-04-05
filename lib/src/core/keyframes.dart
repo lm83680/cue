@@ -282,7 +282,6 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
       final frame = frames[i];
       final clampedTime = frame.at.clamp(0.0, 1.0);
       frameCurves[clampedTime] = frame.curve ?? curve;
-      ;
     }
 
     // Sort by time

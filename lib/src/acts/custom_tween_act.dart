@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:cue/cue.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Animates custom tween values using a builder function.
@@ -14,7 +13,6 @@ import 'package:flutter/material.dart';
 /// [tweenBuilder]) or implements [Lerpable] for custom interpolation. If neither
 /// is provided and `T` is a [Lerpable], the default interpolation uses
 /// `lerpTo()`.
-@internal
 class CustomTweenAct<T extends Object?> extends TweenAct<T> {
   
   @override

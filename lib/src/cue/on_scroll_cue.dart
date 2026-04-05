@@ -1,5 +1,35 @@
 part of 'cue.dart';
 
+/// {@template cue.on_scroll}
+/// A [Cue] that maps the widget's scroll journey through the viewport to
+/// animation progress.
+///
+/// Progress is `0.0` when the widget's leading edge enters the bottom of the
+/// viewport, and `1.0` when it reaches the top. Suitable for parallax effects.
+///
+/// Must be inside a [Scrollable]. Does not support nested scrollables.
+///
+/// ## Scrub mode
+///
+/// The controller is always in **scrub mode**: the scroll position is mapped
+/// directly to a 0–1 progress value and the motion is scrubbed as a timeline
+/// rather than played in real time. The motion you configure still shapes the
+/// animation curve — it just gets seeked through instead of ticked forward.
+///
+/// Prefer non-overshooting motions (e.g. `.smooth()`, `.linear()`, `.easeOut()`)
+/// for scroll-linked animations. Springs with bounce can produce visually
+/// jarring results when scrubbed.
+///
+/// [Actor] delays still apply — they shift when each element appears relative
+/// to the overall 0–1 range.
+///
+/// ```dart
+/// Cue.onScroll(
+///   acts: [.parallax(factor: 0.3)],
+///   child: MyWidget(),
+/// )
+/// ```
+/// {@endtemplate}
 class OnScrollCue extends Cue {
   const OnScrollCue({
     super.key,

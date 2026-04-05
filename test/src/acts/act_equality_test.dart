@@ -993,20 +993,20 @@ void main() {
     });
 
     test('flipX defaults are equal', () {
-      const a = RotateAct.flipX();
-      const b = RotateAct.flipX();
+      const a = Rotate3DAct.flipX();
+      const b = Rotate3DAct.flipX();
       expect(a, equals(b));
     });
 
     test('flipY defaults are equal', () {
-      const a = RotateAct.flipY();
-      const b = RotateAct.flipY();
+      const a = Rotate3DAct.flipY();
+      const b = Rotate3DAct.flipY();
       expect(a, equals(b));
     });
 
     test('flipX vs flipY are not equal', () {
-      const a = RotateAct.flipX();
-      const b = RotateAct.flipY();
+      const a = Rotate3DAct.flipX();
+      const b = Rotate3DAct.flipY();
       expect(a, isNot(equals(b)));
     });
   });
