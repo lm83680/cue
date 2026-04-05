@@ -339,7 +339,7 @@ void main() {
             );
             // The following line should trigger the assertion in DeferredTweenAct.build
             // because animation is CueAnimation<Offset>, not DeferredCueAnimation<double>
-            act.build(context, animation as Animation<Object?>, const SizedBox());
+            act.applyInternal(context, animation as Animation<Object?>, const SizedBox());
             return const SizedBox();
           },
         ),

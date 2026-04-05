@@ -374,7 +374,7 @@ class ActorState extends State<Actor> {
     for (final entry in _acts.reversed) {
       final (act, _) = entry;
       if (_animations[act.key]?.animation case final animation?) {
-        current = act.build(context, animation, current);
+        current = act.applyInternal(context, animation, current);
       } else {
         throw StateError(
           'Animation for act $act not found. This should not happen as animations are set up in initState and didUpdateWidget.',
