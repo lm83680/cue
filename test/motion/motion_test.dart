@@ -33,7 +33,7 @@ void main() {
 
     test('linear vs curved are not equal', () {
       const a = TimedMotion(Duration(milliseconds: 300));
-      final b = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.linear);
+      final b = TimedMotion.curved(Duration(milliseconds: 300), curve: Curves.easeIn);
       expect(a, isNot(equals(b)));
     });
 

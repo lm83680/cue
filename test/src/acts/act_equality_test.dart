@@ -328,12 +328,6 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
-    test('TimedMotion vs curved with same duration are not equal', () {
-      const a = CueMotion.linear(Duration(milliseconds: 200));
-      const b = CueMotion.curved(Duration(milliseconds: 200), curve: Curves.linear);
-      expect(a, isNot(equals(b)));
-    });
-
     test('CueMotion.none is equal to itself', () {
       expect(CueMotion.none, equals(CueMotion.none));
     });

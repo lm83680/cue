@@ -7,11 +7,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 
+/// An [AnimationController] that drives animations through a [CueTimeline].
+///
+/// Extends Flutter's [AnimationController] with Cue's motion and track system.
+/// Duration is derived entirely from the timeline—setting it directly is not
+/// supported.
+///
+/// ```dart
+/// final controller = CueController(vsync: this, motion: .smooth());
+/// ```
+///
+/// **Tracks**: The timeline manages multiple tracks, each with its own motion.
+/// Tracks use the controller's default motion unless overridden. Obtain a track
+/// with [obtainTrack], [tweenTrack], or [keyframedTrack].
+///
+/// **Track lifecycle**: Each call to [obtainTrack] returns a [ReleaseToken].
+/// Call [ReleaseToken.release] when the track is no longer needed. The track
+/// is only removed from the timeline once all tokens for it are released.
+///
+/// **Rebuilding the timeline**: If the default motion changes (e.g., after a
+/// widget rebuild with a new [Spring]), call [rebuildTimeline]. All previously
+/// obtained tracks become stale after a rebuild—including those with their own
+/// motion override—and must be re-obtained.
+///
+/// Cue widgets handle all of this seamlessly. If using the controller manually,
+/// be aware of track staleness after rebuilds.
 class CueController extends AnimationController {
   late CueTimeline _timeline;
 
+  /// The managed Cue timeline.
   CueTimeline get timeline => _timeline;
 
+  /// Creates a controller with a Cue timeline.
+  ///
+  /// - [motion]: Default forward motion for all tracks.
+  /// - [reverseMotion]: Default reverse motion. Falls back to [motion] if not provided.
   CueController({
     super.debugLabel,
     super.value = 0.0,
@@ -19,14 +49,24 @@ class CueController extends AnimationController {
     required super.vsync,
     required CueMotion motion,
     CueMotion? reverseMotion,
-  }) : _timeline = CueTimelineImpl(
+  }) : assert(value >= 0.0 && value <= 1.0, 'The initial value must be between 0.0 and 1.0. Received: $value'),
+       _timeline = CueTimelineImpl(
          TrackConfig(
            motion: motion,
            reverseMotion: reverseMotion ?? motion,
          ),
-       ),
+       )..setProgress(value, forward: value > 0.0),
        super.unbounded();
-       
+
+  /// Rebuilds the timeline with a new default motion.
+  ///
+  /// Disposes the current timeline and creates a new one with [newMotion].
+  /// **All previously obtained tracks become stale** after this call—including
+  /// tracks with their own motion override—and will no longer tick.
+  /// Re-obtain all tracks after rebuilding.
+  ///
+  /// Cue widgets call this automatically when their motion input changes.
+  /// Only call this manually if managing tracks outside of Cue widgets.
   void rebuildTimeline(CueMotion newMotion, {CueMotion? reverseMotion}) {
     _timeline.dispose();
     _timeline = CueTimelineImpl(
@@ -37,6 +77,16 @@ class CueController extends AnimationController {
     );
   }
 
+  /// Obtains a raw [CueTrack] from the timeline.
+  ///
+  /// Low-level API. If a track with the given configuration already exists,
+  /// returns the existing track; otherwise creates a new one. In both cases,
+  /// returns a [ReleaseToken] that must be released when the track is no
+  /// longer needed. The track is removed from the timeline only when all
+  /// tokens for it are released.
+  ///
+  /// Prefer [tweenTrack] or [keyframedTrack] over this method when building
+  /// typed animations.
   (CueTrack, ReleaseToken) obtainTrack({
     CueMotion? motion,
     CueMotion? reverseMotion,
@@ -52,6 +102,17 @@ class CueController extends AnimationController {
     );
   }
 
+  /// Creates a [CueAnimation] that animates between [from] and [to].
+  ///
+  /// Obtains a track with the given motion and builds a typed animation over
+  /// the provided value range. Release the animation when done via
+  /// [CueAnimation.release], which releases the underlying track token.
+  ///
+  /// - [from], [to]: The value range to animate.
+  /// - [motion], [reverseMotion]: Override the default track motion.
+  /// - [reverse]: Controls animation behavior when reversing.
+  /// - [delay]: Delay before the animation starts.
+  /// - [tweenBuilder]: Custom tween factory (e.g., `ColorTween.new`).
   CueAnimation<T> tweenTrack<T>({
     CueMotion? motion,
     CueMotion? reverseMotion,
@@ -84,7 +145,7 @@ class CueController extends AnimationController {
       to: to,
       reverse: reverse,
       tweenBuilder: (from, to) {
-        return tweenBuilder?.call(begin: from, end: to) ?? Tween(begin: from, end: to);
+        return tweenBuilder?.call(begin: from, end: to) ?? Tween<T>(begin: from, end: to);
       },
     );
 
@@ -95,6 +156,17 @@ class CueController extends AnimationController {
     );
   }
 
+  /// Creates a [CueAnimation] that animates through a sequence of keyframes.
+  ///
+  /// Similar to [tweenTrack] but accepts [Keyframes<T>] instead of a single
+  /// from/to pair. Each keyframe defines a segment of the animation, driven
+  /// by [SegmentedSimulation] and evaluated via [SegmentedAnimtable].
+  /// Release the animation when done via [CueAnimation.release].
+  ///
+  /// - [frames]: The keyframe sequence to animate through.
+  /// - [reverse]: Controls behavior when reversing.
+  /// - [delay]: Delay before the animation starts.
+  /// - [tweenBuilder]: Custom tween factory (e.g., `ColorTween.new`).
   CueAnimation<T> keyframedTrack<T>({
     KFReverseBehavior<T> reverse = const KFReverseBehavior.mirror(),
     required Keyframes<T> frames,
@@ -141,6 +213,9 @@ class CueController extends AnimationController {
     super.dispose();
   }
 
+  /// Not supported. Duration is derived from the timeline's motion.
+  ///
+  /// Configure duration by setting motion on the track or controller.
   @override
   set duration(Duration? value) {
     throw UnsupportedError(
@@ -148,6 +223,9 @@ class CueController extends AnimationController {
     );
   }
 
+  /// Not supported. Reverse duration is derived from the timeline's reverse motion.
+  ///
+  /// Configure reverse duration by setting [reverseMotion] on the track or controller.
   @override
   set reverseDuration(Duration? value) {
     throw UnsupportedError(
@@ -155,23 +233,36 @@ class CueController extends AnimationController {
     );
   }
 
+  /// The forward animation duration, derived from the timeline's forward motion.
   @override
   Duration get duration {
     final microseconds = _timeline.forwardDuration * Duration.microsecondsPerSecond;
     return Duration(microseconds: microseconds.round());
   }
 
+  /// The reverse animation duration, derived from the timeline's reverse motion.
   @override
   Duration get reverseDuration {
     final microseconds = _timeline.reverseDuration * Duration.microsecondsPerSecond;
     return Duration(microseconds: microseconds.round());
   }
 
+  /// Jumps to [newValue] instantly, clamped to [0, 1].
+  ///
+  /// Delegates to [setProgress], preserving the current forward/reverse
+  /// direction based on [status].
   @override
   set value(double newValue) {
     setProgress(newValue.clamp(0, 1), forward: status.isForwardOrCompleted);
   }
 
+  /// Sets the animation progress directly, typically for scrubbing.
+  ///
+  /// - [newValue]: Progress in [0, 1].
+  /// - [forward]: Whether progress is interpreted as moving forward. Affects
+  ///   which motion (forward or reverse) is used for track evaluation.
+  /// - [forceLinear]: Bypasses curves/physics for direct linear interpolation.
+  ///   Use this for drag-based scrubbing where you want raw positional control.
   void setProgress(double newValue, {bool forward = true, bool forceLinear = false}) {
     assert(newValue >= 0.0 && newValue <= 1.0, 'The animation value must be between 0.0 and 1.0. Received: $newValue');
     timeline.setProgress(newValue, forward: forward, forceLinear: forceLinear);
@@ -191,15 +282,26 @@ class CueController extends AnimationController {
     timeline.removeStatusListener(listener);
   }
 
+  /// Subscribes to Cue-specific [TimelineEvent]s from the timeline.
+  ///
+  /// Returns an [EventDisposer] to cancel the subscription.
   EventDisposer addEventListener<T extends TimelineEvent>(ValueChanged<T> listener) {
     return timeline.addEventListener(listener);
   }
 
   ReleaseToken? _viewReleaseToken;
 
-  // you should not directly call this method to obain a track
-  // this only exists for unowned apis that access the view for default animation
-  // calling this might remove the track from the timeline if it was previously obtained, which mean it won't tick anymore.
+  /// The raw default track as an `Animation<double>`.
+  ///
+  /// **Avoid calling this directly.** This exists solely for compatibility with
+  /// unowned Flutter APIs that require an `Animation<double>` (e.g., some
+  /// third-party widgets), where you have no control over how the animation is
+  /// consumed.
+  ///
+  /// For typed value animations, use [tweenTrack] or [keyframedTrack] instead and
+  /// listen to the returned [CueAnimation]. Repeated calls to [view] release the
+  /// previously obtained track token and re-obtain a new one, which may cause
+  /// the prior track to stop ticking if it had no other token holders.
   @override
   Animation<double> get view {
     if (_viewReleaseToken != null) {
@@ -210,6 +312,10 @@ class CueController extends AnimationController {
     return track;
   }
 
+  /// Starts the animation in the forward direction.
+  ///
+  /// - [from]: Optional starting progress (0→1).
+  /// - [velocity]: Optional initial velocity for spring-based motions.
   @override
   TickerFuture forward({double? from, double? velocity}) {
     _timeline.willAnimate(forward: true);
@@ -223,13 +329,17 @@ class CueController extends AnimationController {
     return super.animateWith(_timeline);
   }
 
+  /// Starts the animation in the reverse direction.
+  ///
+  /// - [from]: Optional starting progress (0→1).
+  /// - [velocity]: Optional initial velocity for spring-based motions.
   @override
   TickerFuture reverse({double? from, double? velocity}) {
     _timeline.willAnimate(forward: false);
     if (from != null) {
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0. Received: $from');
     }
-    _timeline.prepare(forward: false, from: from);
+    _timeline.prepare(forward: false, from: from, velocity: velocity);
 
     if (from != null) {
       super.value = from;
@@ -237,27 +347,41 @@ class CueController extends AnimationController {
     return super.animateBackWith(_timeline);
   }
 
+  /// Not supported. Use [forward] to drive the Cue timeline.
   @override
   TickerFuture animateWith(Simulation simulation) {
     throw UnsupportedError('animateWith is not supported by CueController. Use forward instead.');
   }
 
+  /// Not supported. Use [reverse] to drive the Cue timeline.
   @override
   TickerFuture animateBackWith(Simulation simulation) {
     throw UnsupportedError('animateBackWith is not supported by CueController. Use reverse instead.');
   }
 
+  /// Resets the animation to 0 and stops any in-flight animation.
+  ///
+  /// Also resets the timeline's internal state (e.g., phase and track progress).
   @override
   void reset() {
     timeline.reset();
     super.value = 0.0;
   }
 
+  /// Repeats the animation [count] times.
+  ///
+  /// - [min], [max]: Optional progress range for the repeat cycle.
+  /// - [reverse]: If `true`, alternates direction each cycle.
+  /// - [count]: Number of repetitions. Loops indefinitely if `null`.
+  ///
+  /// **Note**: The [period] parameter is not supported because Cue treats
+  /// physics-based animations as first-class—duration is always derived from
+  /// the motion, not set externally.
   @override
   TickerFuture repeat({double? min, double? max, bool reverse = false, int? count, Duration? period}) {
     if (period != null) {
       throw UnsupportedError(
-        'CueController does does not support time-based repetitio because physics-based animations is a first-class citizen. You may only specify count and reverse parameters. Received: period: $period',
+        'CueController does not support time-based repetition because physics-based animations are first-class. You may only specify count and reverse parameters. Received: period: $period',
       );
     }
     assert(min == null || (min >= 0.0 && min <= 1.0), 'The "min" value must be between 0.0 and 1.0. Received: $min');
@@ -269,6 +393,14 @@ class CueController extends AnimationController {
     return super.animateWith(_timeline);
   }
 
+  /// Animates to a progress [target] using the configured motion.
+  ///
+  /// - [target]: Progress value in [0, 1] to animate toward.
+  /// - [forward]: Direction override. Inferred from [target] vs current [value] if `null`.
+  ///
+  /// **Note**: The [duration] and [curve] parameters from [AnimationController.animateTo]
+  /// are **ignored**. Motion characteristics are configured per track via [CueMotion],
+  /// not through this method.
   @override
   TickerFuture animateTo(double target, {bool? forward, Duration? duration, Curve curve = Curves.linear}) {
     if (duration != null || curve != Curves.linear) {
@@ -293,6 +425,14 @@ class CueController extends AnimationController {
     }
   }
 
+  /// Drives the animation with a raw Flutter spring fling.
+  ///
+  /// This is a standard Flutter fling (not related to Cue's motion system or
+  /// [Spring] presets). Useful for gesture-driven flings where an external
+  /// velocity needs to carry the animation to its boundary.
+  ///
+  /// The fling drives the animation value toward 0 or 1 depending on [velocity]
+  /// direction, and syncs progress to the Cue timeline at each frame.
   @override
   TickerFuture fling({
     double velocity = 1.0,

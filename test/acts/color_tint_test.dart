@@ -218,7 +218,7 @@ void main() {
         final animation = CueAnimationImpl<Color?>(
           parent: track,
           token:  ReleaseToken(track.config, timeline),
-          animtable: AlwaysStoppedAnimatable<Color?>(null),
+          animtable: ConstantAnimtable<Color?>(null),
         );
 
         await tester.pumpWidget(

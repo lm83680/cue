@@ -120,15 +120,13 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
       };
       return SegmentedAnimtable([
         for (final phase in phases)
-          AnimatableSegment(
-            animatable: createSingleTween(phase.begin, phase.end),
-          ),
+          createSingleTween(phase.begin, phase.end)
       ]);
     } else {
       final effectiveFrom = implicitFrom ?? transform(context, from as T);
       assert(effectiveFrom != null && to != null, 'From and to values must be provided when not using keyframes');
       if (effectiveFrom == to) {
-        return AlwaysStoppedAnimatable<R>(effectiveFrom);
+        return ConstantAnimtable<R>(effectiveFrom);
       } else {
         return TweenAnimtable<R>(
           createSingleTween(effectiveFrom, transform(context, to as T)),

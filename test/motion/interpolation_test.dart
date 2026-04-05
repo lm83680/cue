@@ -10,7 +10,7 @@
 //     that range), so no clamping assertion is made for middle progress.
 
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:cue/src/motion/simulation.dart';
+import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:cue/src/motion/spring_motion.dart';
 import 'package:cue/src/motion/utils.dart';
 import 'package:flutter/material.dart';

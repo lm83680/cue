@@ -70,47 +70,6 @@ void main() {
     });
   });
 
-  group('ReversedAnimtable', () {
-    test('evaluate reverses track value before transform', () {
-      final track = createTrack();
-      final animtable = ReversedAnimtable(Tween(begin: 0.0, end: 100.0));
-
-      track.setProgress(0.0);
-      expect(animtable.evaluate(track), equals(100.0));
-
-      track.setProgress(0.5);
-      expect(animtable.evaluate(track), equals(50.0));
-
-      track.setProgress(1.0);
-      expect(animtable.evaluate(track), equals(0.0));
-    });
-
-    test('evaluate with Color tween reversed', () {
-      final track = createTrack();
-      final animtable = ReversedAnimtable<Color>(
-        Tween(begin: Colors.red, end: Colors.blue),
-      );
-
-      track.setProgress(0.0);
-      expect(animtable.evaluate(track), equals(Colors.blue));
-
-      track.setProgress(1.0);
-      expect(animtable.evaluate(track), equals(Colors.red));
-    });
-
-    test('reversed with curved tween', () {
-      final track = createTrack();
-      final animtable = ReversedAnimtable(
-        Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
-      );
-
-      track.setProgress(0.5);
-      final value = animtable.evaluate(track);
-      final expected = Curves.easeIn.transform(1.0 - 0.5);
-      expect(value, equals(expected));
-    });
-  });
-
   group('DualAnimatable', () {
     test('evaluate uses forward when track is forward', () {
       final track = createTrack();
@@ -178,7 +137,7 @@ void main() {
   group('AlwaysStoppedAnimatable', () {
     test('evaluate always returns the same value', () {
       final track = createTrack();
-      final animtable = AlwaysStoppedAnimatable(42.0);
+      final animtable = ConstantAnimtable(42.0);
 
       track.setProgress(0.0);
       expect(animtable.evaluate(track), equals(42.0));
@@ -192,7 +151,7 @@ void main() {
 
     test('evaluate with complex type', () {
       final track = createTrack();
-      final animtable = AlwaysStoppedAnimatable(Colors.red);
+      final animtable = ConstantAnimtable(Colors.red);
 
       track.setProgress(0.0);
       expect(animtable.evaluate(track), equals(Colors.red));
@@ -203,7 +162,7 @@ void main() {
 
     test('evaluate ignores track direction', () {
       final track = createTrack();
-      final animtable = AlwaysStoppedAnimatable('constant');
+      final animtable = ConstantAnimtable('constant');
 
       track.setProgress(0.5);
       expect(animtable.evaluate(track), equals('constant'));
@@ -214,7 +173,7 @@ void main() {
 
     test('with nullable value', () {
       final track = createTrack();
-      final animtable = AlwaysStoppedAnimatable<String?>(null);
+      final animtable = ConstantAnimtable<String?>(null);
 
       expect(animtable.evaluate(track), isNull);
     });
@@ -222,9 +181,7 @@ void main() {
 
   group('AnimatableSegment', () {
     test('transform delegates to animatable', () {
-      final segment = AnimatableSegment<double>(
-        animatable: Tween(begin: 0.0, end: 100.0),
-      );
+      final segment = Tween(begin: 0.0, end: 100.0);
 
       expect(segment.transform(0.0), equals(0.0));
       expect(segment.transform(0.5), equals(50.0));
@@ -232,18 +189,14 @@ void main() {
     });
 
     test('transform with curved animatable', () {
-      final segment = AnimatableSegment<double>(
-        animatable: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
-      );
+      final segment = Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn));
 
       final value = segment.transform(0.5);
       expect(value, lessThan(0.5));
     });
 
     test('transform with Color animatable', () {
-      final segment = AnimatableSegment<Color>(
-        animatable: Tween(begin: Colors.red, end: Colors.blue),
-      );
+      final segment = Tween(begin: Colors.red, end: Colors.blue);
 
       expect(segment.transform(0.0), equals(Colors.red));
       expect(segment.transform(1.0), equals(Colors.blue));
@@ -254,9 +207,9 @@ void main() {
     test('evaluate returns correct segment based on phase', () {
       final track = createTrack();
       final animtable = SegmentedAnimtable<double>([
-        AnimatableSegment(animatable: Tween(begin: 0.0, end: 10.0)),
-        AnimatableSegment(animatable: Tween(begin: 100.0, end: 200.0)),
-        AnimatableSegment(animatable: Tween(begin: 500.0, end: 600.0)),
+        Tween(begin: 0.0, end: 10.0),
+        Tween(begin: 100.0, end: 200.0),
+        Tween(begin: 500.0, end: 600.0),
       ]);
 
       track.setProgress(0.5);
@@ -266,7 +219,7 @@ void main() {
     test('evaluate with single segment', () {
       final track = createTrack();
       final animtable = SegmentedAnimtable<double>([
-        AnimatableSegment(animatable: Tween(begin: 0.0, end: 100.0)),
+        Tween(begin: 0.0, end: 100.0),
       ]);
 
       track.setProgress(0.0);
@@ -279,9 +232,7 @@ void main() {
     test('evaluate with different types per segment', () {
       final track = createTrack();
       final animtable = SegmentedAnimtable<Color>([
-        AnimatableSegment(
-          animatable: Tween(begin: Colors.red, end: Colors.blue),
-        ),
+        Tween(begin: Colors.red, end: Colors.blue),
       ]);
 
       track.setProgress(0.0);
@@ -294,8 +245,8 @@ void main() {
     test('evaluate respects track phase', () {
       final track = createTrack();
       final segments = [
-        AnimatableSegment(animatable: Tween(begin: 0.0, end: 10.0)),
-        AnimatableSegment(animatable: Tween(begin: 20.0, end: 30.0)),
+        Tween(begin: 0.0, end: 10.0),
+        Tween(begin: 20.0, end: 30.0),
       ];
       final animtable = SegmentedAnimtable<double>(segments);
 
@@ -308,20 +259,6 @@ void main() {
     test('is const constructable', () {
       final animtable = TweenAnimtable<double>(Tween(begin: 0.0, end: 1.0));
       expect(animtable, isA<CueAnimtable<double>>());
-    });
-
-    test('can be used as base type', () {
-      CueAnimtable<double> animtable = TweenAnimtable(Tween(begin: 0.0, end: 1.0));
-      final track = createTrack();
-
-      track.setProgress(0.5);
-      expect(animtable.evaluate(track), equals(0.5));
-
-      animtable = AlwaysStoppedAnimatable(42.0);
-      expect(animtable.evaluate(track), equals(42.0));
-
-      animtable = ReversedAnimtable(Tween(begin: 0.0, end: 1.0));
-      expect(animtable.evaluate(track), equals(0.5));
     });
   });
 }

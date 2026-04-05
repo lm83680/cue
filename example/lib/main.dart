@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/ios_context_menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +30,8 @@ class MyApp extends StatelessWidget {
     );
   }
 }
- class DemoPage extends StatefulWidget {
+
+class DemoPage extends StatefulWidget {
   const DemoPage({super.key});
 
   @override
@@ -41,13 +41,19 @@ class MyApp extends StatelessWidget {
 class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(title: const Text('Demo')),
       body: SizedBox.expand(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Expanded(child: IosContextMenu()),
+            Cue.onMount(
+              motion: .linear(500.ms),
+              child: const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Hello World'),
+              ),
+            ),
           ],
         ),
       ),

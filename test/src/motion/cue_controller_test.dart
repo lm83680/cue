@@ -248,7 +248,7 @@ void main() {
           to: 1.0,
         );
 
-        expect(animation.trackConfig.motion, equals(customMotion));
+        expect(animation.parent.config.motion, equals(customMotion));
       });
 
       test('creates animation with custom reverse type', () {
@@ -261,7 +261,7 @@ void main() {
           to: 1.0,
         );
 
-        expect(animation.trackConfig.reverseType, equals(ReverseBehaviorType.exclusive));
+        expect(animation.parent.config.reverseType, equals(ReverseBehaviorType.exclusive));
       });
 
       test('creates animation with reverseTo behavior', () {

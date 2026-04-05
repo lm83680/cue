@@ -1,6 +1,6 @@
 
 import 'package:cue/cue.dart';
-import 'package:cue/src/motion/simulation.dart';
+import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 

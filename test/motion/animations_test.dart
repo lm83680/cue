@@ -50,7 +50,7 @@ void main() {
         animtable: animtable,
       );
 
-      expect(animation.trackConfig, equals(track.config));
+      expect(animation.parent.config, equals(track.config));
     });
 
     test('isReverseOrDismissed returns correct value', () {
@@ -227,7 +227,7 @@ void main() {
         token: token,
       );
 
-      expect(animation.trackConfig, equals(track.config));
+      expect(animation.parent.config, equals(track.config));
     });
 
     test('isReverseOrDismissed reflects track status', () {
