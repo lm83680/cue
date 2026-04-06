@@ -1,8 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/ios_context_menu.dart';
-import 'package:example/examples/options_button.dart';
-import 'package:example/examples/smooth_switch.dart';
-import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
