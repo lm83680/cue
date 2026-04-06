@@ -102,7 +102,7 @@ abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<
       motion: motion,
       reverseMotion: widget.reverseMotion,
       vsync: this,
-      debugLabel: 'Cue Controller for ${widget.debugLabel ?? widget.runtimeType}',
+      debugLabel: 'CueController: ${widget.debugLabel ?? widget.runtimeType}',
     );
   }
 

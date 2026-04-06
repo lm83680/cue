@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class CueDebugTools extends StatefulWidget {
-  const CueDebugTools({super.key, required this.child});
+  const CueDebugTools({super.key, required this.child, this.alignment = Alignment.bottomLeft});
 
   final Widget child;
+  final AlignmentGeometry alignment;
 
   @override
   State<CueDebugTools> createState() => _CueDebugToolsState();
@@ -39,19 +40,32 @@ class CueDebugTools extends StatefulWidget {
 }
 
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
-  final _overlayData = ValueNotifier<_OverlayData>(
+
+  late final _overlayData = ValueNotifier<_OverlayData>(
     _OverlayData(
       isLooping: false,
       isMinimized: true,
       verticalOffset: 0,
       activeTargetId: null,
       isSlowMode: timeDilation != 1.0,
+      alignment: widget.alignment,
     ),
   );
 
   OverlayEntry? _entry;
 
   CueController? get _controller => _overlayData.value.controller;
+
+
+
+  @override
+  void didUpdateWidget(covariant CueDebugTools oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.alignment != oldWidget.alignment) {
+      _overlayData.value = _overlayData.value.copyWith(alignment: widget.alignment);
+    }
+  }
+
 
   void _startAutoPlay() {
     if (_overlayData.value.isLooping) {
@@ -190,15 +204,17 @@ class _DebugOverlayState extends State<_DebugOverlay> {
       builder: (context, _) {
         return GestureDetector(
           onVerticalDragUpdate: (details) {
-            final maxTop = MediaQuery.sizeOf(context).height - 240;
-            final minTop = 0.0;
+            final screenHeight = MediaQuery.sizeOf(context).height;
+            final isBottomAligned =
+                _data.alignment == Alignment.bottomLeft ||
+                _data.alignment == Alignment.bottomRight ||
+                _data.alignment == Alignment.bottomCenter;
+
+            final minOffset = isBottomAligned ? -(screenHeight - 240) : 0.0;
+            final maxOffset = isBottomAligned ? 0.0 : screenHeight - 240;
+
             _dataNotifier.value = _data.copyWith(
-              verticalOffset:
-                  _data.verticalOffset +
-                  details.delta.dy.clamp(
-                    minTop - _data.verticalOffset,
-                    maxTop - _data.verticalOffset,
-                  ),
+              verticalOffset: (_data.verticalOffset + details.delta.dy).clamp(minOffset, maxOffset),
             );
           },
           child: Transform.translate(
@@ -210,7 +226,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                 return Opacity(opacity: value, child: child);
               },
               child: Align(
-                alignment: Alignment.topLeft,
+                alignment: _data.alignment,
                 child: SafeArea(
                   minimum: .only(top: 16),
                   child: IconTheme(
@@ -233,7 +249,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                           constraints: const BoxConstraints(maxWidth: 500),
                           child: AnimatedSize(
                             duration: const Duration(milliseconds: 200),
-                            alignment: .topLeft,
+                            alignment: _data.alignment,
                             child: ListenableBuilder(
                               listenable: Listenable.merge([_controller]),
                               builder: (context, _) {
@@ -407,27 +423,30 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                       ),
 
                                       Container(
-                                        padding: const .fromLTRB(20, 12, 20, 4),
+                                        padding: const .fromLTRB(0, 12, 0, 4),
                                         decoration: BoxDecoration(
                                           color: theme.colorScheme.surfaceContainer,
                                           borderRadius: .circular(10),
                                         ),
-                                        child: SliderTheme(
-                                          data: SliderThemeData(
-                                            trackShape: _TimelineTickMarkShape(start: 0, end: 1),
-                                            tickMarkShape: SliderTickMarkShape.noTickMark,
-                                            inactiveTrackColor: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface.withValues(alpha: .6),
-                                            thumbShape: _NeedleThumb(height: 60),
-                                          ),
-                                          child: Slider(
-                                            padding: EdgeInsets.zero,
-                                            value: _controller?.value ?? 0,
-                                            activeColor: Colors.transparent,
-                                            thumbColor: theme.colorScheme.primary,
-                                            overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                                            onChanged: _onSliderChanged,
+                                        child: ColoredBox(
+                                          color: Colors.red,
+                                          child: SliderTheme(
+                                            data: SliderThemeData(
+                                              trackShape: _TimelineTickMarkShape(start: 0, end: 1),
+                                              tickMarkShape: SliderTickMarkShape.noTickMark,
+                                              inactiveTrackColor: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface.withValues(alpha: .6),
+                                              thumbShape: _NeedleThumb(height: 56),
+                                            ),
+                                            child: Slider(
+                                              padding: EdgeInsets.symmetric(horizontal: 20),
+                                              value: _controller?.value ?? 0,
+                                              activeColor: Colors.transparent,
+                                              thumbColor: theme.colorScheme.primary,
+                                              overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                                              onChanged: _onSliderChanged,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -604,6 +623,7 @@ class _OverlayData {
   final double verticalOffset;
   final String? activeTargetId;
   final bool forward;
+  final AlignmentGeometry alignment;
   final CueController? controller;
 
   _OverlayData({
@@ -612,6 +632,7 @@ class _OverlayData {
     required this.isMinimized,
     required this.verticalOffset,
     required this.activeTargetId,
+    required this.alignment,
     this.controller,
     this.forward = true,
   });
@@ -626,6 +647,7 @@ class _OverlayData {
           isMinimized == other.isMinimized &&
           verticalOffset == other.verticalOffset &&
           controller == other.controller &&
+          alignment == other.alignment &&
           forward == other.forward &&
           activeTargetId == other.activeTargetId;
 
@@ -638,6 +660,7 @@ class _OverlayData {
     activeTargetId,
     forward,
     controller,
+    alignment,
   );
 
   _OverlayData copyWith({
@@ -648,6 +671,7 @@ class _OverlayData {
     bool? forward,
     bool? isSlowMode,
     CueController? controller,
+    AlignmentGeometry? alignment,
   }) {
     return _OverlayData(
       isSlowMode: isSlowMode ?? this.isSlowMode,
@@ -657,6 +681,7 @@ class _OverlayData {
       forward: forward ?? this.forward,
       activeTargetId: activeTargetId ?? this.activeTargetId,
       controller: controller ?? this.controller,
+      alignment: alignment ?? this.alignment,
     );
   }
 }

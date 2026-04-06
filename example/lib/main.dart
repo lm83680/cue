@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/expanding_cards.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -44,7 +45,6 @@ class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
       appBar: AppBar(
         title: const Text('Demo'),
         actions: [
@@ -57,29 +57,20 @@ class _DemoPageState extends State<DemoPage> {
             icon: Icon(
               isOpen ? Icons.close : Icons.menu,
             ),
-          )
+          ),
         ],
       ),
-      body: Cue.onToggle(
-        toggled: isOpen,
-        child: Column(children: [
-          Actor(
-            acts: [
-               .slideX(to: 1, motion: .smooth()),
+      body: SizedBox.expand(
+        child: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: Column(
+            // mainAxisAlignment: .end,
+            // crossAxisAlignment: .end,
+            children: [
+              ExpandingCards()
             ],
-            child: Container(
-              width: 200,
-              height: 200,
-              color: Colors.blue,
-            ),
           ),
-          const SizedBox(height: 20),
-          Container(
-            width: 200,
-            height: 200,
-            color: Colors.red,
-          ),
-        ],)
+        ),
       ),
     );
   }

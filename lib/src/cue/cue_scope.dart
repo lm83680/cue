@@ -43,6 +43,14 @@ class CueScope extends InheritedWidget {
   }
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty('controller', controller));
+    properties.add(DiagnosticsProperty('reanimateFromCurrent', reanimateFromCurrent));
+    properties.add(DiagnosticsProperty('defaultConfig', defaultConfig));
+  }
+
+  @override
   bool updateShouldNotify(covariant CueScope oldWidget) {
     return controller != oldWidget.controller ||
         reanimateFromCurrent != oldWidget.reanimateFromCurrent ||

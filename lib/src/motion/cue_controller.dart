@@ -327,9 +327,6 @@ class CueController extends AnimationController {
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0. Received: $from');
     }
     _timeline.prepare(forward: true, from: from, velocity: velocity);
-    if (from != null) {
-      super.value = from;
-    }
     return super.animateWith(_timeline);
   }
 
@@ -344,10 +341,6 @@ class CueController extends AnimationController {
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0. Received: $from');
     }
     _timeline.prepare(forward: false, from: from, velocity: velocity);
-
-    if (from != null) {
-      super.value = from;
-    }
     return super.animateBackWith(_timeline);
   }
 

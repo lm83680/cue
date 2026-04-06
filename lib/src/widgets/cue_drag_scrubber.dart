@@ -17,13 +17,15 @@ enum CueDragReleaseMode {
 
 /// Controls the direction of scrubbing when the user drags to scrub the animation.
 enum CueScrubDirection {
-  /// this will set progress(value,forward: true) when scrubbed
+  /// Dragging in the positive axis direction increases progress (0→1).
   forward,
 
-  /// this will set progress(value,forward: false) when scrubbed
+  /// Dragging in the positive axis direction decreases progress (1→0).
   reverse,
 
-  /// this will set progress(value,forward: true/false) based on whether the controller is currently completed or dismissed when the drag starts. If the controller is in a mid-progress state, it will default to forward.
+  /// Infers direction from the controller state at drag start:
+  /// completed/forward → reverse scrub; dismissed/reverse → forward scrub.
+  /// If it's animating, uses current direction of animation.
   auto,
 }
 
@@ -74,7 +76,9 @@ class CueDragScrubber extends StatefulWidget {
   /// The widget below this widget in the tree.
   final Widget child;
 
-  /// The number of logical pixels that map to a full 0→1 progress travel.
+  /// The number of logical pixels that map to a full progress travel.
+  ///
+  /// Always positive. The direction of progress change is controlled by [scrubDirection].
   final double distance;
 
   /// Optional explicit controller. If omitted, the controller is taken from
@@ -140,8 +144,9 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   void _onDragStart(DragStartDetails d) {
     assert(_controller != null);
     final controller = _controller!;
+    final isForward = controller.status.isForwardOrCompleted;
     _scrubForward = switch (widget.scrubDirection) {
-      CueScrubDirection.auto => !controller.status.isForwardOrCompleted,
+      CueScrubDirection.auto => controller.isAnimating ? isForward : !isForward,
       CueScrubDirection.forward => true,
       CueScrubDirection.reverse => false,
     };
@@ -154,7 +159,8 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
     assert(_controller != null);
     final controller = _controller!;
     final delta = _primaryOffset(d.localPosition) - _startOffset;
-    final progress = (_startProgress + delta / widget.distance).clamp(0.0, 1.0);
+    final sign = _scrubForward ? 1.0 : -1.0;
+    final progress = (_startProgress + sign * delta / widget.distance).clamp(0.0, 1.0);
     controller.setProgress(
       progress,
       forward: _scrubForward,
