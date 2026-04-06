@@ -24,20 +24,22 @@ class CueScope extends InheritedWidget {
   /// Whether to reanimate from the current position when the animation triggers again.
   final bool reanimateFromCurrent;
 
+  /// Retrieves the [CueScope] from the given [context].
+  ///
+  /// Throws an assertion error if no [CueScope] is found.
   static CueScope of(BuildContext context) {
     final cue = context.dependOnInheritedWidgetOfExactType<CueScope>();
     assert(cue != null, 'No Cue found in context, make sure to wrap your widget tree with a Cue widget.');
     return cue!;
   }
 
+  /// Retrieves the [CueScope] from the given [context], or null if not found.
   static CueScope? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<CueScope>();
   }
 
   @override
   bool updateShouldNotify(covariant CueScope oldWidget) {
-    return controller != oldWidget.controller ||
-        reanimateFromCurrent != oldWidget.reanimateFromCurrent;
+    return controller != oldWidget.controller || reanimateFromCurrent != oldWidget.reanimateFromCurrent;
   }
 }
-

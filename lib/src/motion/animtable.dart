@@ -13,8 +13,9 @@ import 'package:flutter/widgets.dart';
 /// - [ConstantAnimtable]: Constant value regardless of state
 /// - [SegmentedAnimtable]: Phase-based evaluator selection for keyframes
 abstract class CueAnimtable<T> {
+  /// Creates an animatable driver.
   const CueAnimtable();
-  
+
   /// Evaluates the animated value given the animation track state.
   T evaluate(CueTrack track);
 }
@@ -51,7 +52,7 @@ class TweenAnimtable<T> extends CueAnimtable<T> {
 class DualAnimatable<T> extends CueAnimtable<T> {
   /// The animatable to evaluate when moving forward.
   final CueAnimtable<T> forward;
-  
+
   /// The animatable to evaluate when moving in reverse.
   final CueAnimtable<T> reverse;
 
@@ -86,7 +87,6 @@ class ConstantAnimtable<T> extends CueAnimtable<T> {
   @override
   T evaluate(CueTrack track) => value;
 }
-
 
 /// An [CueAnimtable] that selects and evaluates an evaluator based on phase.
 ///

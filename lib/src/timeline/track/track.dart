@@ -1,4 +1,3 @@
-
 import 'package:cue/cue.dart';
 import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
@@ -83,7 +82,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   /// [alwaysNotify] - Force notifying listeners even if value didn't change
   /// [forceLinear] - Ignore curves/springs and use linear interpolation
   @override
-  void setProgress(double t, {bool forward = true, bool alwaysNotify = false , bool forceLinear = false}) {
+  void setProgress(double t, {bool forward = true, bool alwaysNotify = false, bool forceLinear = false}) {
     assert(t >= 0.0 && t <= 1.0, 'Progress value must be between 0.0 and 1.0. Received: $t');
     _forward = forward;
     _needsPrepare = true;
@@ -164,7 +163,6 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
       _value = sim.x(_localT);
       _phase = sim.phase;
     }
-
 
     final (targetValue, targetPhase) = target == null ? (null, null) : _valueAtProgress(target, forward);
     _activeSim = active.build(
@@ -251,12 +249,16 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
 
   @override
   void didUnregisterListener() => _listenres--;
- 
+
   /// Whether this track has any active listeners.
   bool get hasListeners => _listenres > 0;
 }
 
-
+/// Abstract base class for animation tracks.
+///
+/// A track drives a specific animation with forward and reverse motions.
+/// It maintains progress (0-1), computed animation values, and respects
+/// the track's [ReverseBehaviorType] configuration.
 abstract class CueTrack extends Animation<double> with AnimationLocalListenersMixin {
   /// Prepares the track for animation playback.
   /// Must be called before [tick] when resuming from a [setProgress] call.

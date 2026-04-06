@@ -18,6 +18,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class OnFocusCue extends SelfAnimatedCue {
+  /// Creates an OnFocusCue that animates when focus changes.
   const OnFocusCue({
     super.key,
     super.debugLabel,
@@ -29,6 +30,8 @@ class OnFocusCue extends SelfAnimatedCue {
     required super.child,
   });
 
+/// An optional [FocusNode] to control focus externally. 
+/// If null, a private [FocusNode] is created and managed internally.
   final FocusNode? focusNode;
 
   @override

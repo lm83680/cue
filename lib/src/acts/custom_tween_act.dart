@@ -14,12 +14,13 @@ import 'package:flutter/material.dart';
 /// is provided and `T` is a [Lerpable], the default interpolation uses
 /// `lerpTo()`.
 class CustomTweenAct<T extends Object?> extends TweenAct<T> {
-  
   @override
   final ActKey key = const ActKey('TweenActor');
 
+  /// The widget builder function that receives the animated value.
   final Widget Function(BuildContext context, CueAnimation<T> animation) builder;
 
+  /// Optional custom tween builder for types without [Lerpable] support.
   final Animatable<T>? tweenBuilder;
 
   /// {@template act.custom_tween}
@@ -77,6 +78,7 @@ class CustomTweenAct<T extends Object?> extends TweenAct<T> {
   /// )
   /// ```
   /// {@endtemplate}
+  /// Creates a custom tween act with the given [builder].
   const CustomTweenAct({
     super.from,
     super.to,
@@ -288,7 +290,7 @@ class AnimatedValues extends Lerpable<AnimatedValues> {
   final Size? size;
   final double blur;
 
-/// Default constructor
+  /// Default constructor
   const AnimatedValues({
     this.scale = 1.0,
     this.opacity = 1.0,
@@ -359,6 +361,7 @@ class AnimatedValues extends Lerpable<AnimatedValues> {
 /// )
 /// ```
 abstract class Lerpable<T extends Lerpable<T>> {
+  /// Default const constructor
   const Lerpable();
 
   /// Interpolates from this to [end] with progress `t` (0 to 1).
@@ -375,8 +378,9 @@ abstract class Lerpable<T extends Lerpable<T>> {
 ///
 @visibleForTesting
 class InlineFnTween<T extends Object?> extends Tween<T> {
+  /// The custom lerp function that defines how to interpolate between `begin` and `end`.
   final T Function(double t) lerpFn;
-
+  /// Default constructor
   InlineFnTween({required this.lerpFn, super.begin, super.end});
 
   @override
