@@ -1,5 +1,7 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/expanding_cards.dart';
+import 'package:example/examples/options_button.dart';
+import 'package:example/examples/smooth_switch.dart';
+import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wallet App',
+      title: 'Cue',
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF6C63FF),
@@ -40,34 +42,17 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  bool isOpen = false;
-  final drawerWidth = 320.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Demo'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                isOpen = !isOpen;
-              });
-            },
-            icon: Icon(
-              isOpen ? Icons.close : Icons.menu,
-            ),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Cue')),
       body: SizedBox.expand(
         child: Padding(
           padding: const EdgeInsets.all(0.0),
           child: Column(
-            // mainAxisAlignment: .end,
-            // crossAxisAlignment: .end,
+            mainAxisAlignment: .center,
             children: [
-              ExpandingCards()
+             OptionsButton()
             ],
           ),
         ),

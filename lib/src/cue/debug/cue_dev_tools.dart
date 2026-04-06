@@ -40,7 +40,6 @@ class CueDebugTools extends StatefulWidget {
 }
 
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
-
   late final _overlayData = ValueNotifier<_OverlayData>(
     _OverlayData(
       isLooping: false,
@@ -56,8 +55,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
 
   CueController? get _controller => _overlayData.value.controller;
 
-
-
   @override
   void didUpdateWidget(covariant CueDebugTools oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -65,7 +62,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       _overlayData.value = _overlayData.value.copyWith(alignment: widget.alignment);
     }
   }
-
 
   void _startAutoPlay() {
     if (_overlayData.value.isLooping) {
@@ -87,10 +83,6 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   }
 
   VoidCallback attachDebugTarget(BuildContext context, {required String id, required CueController controller}) {
-    _overlayData.value = _overlayData.value.copyWith(
-      activeTargetId: id,
-      controller: controller,
-    );
     void deattachCallback() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         timeDilation = 1.0;
@@ -102,6 +94,15 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
         );
       });
     }
+
+    if (_overlayData.value.activeTargetId == id && _overlayData.value.controller == controller) {
+      return deattachCallback;
+    }
+
+    _overlayData.value = _overlayData.value.copyWith(
+      activeTargetId: id,
+      controller: controller,
+    );
 
     if (_entry != null) return deattachCallback;
     openOverlay(context);
@@ -428,25 +429,22 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           color: theme.colorScheme.surfaceContainer,
                                           borderRadius: .circular(10),
                                         ),
-                                        child: ColoredBox(
-                                          color: Colors.red,
-                                          child: SliderTheme(
-                                            data: SliderThemeData(
-                                              trackShape: _TimelineTickMarkShape(start: 0, end: 1),
-                                              tickMarkShape: SliderTickMarkShape.noTickMark,
-                                              inactiveTrackColor: Theme.of(
-                                                context,
-                                              ).colorScheme.onSurface.withValues(alpha: .6),
-                                              thumbShape: _NeedleThumb(height: 56),
-                                            ),
-                                            child: Slider(
-                                              padding: EdgeInsets.symmetric(horizontal: 20),
-                                              value: _controller?.value ?? 0,
-                                              activeColor: Colors.transparent,
-                                              thumbColor: theme.colorScheme.primary,
-                                              overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                                              onChanged: _onSliderChanged,
-                                            ),
+                                        child: SliderTheme(
+                                          data: SliderThemeData(
+                                            trackShape: _TimelineTickMarkShape(start: 0, end: 1, horizontalPadding: 20),
+                                            tickMarkShape: SliderTickMarkShape.noTickMark,
+                                            inactiveTrackColor: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface.withValues(alpha: .6),
+                                            thumbShape: _NeedleThumb(height: 56, horizontalPadding: 20),
+                                          ),
+                                          child: Slider(
+                                            padding: EdgeInsets.zero,
+                                            value: _controller?.value ?? 0,
+                                            activeColor: Colors.transparent,
+                                            thumbColor: theme.colorScheme.primary,
+                                            overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                                            onChanged: _onSliderChanged,
                                           ),
                                         ),
                                       ),
@@ -472,8 +470,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
 
 class _NeedleThumb extends SliderComponentShape {
   final double height;
+  final double horizontalPadding;
 
-  const _NeedleThumb({this.height = 60});
+  const _NeedleThumb({this.height = 60, this.horizontalPadding = 16});
 
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) => Size(height, height);
@@ -493,9 +492,9 @@ class _NeedleThumb extends SliderComponentShape {
     required double textScaleFactor,
     required Size sizeWithOverflow,
   }) {
-    final size = parentBox.size;
+    final size = Size(parentBox.size.width - (2 * horizontalPadding), parentBox.size.height);
     final canvas = context.canvas;
-    final progressX = value * size.width;
+    final progressX = horizontalPadding + value * size.width;
     final color = sliderTheme.thumbColor ?? Colors.purple;
     final progressPaint = Paint()
       ..color = color
@@ -520,8 +519,9 @@ class _NeedleThumb extends SliderComponentShape {
 class _TimelineTickMarkShape extends SliderTrackShape {
   final double start;
   final double end;
+  final double horizontalPadding;
 
-  const _TimelineTickMarkShape({required this.start, required this.end});
+  const _TimelineTickMarkShape({required this.start, required this.end, this.horizontalPadding = 16});
 
   @override
   Rect getPreferredRect({
@@ -570,7 +570,7 @@ class _TimelineTickMarkShape extends SliderTrackShape {
       ..color = color
       ..strokeWidth = 1;
     final count = ((end - start) * 10) * 2;
-    final stepWidth = size.width / count;
+    final stepWidth = (size.width - (horizontalPadding * 2)) / count;
 
     final labelStyle = TextStyle(
       color: color,
@@ -601,12 +601,12 @@ class _TimelineTickMarkShape extends SliderTrackShape {
         )..layout();
         textPainter.paint(
           canvas,
-          Offset(i * stepWidth - textPainter.width / 2, 0),
+          Offset(horizontalPadding + i * stepWidth - textPainter.width / 2, 0),
         );
       }
 
       final height = isFullTick ? tickHeight : halfTickHeight;
-      final x = i * stepWidth;
+      final x = horizontalPadding + i * stepWidth;
       canvas.drawLine(
         Offset(x, yOffset),
         Offset(x, height + yOffset),

@@ -290,7 +290,7 @@ class CueController extends AnimationController {
   ///
   /// Returns an [EventDisposer] to cancel the subscription.
   EventDisposer addEventListener<T extends TimelineEvent>(ValueChanged<T> listener) {
-    return timeline.addEventListener(listener);
+    return timeline.addEventListener<T>(listener);
   }
 
   ReleaseToken? _viewReleaseToken;

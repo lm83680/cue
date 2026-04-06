@@ -48,8 +48,8 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                       clipBehavior: .hardEdge,
                       color: theme.colorScheme.surfaceContainer,
                       borderRadius: .vertical(
-                        top: Radius.circular(fromTopRadius),
-                        bottom: Radius.circular(fromBottomRadius),
+                        top: .circular(fromTopRadius),
+                        bottom: .circular(fromBottomRadius),
                       ),
                       child: InkWell(
                         onTap: () {
