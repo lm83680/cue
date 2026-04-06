@@ -20,110 +20,111 @@
 Physics-first Flutter animations with a composable, timeline-driven API for building polished transitions, expressive UI motion, and reusable animation systems without wiring imperative controllers through your widget tree.
 
 <table>
-	<tr>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/ios_context_menu.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/ios_context_menu.gif" alt="iOS context menu demo" width="100%">
-			</a>
-			<br/>
-			<strong>iOS Context Menu</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/ios_context_menu.dart">source</a>
-		</td>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/draggable_panel.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/draggable_panel.gif" alt="Draggable panel demo" width="100%">
-			</a>
-			<br/>
-			<strong>Draggable Panel</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/draggable_panel.dart">source</a>
-		</td>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/indicator_to_button.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/indicator_to_button.gif" alt="Indicator to button demo" width="100%">
-			</a>
-			<br/>
-			<strong>Indicator To Button</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/indicator_to_button.dart">source</a>
-		</td>
-	</tr>
-	<tr>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/bottom_bar.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/bottom_bar.gif" alt="Bottom bar demo" width="100%">
-			</a>
-			<br/>
-			<strong>Bottom Bar</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/bottom_bar.dart">source</a>
-		</td>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/delete_confirmation.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/delete_confirmation.gif" alt="Delete confirmation demo" width="100%">
-			</a>
-			<br/>
-			<strong>Delete Confirmation</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/delete_confirmation.dart">source</a>
-		</td>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/expanding_cards.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/expanding_cards.gif" alt="Expanding cards demo" width="100%">
-			</a>
-			<br/>
-			<strong>Expanding Cards</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/expanding_cards.dart">source</a>
-		</td>
-	</tr>
-	<tr>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/horizinally_expanding_cards.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/horizintally_expanding_cards.gif" alt="Horizontally expanding cards demo" width="100%">
-			</a>
-			<br/>
-			<strong>Horizontally Expanding Cards</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/horizinally_expanding_cards.dart">source</a>
-		</td>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/slack_style_fab.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/slack_style_fab.gif" alt="Slack style fab demo" width="100%">
-			</a>
-			<br/>
-			<strong>Slack Style FAB</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/slack_style_fab.dart">source</a>
-		</td>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/smooth_switch.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/smooth_switch.gif" alt="Smooth switch demo" width="100%">
-			</a>
-			<br/>
-			<strong>Smooth Switch</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/smooth_switch.dart">source</a>
-		</td>
-	</tr>
-	<tr>
-		<td align="center" width="33%">
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/three_dots_action.dart">
-				<img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/three_dots_action.dart.gif" alt="Three dots action demo" width="100%">
-			</a>
-			<br/>
-			<strong>Three Dots Action</strong>
-			<br/>
-			<a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/three_dots_action.dart">source</a>
-		</td>
-		<td align="center" width="33%"></td>
-		<td align="center" width="33%"></td>
-	</tr>
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/ios_context_menu.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/ios_context_menu.gif" alt="iOS context menu demo" width="100%">
+      </a>
+      <br/>
+      <strong>iOS Context Menu</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/ios_context_menu.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/draggable_panel.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/draggable_panel.gif" alt="Draggable panel demo" width="100%">
+      </a>
+      <br/>
+      <strong>Draggable Panel</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/draggable_panel.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/indicator_to_button.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/indicator_to_button.gif" alt="Indicator to button demo" width="100%">
+      </a>
+      <br/>
+      <strong>Indicator To Button</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/indicator_to_button.dart">source</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/bottom_bar.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/bottom_bar.gif" alt="Bottom bar demo" width="100%">
+      </a>
+      <br/>
+      <strong>Bottom Bar</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/bottom_bar.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/delete_confirmation.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/delete_confirmation.gif" alt="Delete confirmation demo" width="100%">
+      </a>
+      <br/>
+      <strong>Delete Confirmation</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/delete_confirmation.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/expanding_cards.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/expanding_cards.gif" alt="Expanding cards demo" width="100%">
+      </a>
+      <br/>
+      <strong>Expanding Cards</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/expanding_cards.dart">source</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/horizinally_expanding_cards.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/horizintally_expanding_cards.gif" alt="Horizontally expanding cards demo" width="100%">
+      </a>
+      <br/>
+      <strong>Horizontally Expanding Cards</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/horizinally_expanding_cards.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/slack_style_fab.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/slack_style_fab.gif" alt="Slack style fab demo" width="100%">
+      </a>
+      <br/>
+      <strong>Slack Style FAB</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/slack_style_fab.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/smooth_switch.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/smooth_switch.gif" alt="Smooth switch demo" width="100%">
+      </a>
+      <br/>
+      <strong>Smooth Switch</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/smooth_switch.dart">source</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/three_dots_action.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/three_dots_action.dart.gif" alt="Three dots action demo" width="100%">
+      </a>
+      <br/>
+      <strong>Three Dots Action</strong>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/three_dots_action.dart">source</a>
+    </td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 Cue separates animation into a few small pieces:
 
+## Usage
 - `Cue` decides when an animation should run.
 - `Actor` decides which widget is animated.
 - `Act` describes the effect that is applied.
@@ -136,15 +137,15 @@ That separation keeps animation code readable, reusable, and easy to scale acros
 
 ```dart
 Cue.onMount(
-	motion: .smooth(),
-	child: Actor(
-		acts: [
-			.fadeIn(),
-			.slideY(from: 0.2),
-			.scale(from: 0.96),
-		],
-		child: const Text('Hello Cue'),
-	),
+  motion: .smooth(),
+  child: Actor(
+    acts: [
+      .fadeIn(),
+      .slideY(from: 0.2),
+      .scale(from: 0.96),
+    ],
+    child: const Text('Hello Cue'),
+  ),
 )
 ```
 
@@ -152,12 +153,12 @@ For a single animated child, you can skip the explicit `Actor` and pass acts dir
 
 ```dart
 Cue.onMount(
-	motion: .smooth(),
-	acts: [
-		.fadeIn(),
-		.slideY(from: 0.2),
-	],
-	child: const Text('Hello Cue'),
+  motion: .smooth(),
+  acts: [
+    .fadeIn(),
+    .slideY(from: 0.2),
+  ],
+  child: const Text('Hello Cue'),
 )
 ```
 
@@ -165,12 +166,12 @@ If you are exploring animations during development, enable `CueDebugTools` right
 
 ```dart
 MaterialApp(
-	builder: (context, child) {
-		if (kDebugMode) {
-			return CueDebugTools(child: child!);
-		}
-		return child!;
-	},
+  builder: (context, child) {
+    if (kDebugMode) {
+      return CueDebugTools(child: child!);
+    }
+    return child!;
+  },
 )
 ```
 
@@ -199,22 +200,22 @@ Example:
 
 ```dart
 Cue.onToggle(
-	toggled: isExpanded,
-	motion: .smooth(),
-	reverseMotion: .snappy(),
-	child: Column(
-		children: [
-			Actor(
-				acts: [.rotate(to: 180)],
-				child: const Icon(Icons.expand_more),
-			),
-			Actor(
-				delay: 50.ms,
-				acts: [.fadeIn(), .slideY(from: 0.15)],
-				child: const Text('Details'),
-			),
-		],
-	),
+  toggled: isExpanded,
+  motion: .smooth(),
+  reverseMotion: .snappy(),
+  child: Column(
+    children: [
+      Actor(
+        acts: [.rotate(to: 180)],
+        child: const Icon(Icons.expand_more),
+      ),
+      Actor(
+        delay: 50.ms,
+        acts: [.fadeIn(), .slideY(from: 0.15)],
+        child: const Text('Details'),
+      ),
+    ],
+  ),
 )
 ```
 
@@ -234,11 +235,11 @@ You can also attach acts inline with the widget extension:
 
 ```dart
 ElevatedButton(
-	onPressed: onPressed,
-	child: const Text('Save'),
+  onPressed: onPressed,
+  child: const Text('Save'),
 ).act([
-	.fadeIn(),
-	.slideUp(),
+  .fadeIn(),
+  .slideUp(),
 ])
 ```
 
@@ -248,12 +249,12 @@ An `Act` is an immutable description of one animated property. Prefer the shorth
 
 ```dart
 Actor(
-	acts: [
-		.fadeIn(),
-		.scale(from: 0.9),
-		.slideY(from: 0.2),
-	],
-	child: child,
+  acts: [
+    .fadeIn(),
+    .scale(from: 0.9),
+    .slideY(from: 0.2),
+  ],
+  child: child,
 )
 ```
 
@@ -284,11 +285,11 @@ Common presets:
 
 ```dart
 Cue.onHover(
-	motion: .interactive(),
-	child: Actor(
-		acts: [.scale(to: 1.03)],
-		child: const Chip(label: Text('Hover me')),
-	),
+  motion: .interactive(),
+  child: Actor(
+    acts: [.scale(to: 1.03)],
+    child: const Chip(label: Text('Hover me')),
+  ),
 )
 ```
 
@@ -300,16 +301,16 @@ Motion-based keyframes:
 
 ```dart
 Actor(
-	acts: [
-		ScaleAct.keyframed(
-			frames: Keyframes([
-				.key(0.92),
-				.key(1.06, motion: .bouncy()),
-				.key(1.0),
-			], motion: .smooth()),
-		),
-	],
-	child: child,
+  acts: [
+    ScaleAct.keyframed(
+      frames: Keyframes([
+        .key(0.92),
+        .key(1.06, motion: .bouncy()),
+        .key(1.0),
+      ], motion: .smooth()),
+    ),
+  ],
+  child: child,
 )
 ```
 
@@ -317,16 +318,16 @@ Fractional keyframes:
 
 ```dart
 Actor(
-	acts: [
-		TranslateAct.keyframed(
-			frames: .fractional([
-				.key(const Offset(0, 24), at: 0.0),
-				.key(const Offset(0, -8), at: 0.7),
-				.key(Offset.zero, at: 1.0),
-			], duration: 450.ms),
-		),
-	],
-	child: child,
+  acts: [
+    TranslateAct.keyframed(
+      frames: .fractional([
+        .key(const Offset(0, 24), at: 0.0),
+        .key(const Offset(0, -8), at: 0.7),
+        .key(Offset.zero, at: 1.0),
+      ], duration: 450.ms),
+    ),
+  ],
+  child: child,
 )
 ```
 
@@ -336,15 +337,15 @@ Actor(
 
 ```dart
 Cue.onMount(
-	motion: .smooth(),
-	acts: [
-		.fadeIn(),
-		.slideY(from: 0.15),
-	],
-	child: const Card(child: Padding(
-		padding: EdgeInsets.all(16),
-		child: Text('Mounted content'),
-	)),
+  motion: .smooth(),
+  acts: [
+    .fadeIn(),
+    .slideY(from: 0.15),
+  ],
+  child: const Card(child: Padding(
+    padding: EdgeInsets.all(16),
+    child: Text('Mounted content'),
+  )),
 )
 ```
 
@@ -352,18 +353,18 @@ Cue.onMount(
 
 ```dart
 Cue.onToggle(
-	toggled: selected,
-	motion: .smooth(),
-	child: Actor(
-		acts: [
-			.scale(to: 1.04),
-			.decorate(
-				color: .tween(Colors.white, Colors.blue.shade50),
-				borderRadius: .fixed(.circular(16)),
-			),
-		],
-		child: child,
-	),
+  toggled: selected,
+  motion: .smooth(),
+  child: Actor(
+    acts: [
+      .scale(to: 1.04),
+      .decorate(
+        color: .tween(Colors.white, Colors.blue.shade50),
+        borderRadius: .fixed(.circular(16)),
+      ),
+    ],
+    child: child,
+  ),
 )
 ```
 
@@ -373,14 +374,14 @@ Cue.onToggle(
 
 ```dart
 Cue.onChange(
-	value: currentTab,
-	motion: .smooth(),
-	fromCurrentValue: true,
-	acts: [
-		.fadeIn(),
-		.slideY(from: 0.08),
-	],
-	child: Text(labels[currentTab]),
+  value: currentTab,
+  motion: .smooth(),
+  fromCurrentValue: true,
+  acts: [
+    .fadeIn(),
+    .slideY(from: 0.08),
+  ],
+  child: Text(labels[currentTab]),
 )
 ```
 
@@ -388,13 +389,13 @@ Cue.onChange(
 
 ```dart
 Cue.onHover(
-	motion: .interactive(),
-	acts: [.scale(to: 1.02)],
-	child: Cue.onFocus(
-		motion: .smooth(),
-		acts: [.decorate(borderRadius: .fixed(.circular(14)))],
-		child: child,
-	),
+  motion: .interactive(),
+  acts: [.scale(to: 1.02)],
+  child: Cue.onFocus(
+    motion: .smooth(),
+    acts: [.decorate(borderRadius: .fixed(.circular(14)))],
+    child: child,
+  ),
 )
 ```
 
@@ -406,40 +407,40 @@ Cue.onHover(
 final controller = CuePageController(viewportFraction: 0.8);
 
 PageView.builder(
-	controller: controller,
-	itemCount: pages.length,
-	itemBuilder: (context, index) {
-		final page = pages[index];
-		return Cue.indexed(
-			controller: controller,
-			index: index,
-			child: Column(
-				mainAxisAlignment: MainAxisAlignment.center,
-				children: [
-					Actor(
-						acts: [
-							.fadeIn(),
-							.slideY(from: 0.12),
-						],
-						child: Text(page.title),
-					),
-					Actor(
-						delay: 60.ms,
-						acts: [
-							.scale(from: 0.96),
-							.fadeIn(),
-						],
-						child: Card(
-							child: SizedBox(
-								height: 220,
-								child: Center(child: Text(page.subtitle)),
-							),
-						),
-					),
-				],
-			),
-		);
-	},
+  controller: controller,
+  itemCount: pages.length,
+  itemBuilder: (context, index) {
+    final page = pages[index];
+    return Cue.indexed(
+      controller: controller,
+      index: index,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Actor(
+            acts: [
+              .fadeIn(),
+              .slideY(from: 0.12),
+            ],
+            child: Text(page.title),
+          ),
+          Actor(
+            delay: 60.ms,
+            acts: [
+              .scale(from: 0.96),
+              .fadeIn(),
+            ],
+            child: Card(
+              child: SizedBox(
+                height: 220,
+                child: Center(child: Text(page.subtitle)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  },
 )
 ```
 
@@ -496,19 +497,19 @@ Acts, Actors, and Cues can all contribute timing.
 
 ```dart
 Actor(
-	motion: .smooth(),
-	reverseMotion: .linear(160.ms),
-	delay: 80.ms,
-	acts: [
-		.fadeIn(
-			reverse: .mirror(delay: 40.ms),
-		),
-		.scale(
-			to: 1.06,
-			reverse: .to(0.98),
-		),
-	],
-	child: child,
+  motion: .smooth(),
+  reverseMotion: .linear(160.ms),
+  delay: 80.ms,
+  acts: [
+    .fadeIn(
+      reverse: .mirror(delay: 40.ms),
+    ),
+    .scale(
+      to: 1.06,
+      reverse: .to(0.98),
+    ),
+  ],
+  child: child,
 )
 ```
 
@@ -542,18 +543,18 @@ late final CueController controller;
 
 @override
 void initState() {
-	super.initState();
-	controller = CueController(vsync: this, motion: .smooth());
+  super.initState();
+  controller = CueController(vsync: this, motion: .smooth());
 }
 
 
 @override
 Widget build(BuildContext context) {
-	return Cue(
-		controller: controller,
-		acts: [.fadeIn(), .slideY(from: 0.2)],
-		child: child,
-	);
+  return Cue(
+    controller: controller,
+    acts: [.fadeIn(), .slideY(from: 0.2)],
+    child: child,
+  );
 }
 ```
 
@@ -566,25 +567,25 @@ late final CueAnimation<double> scale;
 
 @override
 void initState() {
-	super.initState();
-	controller = CueController(vsync: this, motion: .smooth());
-	opacity = controller.tweenTrack<double>(
-		from: 0,
-		to: 1,
-	);
-	scale = controller.keyframedTrack<double>(
-		frames: Keyframes([
-			.key(0.92),
-			.key(1.06),
-			.key(1.0),
-		], motion: .smooth()),
-	);
+  super.initState();
+  controller = CueController(vsync: this, motion: .smooth());
+  opacity = controller.tweenTrack<double>(
+    from: 0,
+    to: 1,
+  );
+  scale = controller.keyframedTrack<double>(
+    frames: Keyframes([
+      .key(0.92),
+      .key(1.06),
+      .key(1.0),
+    ], motion: .smooth()),
+  );
 }
 
 @override
 void dispose() {
-	controller.dispose();
-	super.dispose();
+  controller.dispose();
+  super.dispose();
 }
 ```
 
@@ -612,16 +613,16 @@ Use Cue-powered route transitions for dialogs and overlays. Actors inside the ro
 
 ```dart
 showCueDialog(
-	context: context,
-	motion: .smooth(),
-	reverseMotion: .snappy(),
-	builder: (context) => Actor(
-		acts: [
-			.fadeIn(),
-			.slideY(from: 0.12),
-		],
-		child: const AlertDialog(title: Text('Hello')),
-	),
+  context: context,
+  motion: .smooth(),
+  reverseMotion: .snappy(),
+  builder: (context) => Actor(
+    acts: [
+      .fadeIn(),
+      .slideY(from: 0.12),
+    ],
+    child: const AlertDialog(title: Text('Hello')),
+  ),
 )
 ```
 
@@ -631,24 +632,24 @@ Use this when a trigger should expand into contextual modal content. The builder
 
 ```dart
 CueModalTransition(
-	motion: .smooth(),
-	reverseMotion: .snappy(),
-	hideTriggerOnTransition: true,
-	triggerBuilder: (context, open) {
-		return IconButton(
-			onPressed: open,
-			icon: const Icon(Icons.more_horiz),
-		);
-	},
-	builder: (context, rect) {
-		return Actor(
-			acts: [
-				.translateFromGlobalRect(rect),
-				.sizedClip(from: .size(rect.size), to: .width(240)),
-			],
-			child: const Card(child: SizedBox(height: 180)),
-		);
-	},
+  motion: .smooth(),
+  reverseMotion: .snappy(),
+  hideTriggerOnTransition: true,
+  triggerBuilder: (context, open) {
+    return IconButton(
+      onPressed: open,
+      icon: const Icon(Icons.more_horiz),
+    );
+  },
+  builder: (context, rect) {
+    return Actor(
+      acts: [
+        .translateFromGlobalRect(rect),
+        .sizedClip(from: .size(rect.size), to: .width(240)),
+      ],
+      child: const Card(child: SizedBox(height: 180)),
+    );
+  },
 )
 ```
 
@@ -671,15 +672,15 @@ When the built-in acts are not enough, there are two main paths:
 
 ```dart
 TweenActor<double>(
-	from: 0,
-	to: 1,
-	motion: .smooth(),
-	builder: (context, animation) {
-		return FadeTranstion(
-			opacity: animation,
-			child: const Text('Custom animation'),
-		);
-	},
+  from: 0,
+  to: 1,
+  motion: .smooth(),
+  builder: (context, animation) {
+    return FadeTranstion(
+      opacity: animation,
+      child: const Text('Custom animation'),
+    );
+  },
 )
 ```
 
