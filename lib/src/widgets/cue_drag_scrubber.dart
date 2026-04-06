@@ -14,10 +14,13 @@ enum CueDragReleaseMode {
   /// Stays wherever the drag stopped — no completion animation.
   none,
 }
-
+/// Controls the direction of scrubbing when the user drags to scrub the animation.
 enum CueScrubDirection {
-  forward,
+  /// this will set progress(value,forward: true) when scrubbed
+  forward, 
+  /// this will set progress(value,forward: false) when scrubbed
   reverse,
+  /// this will set progress(value,forward: true/false) based on whether the controller is currently completed or dismissed when the drag starts. If the controller is in a mid-progress state, it will default to forward.
   auto,
 }
 
@@ -122,7 +125,7 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
     assert(_controller != null);
     final controller = _controller!;
     _scrubForward = switch (widget.scrubDirection) {
-      CueScrubDirection.auto => controller.status.isForwardOrCompleted,
+      CueScrubDirection.auto => !controller.status.isForwardOrCompleted,
       CueScrubDirection.forward => true,
       CueScrubDirection.reverse => false,
     };

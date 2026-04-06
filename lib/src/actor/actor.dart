@@ -234,6 +234,7 @@ class Actor extends StatefulWidget {
   /// animate independently of their surroundings.
   final bool addRepaintBoundary;
 
+  /// Default constructor.
   const Actor({
     super.key,
     required this.acts,
@@ -249,6 +250,7 @@ class Actor extends StatefulWidget {
   State<Actor> createState() => ActorState();
 }
 
+/// Creates Actor State
 class ActorState extends State<Actor> {
   final _animations = <ActKey, _CacheEntry>{};
   final _animationSnapshots = <ActKey, Object?>{};
@@ -412,20 +414,42 @@ class _CacheEntry {
 ///
 /// Supports both tween-based and [Keyframes]-based construction.
 abstract class SingleActorBase<T> extends StatelessWidget {
+  /// The child widget that the single act will be applied to.
   final Widget child;
+
+  /// How the act should behave when the animation is reversed.
   final ReverseBehavior<T> reverse;
+
+  /// Optional motion used for this act. When null the surrounding
+  /// `Actor`/`Cue` motion resolution applies.
   final CueMotion? motion;
+
+  /// Delay before the forward animation starts.
   final Duration delay;
+
+  /// Delay before the reverse animation starts.
   final Duration reverseDelay;
+
+  /// Optional motion used when reversing. If null, `motion` is reused.
   final CueMotion? reverseMotion;
 
+  /// Optional keyframed frames for this act.
   final Keyframes<T>? frames;
+
   final T? _from;
   final T? _to;
 
+  /// The `from` value when this instance was constructed with a concrete
+  /// `from`/`to` pair. When created via `keyframes` this is `null`.
   T? get from => _from;
+
+  /// The `to` value when this instance was constructed with a concrete
+  /// `from`/`to` pair. When created via `keyframes` this is `null`.
   T? get to => _to;
 
+  /// Create a `SingleActorBase` using explicit `from`/`to` values.
+  ///
+  /// Use this constructor when the act has a clear start and end value.
   const SingleActorBase({
     super.key,
     required this.child,
@@ -440,6 +464,10 @@ abstract class SingleActorBase<T> extends StatelessWidget {
        _from = from,
        _to = to;
 
+  /// Create a `SingleActorBase` backed by keyframed `frames`.
+  ///
+  /// Use this when you need complex, multi-key animations rather than a
+  /// single `from`→`to` tween.
   const SingleActorBase.keyframes({
     required Keyframes<T> this.frames,
     super.key,
@@ -452,6 +480,10 @@ abstract class SingleActorBase<T> extends StatelessWidget {
        motion = null,
        reverseMotion = null;
 
+  /// The single [Act] instance this widget provides to the wrapping [Actor].
+  ///
+  /// Subclasses must implement this to return the concrete act that will be
+  /// applied to `child`.
   Act get act;
 
   @override
@@ -467,7 +499,12 @@ abstract class SingleActorBase<T> extends StatelessWidget {
   }
 }
 
+/// Convenience extension to attach `Actor` acts to any widget using
+/// `.act([...])` shorthand.
 extension ActorExtenstion on Widget {
+  /// Wraps this widget with an [Actor] using the provided [acts].
+  ///
+  /// Helpful for terse inline usage: `myWidget.act([.fadeIn(), .slideUp()])`.
   Widget act(
     List<Act> acts, {
     CueMotion? motion,

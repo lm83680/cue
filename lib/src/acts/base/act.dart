@@ -33,8 +33,6 @@ part '../card.dart';
 part '../paint.dart';
 part '../path_motion.dart';
 
-
-
 /// A declarative description of a single animated property on a widget.
 ///
 /// ## Overview
@@ -170,7 +168,7 @@ abstract class Act {
   /// {@macro act.scale}
   const factory Act.scale({
     double from,
-     double to,
+    double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
     Duration delay,
@@ -636,6 +634,7 @@ class ActContext {
   /// the implicit `from` for smooth mid-flight transitions.
   final Object? implicitFrom;
 
+  /// Internal constructor.
   const ActContext({
     required this.motion,
     required this.reverseMotion,
@@ -645,6 +644,7 @@ class ActContext {
     this.implicitFrom,
   });
 
+  /// Creates a copy of this context with the given fields replaced by new values.
   ActContext copyWith({
     TextDirection? textDirection,
     Object? implicitFrom,
@@ -679,6 +679,7 @@ class ActKey {
   /// Optional human-readable description, shown in [toString] for debugging.
   final String? desc;
 
+  /// Default constructor.
   const ActKey(this.key, [this.desc]);
 
   @override
