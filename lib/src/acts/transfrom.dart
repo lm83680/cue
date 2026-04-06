@@ -99,6 +99,7 @@ class TransformAct extends TweenAct<Matrix4> {
   @override
   final ActKey key = const ActKey('Transform');
 
+  /// Creates a TransformAct with optional from/to matrix values.
   TransformAct({
     Matrix4? from,
     required super.to,
@@ -109,7 +110,10 @@ class TransformAct extends TweenAct<Matrix4> {
     super.delay,
   }) : super.tween(from: from ?? Matrix4.identity());
 
+  /// The alignment of the transformation origin.
   final AlignmentGeometry? alignment;
+
+  /// The origin of the transformation (offset from center).
   final Offset? origin;
 
   /// {@template act.transform.keyframed}
@@ -188,7 +192,8 @@ class TransformAct extends TweenAct<Matrix4> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TransformAct &&
-          runtimeType == other.runtimeType && super == (other) &&
+          runtimeType == other.runtimeType &&
+          super == (other) &&
           alignment == other.alignment &&
           origin == other.origin;
 
@@ -297,9 +302,13 @@ class SkewAct extends TweenActBase<Skew, Matrix4> {
   @override
   ActKey get key => const ActKey('Transform:Skew');
 
+  /// The alignment of the skew origin.
   final AlignmentGeometry? alignment;
+
+  /// The origin of the skew (offset from center).
   final Offset? origin;
 
+  /// Creates a SkewAct for animating skew transformations.
   const SkewAct({
     this.alignment,
     this.origin,
@@ -382,14 +391,21 @@ class SkewAct extends TweenActBase<Skew, Matrix4> {
   }
 }
 
+/// Represents a 2D skew transformation with x and y angles.
 class Skew {
+  /// The horizontal skew angle in radians.
   final double x;
+
+  /// The vertical skew angle in radians.
   final double y;
 
+  /// Creates a Skew with optional x and y values.
   const Skew({this.x = 0, this.y = 0});
 
+  /// A Skew with zero values (no skew).
   static const Skew zero = Skew(x: 0, y: 0);
 
+  /// Creates a symmetric skew with the same value for both x and y.
   const Skew.symmetric(double value) : x = value, y = value;
 
   @override

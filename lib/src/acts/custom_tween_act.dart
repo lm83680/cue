@@ -128,7 +128,10 @@ class CustomTweenAct<T extends Object?> extends TweenAct<T> {
 /// simple custom tween animations. Use this instead of wrapping [CustomTweenAct]
 /// in [Actor] for better readability.
 class TweenActor<T extends Object?> extends SingleActorBase<T> {
+  /// The widget builder function that receives the animated value.
   final Widget Function(BuildContext context, CueAnimation<T> animation) builder;
+
+  /// Optional custom tween builder for types without [Lerpable] support.
   final Animatable<T>? tweenBuilder;
 
   /// {@template actor.tween}
@@ -282,12 +285,25 @@ class TweenActor<T extends Object?> extends SingleActorBase<T> {
 ///
 /// Use this as a template for your own multi-property animation types.
 class AnimatedValues extends Lerpable<AnimatedValues> {
+  /// The scale factor.
   final double scale;
+
+  /// The opacity value (0-1).
   final double opacity;
+
+  /// The offset position.
   final Offset offset;
+
+  /// The rotation angle in radians.
   final double rotation;
+
+  /// The optional color value.
   final Color? color;
+
+  /// The optional size value.
   final Size? size;
+
+  /// The blur amount.
   final double blur;
 
   /// Default constructor
@@ -380,6 +396,7 @@ abstract class Lerpable<T extends Lerpable<T>> {
 class InlineFnTween<T extends Object?> extends Tween<T> {
   /// The custom lerp function that defines how to interpolate between `begin` and `end`.
   final T Function(double t) lerpFn;
+
   /// Default constructor
   InlineFnTween({required this.lerpFn, super.begin, super.end});
 

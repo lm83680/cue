@@ -393,7 +393,8 @@ enum ReverseBehaviorType {
   /// Forward animates to `to`, reverse animates to a custom target
   /// value or keyframes sequence.
   /// Can specify separate motion/delay for reverse.
-  to;
+  to
+  ;
 
   /// Whether this type requires a separate reverse animatable.
   bool get needsReverseTween => this == ReverseBehaviorType.to;
@@ -588,6 +589,7 @@ class ReverseBehaviorBase<T> {
 /// }
 /// ```
 abstract class TweenAct<T> extends TweenActBase<T, T> {
+  /// Creates a TweenAct with optional tween or keyframed values.
   @internal
   const TweenAct({
     super.from,
@@ -598,6 +600,7 @@ abstract class TweenAct<T> extends TweenActBase<T, T> {
     super.reverse = const ReverseBehavior.mirror(),
   });
 
+  /// Creates a TweenAct from explicit tween values (from/to).
   const TweenAct.tween({
     required super.from,
     required super.to,
@@ -606,6 +609,7 @@ abstract class TweenAct<T> extends TweenActBase<T, T> {
     super.reverse,
   }) : super.tween();
 
+  /// Creates a TweenAct from keyframes.
   const TweenAct.keyframed({
     required super.frames,
     super.delay,
@@ -622,18 +626,25 @@ abstract class TweenAct<T> extends TweenActBase<T, T> {
 }
 
 class AnimatableValue<T> {
+  /// The starting value for the animation.
   final T from;
+
+  /// The ending value for the animation.
   final T to;
 
+  /// Creates an animatable value with explicit [from] and [to] values.
   const AnimatableValue({
     required this.from,
     required this.to,
   });
 
+  /// Creates a fixed value that doesn't animate (from and to are the same).
   const AnimatableValue.fixed(T value) : from = value, to = value;
 
+  /// Alias for the main constructor (from/to as positional args).
   const AnimatableValue.tween(this.from, this.to);
 
+  /// Whether this value is constant (from equals to).
   bool get isConstant => from == to;
 
   @override

@@ -66,6 +66,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class IndexedCue extends Cue {
+  /// Creates an IndexedCue with the given index and controller.
   const IndexedCue({
     super.key,
     super.debugLabel,
@@ -75,7 +76,10 @@ class IndexedCue extends Cue {
     super.acts,
   }) : super._();
 
+  /// The index value for this cue.
   final int index;
+
+  /// The controller managing this indexed cue.
   final IndexedCueController controller;
 
   @override
@@ -89,7 +93,6 @@ class IndexedCue extends Cue {
 }
 
 class _IndexedCueState extends CueState<IndexedCue> with SingleTickerProviderStateMixin {
-  
   late final _controller = CueController(vsync: this, motion: const .linear(Duration(milliseconds: 500)));
 
   @override
@@ -133,7 +136,6 @@ class _IndexedCueState extends CueState<IndexedCue> with SingleTickerProviderSta
   CueController get controller => _controller;
 }
 
- 
 /// The controller protocol for [IndexedCue].
 ///
 /// Exposes a [globalOffset] — a fractional index value (e.g. `1.5` means
@@ -234,10 +236,12 @@ mixin IndexedCueController implements Listenable {
   }
 }
 
+/// A page controller that integrates with [IndexedCue] for animated page transitions.
 class CuePageController extends PageController with IndexedCueController {
   bool _isAnimating = false;
   int _destination = 0;
 
+  /// Creates a CuePageController with the given options.
   CuePageController({
     super.initialPage,
     super.viewportFraction,
@@ -249,6 +253,7 @@ class CuePageController extends PageController with IndexedCueController {
     _lastSettledIndex = initialPage;
   }
 
+  /// Whether to animate all pages or just the current one.
   @override
   final bool animateAll;
 
@@ -309,7 +314,9 @@ class CuePageController extends PageController with IndexedCueController {
   }
 }
 
+/// A tab controller that integrates with [IndexedCue] for animated tab transitions.
 class CueTabController extends TabController with IndexedCueController {
+  /// Creates a CueTabController with the given options.
   CueTabController({
     required super.length,
     super.initialIndex = 0,
@@ -319,6 +326,7 @@ class CueTabController extends TabController with IndexedCueController {
 
   int _destinationIndex = 0;
 
+  /// Whether to animate all tabs or just the current one.
   @override
   final bool animateAll;
 
@@ -353,7 +361,9 @@ class CueTabController extends TabController with IndexedCueController {
   }
 }
 
+/// A change-notifier controller for manually controlled indexed animations.
 class CueIndexController with ChangeNotifier, IndexedCueController {
+  /// Creates a CueIndexController with the given configuration.
   CueIndexController({
     required this.length,
     required TickerProvider vsync,

@@ -18,16 +18,37 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
   @override
   final ActKey key = const ActKey('Card');
 
+  /// The clip behavior for overflow handling.
   final Clip clipBehavior;
+
+  /// Whether the border is drawn on top of the child.
   final bool borderOnForeground;
+
+  /// The background color animation.
   final AnimatableValue<Color>? color;
+
+  /// The shadow color animation.
   final AnimatableValue<Color> shadowColor;
+
+  /// The surface tint color animation.
   final AnimatableValue<Color>? surfaceTintColor;
+
+  /// The elevation animation (shadow depth).
   final AnimatableValue<double>? elevation;
+
+  /// The border radius animation.
   final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+
+  /// The margin around the card.
   final AnimatableValue<EdgeInsetsGeometry>? margin;
+
+  /// The shape animation (mutually exclusive with borderRadius).
   final AnimatableValue<ShapeBorder>? shape;
+
+  /// Whether this is a semantic container for accessibility.
   final bool semanticContainer;
+
+  /// Keyframes for the card properties.
   final Keyframes<CardProps>? frames;
 
   /// {@template act.card}
@@ -394,6 +415,7 @@ class CardProps {
     margin,
   );
 
+  /// Linearly interpolates between two [CardProps] instances.
   static CardProps lerp(CardProps a, CardProps b, double t) {
     return CardProps(
       elevation: lerpDouble(a.elevation, b.elevation, t),
@@ -485,18 +507,43 @@ class _CardPropsProxyTween extends Tween<CardProps> {
 /// )
 /// ```
 class CardActor extends StatelessWidget {
+  /// The background color animation.
   final AnimatableValue<Color>? color;
+
+  /// The shadow color animation.
   final AnimatableValue<Color> shadowColor;
+
+  /// The surface tint color animation.
   final AnimatableValue<Color>? surfaceTintColor;
+
+  /// The elevation animation (shadow depth).
   final AnimatableValue<double>? elevation;
+
+  /// The border radius animation.
   final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+
+  /// The shape animation (mutually exclusive with borderRadius).
   final AnimatableValue<ShapeBorder>? shape;
+
+  /// The margin animation.
   final AnimatableValue<EdgeInsetsGeometry>? margin;
+
+  /// The clip behavior for overflow.
   final Clip clipBehavior;
+
+  /// Whether the border is drawn on top of the child.
   final bool borderOnForeground;
+
+  /// The child widget.
   final Widget? child;
+
+  /// The motion for the animation.
   final CueMotion? motion;
+
+  /// The reverse behavior configuration.
   final ReverseBehavior<CardProps> reverse;
+
+  /// The delay before animation starts.
   final Duration delay;
 
   const CardActor({

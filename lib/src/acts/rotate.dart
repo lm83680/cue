@@ -9,7 +9,6 @@ part of 'base/act.dart';
 /// For single-axis rotation, this is the preferred choice over [RotateLayoutAct]
 /// which recalculates layout. Use [Rotate3DAct] for simultaneous x, y, z rotations.
 class RotateAct extends TweenAct<double> {
-
   @override
   final ActKey key = const ActKey('Rotate');
 
@@ -238,7 +237,6 @@ class RotateAct extends TweenAct<double> {
 /// - [Rotate3DAct.flipX] — 180° horizontal flip with depth
 /// - [Rotate3DAct.flipY] — 180° vertical flip with depth
 class Rotate3DAct extends TweenAct<Rotation3D> {
-  
   @override
   final ActKey key = const ActKey('Rotate3D');
 
@@ -498,6 +496,7 @@ class Rotation3D {
   @override
   int get hashCode => Object.hash(x, y, z);
 
+  /// Linearly interpolates from this rotation to [other] by [t].
   Rotation3D lerpTo(Rotation3D other, double t) {
     return Rotation3D(
       x: x + (other.x - x) * t,
@@ -506,6 +505,7 @@ class Rotation3D {
     );
   }
 
+  /// Linearly interpolates between two rotations, or returns null if both are null.
   static Rotation3D? lerp(Rotation3D? a, Rotation3D? b, double t) {
     if (a == null && b == null) return null;
     a ??= zero;
@@ -530,17 +530,41 @@ class _Rotation3DTween extends Tween<Rotation3D> {
 /// - [x]: Rotate around the X-axis (horizontal flip)
 /// - [y]: Rotate around the Y-axis (vertical flip)
 /// - [z]: Rotate around the Z-axis (2D rotation in the plane)
-enum RotateAxis { x, y, z }
+enum RotateAxis {
+  /// Rotate around the X-axis (horizontal flip).
+  x,
+
+  /// Rotate around the Y-axis (vertical flip).
+  y,
+
+  /// Rotate around the Z-axis (2D rotation in the plane).
+  z,
+}
 
 /// Unit for rotation values in [RotateAct] and [RotateLayoutAct].
 ///
 /// - [degrees]: Degrees (0–360, full rotation = 360°)
 /// - [radians]: Radians (0–2π, full rotation = 2π)
 /// - [quarterTurns]: Quarter-turns (0–4, full rotation = 4)
-enum RotateUnit { degrees, radians, quarterTurns }
+enum RotateUnit {
+  /// Degrees (0–360, full rotation = 360°).
+  degrees,
+
+  /// Radians (0–2π, full rotation = 2π).
+  radians,
+
+  /// Quarter-turns (0–4, full rotation = 4).
+  quarterTurns,
+}
 
 /// Unit for 3D rotation values in [Rotate3DAct].
 ///
 /// - [degrees]: Degrees (0–360, full rotation = 360°)
 /// - [radians]: Radians (0–2π, full rotation = 2π)
-enum Rotate3DUnit { degrees, radians }
+enum Rotate3DUnit {
+  /// Degrees (0–360, full rotation = 360°).
+  degrees,
+
+  /// Radians (0–2π, full rotation = 2π).
+  radians,
+}

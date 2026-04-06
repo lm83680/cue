@@ -39,12 +39,14 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   late final Map<TrackConfig, TrackEntry> _tracks;
 
+  /// Creates a timeline implementation with the given default track config.
   CueTimelineImpl(this.defaultConfig) {
     _tracks = {
       defaultConfig: TrackEntry(buildTrack(defaultConfig)),
     };
   }
 
+  /// Creates a timeline from a single motion (forward and reverse use the same).
   factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion}) {
     final config = TrackConfig(motion: motion, reverseMotion: reverseMotion ?? motion);
     return CueTimelineImpl(config);
@@ -152,7 +154,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   AnimationStatus _status = AnimationStatus.dismissed;
 
   /// Overall timeline progress (0-1).
-  /// 
+  ///
   /// Returns the progress of the longest-duration track in the current direction.
   /// Shorter tracks complete earlier but the timeline progress follows the longest.
   @override
@@ -357,6 +359,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   void didUnregisterListener() => _listenres--;
 
+  /// Whether this timeline has any listeners.
   bool get hasListeners => _listenres > 0;
 
   @override
@@ -398,8 +401,8 @@ abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> 
 
   /// Current animation status.
   /// Represents the overall status across all tracks (forward, reverse, completed, dismissed).
-  /// 
-  /// if any track is animating forward, status is forward; 
+  ///
+  /// if any track is animating forward, status is forward;
   /// if any track is animating reverse, status is reverse;
   /// if all tracks are completed, status is completed;
   /// if all tracks are dismissed, status is dismissed.
@@ -424,10 +427,13 @@ abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> 
   TrackConfig get defaultConfig;
 
   @override
+  /// Disposes timeline resources.
   void dispose();
 
+  /// Adds a status listener to be notified of animation state changes.
   void addStatusListener(AnimationStatusListener listener);
 
+  /// Removes a previously added status listener.
   void removeStatusListener(AnimationStatusListener listener);
 }
 
@@ -447,6 +453,7 @@ class TimelineWillAnimateEvent extends TimelineEvent {
   /// Whether the animation is progressing forward (true) or in reverse (false).
   final bool forward;
 
+  /// Creates a TimelineWillAnimateEvent.
   const TimelineWillAnimateEvent(this.forward);
 }
 
@@ -458,6 +465,7 @@ class TimelinePrepareEvent extends TimelineEvent {
   /// Whether the animation is prepared for forward (true) or reverse (false).
   final bool forward;
 
+  /// Creates a TimelinePrepareEvent.
   const TimelinePrepareEvent(this.forward);
 }
 
@@ -469,18 +477,19 @@ class RepeatConfig {
   /// Number of cycles to repeat (null = infinite).
   /// Decremented after each cycle completion.
   final int? count;
-  
+
   /// Whether to reverse direction between cycles (true) or always forward (false).
   final bool reverse;
-  
+
   /// Optional target progress for each cycle.
   /// If null, uses default (1.0 forward, 0.0 reverse).
   final double? target;
-  
+
   /// Optional starting progress for each cycle.
   /// If null, uses default based on direction.
   final double? from;
 
+  /// Creates a RepeatConfig with the specified settings.
   RepeatConfig({
     this.count,
     required this.reverse,
@@ -511,10 +520,11 @@ class RepeatConfig {
 class ReleaseToken {
   /// The configuration of the track this token refers to.
   final TrackConfig config;
-  
+
   /// Reference to the timeline for releasing this token.
   final CueTimeline _timeline;
-  
+
+  /// Creates a ReleaseToken for the given config and timeline.
   const ReleaseToken(this.config, this._timeline);
 
   /// Releases this token, potentially removing the track if no other tokens exist.
@@ -529,11 +539,11 @@ class ReleaseToken {
 class TrackEntry {
   /// The animation track instance.
   final CueTrack track;
-  
+
   /// Active release tokens for this track.
   /// Tracks are kept alive as long as this list is not empty.
   final List<ReleaseToken> tokens;
-  
+
   TrackEntry(this.track) : tokens = [];
 
   /// Adds a release token to mark this track as "in use".

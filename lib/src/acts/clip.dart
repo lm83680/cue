@@ -146,7 +146,10 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
   @override
   ActKey get key => const ActKey('Clip');
 
+  /// The axis along which to clip (horizontal or vertical).
   final Axis _axis;
+
+  /// The alignment point from which the clip expands.
   final AlignmentGeometry alignment;
 
   /// {@macro act.clip.width}
@@ -205,12 +208,16 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
 
 /// Animates clipping from an alignment point along an expanding path or circle.
 class PathClipAct extends TweenAct<double> implements ClipAct {
-
   @override
   ActKey get key => const ActKey('Clip');
 
+  /// The border radius for the clipping path.
   final BorderRadiusGeometry? borderRadius;
+
+  /// The alignment point from which the clip expands.
   final AlignmentGeometry? alignment;
+
+  /// Whether to use superellipse optimization for smoother curves.
   final bool useSuperellipse;
 
   /// {@macro act.clip}
@@ -268,7 +275,7 @@ class PathClipAct extends TweenAct<double> implements ClipAct {
     );
   }
 
- @override
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         super == other &&
@@ -281,15 +288,23 @@ class PathClipAct extends TweenAct<double> implements ClipAct {
 
   @override
   int get hashCode => Object.hash(super.hashCode, borderRadius, alignment, useSuperellipse);
-
 }
 
+/// Custom clipper that creates an expanding path clip.
 class ExpandingPathClipper extends CustomClipper<Path> {
+  /// The progress of the clip (0-1).
   final double progress;
+
+  /// The border radius for the clip shape.
   final BorderRadius? borderRadius;
+
+  /// The alignment point for the clip expansion.
   final Alignment alignment;
+
+  /// Whether to use superellipse optimization.
   final bool useSuperellipse;
 
+  /// Creates an ExpandingPathClipper with the given configuration.
   ExpandingPathClipper({
     required this.progress,
     this.borderRadius,

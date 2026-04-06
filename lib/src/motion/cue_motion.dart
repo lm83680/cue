@@ -44,6 +44,7 @@ import 'package:flutter/material.dart';
 /// All constructors are designed for shorthand dot syntax when the type is
 /// already inferred — e.g. `motion: .smooth()`, `motion: .linear(200.ms)`.
 abstract class CueMotion {
+  /// Creates a CueMotion.
   const CueMotion();
 
   /// The number of phases this motion contains. Defaults to `1`.
@@ -79,6 +80,7 @@ abstract class CueMotion {
     false => build(SimulationBuildData.reverse(phase: phase ?? totalPhases - 1)),
   };
 
+  /// Creates a delayed version of this motion with the given delay.
   @internal
   CueMotion delayed(Duration delay) => DelayedMotion(this, delay);
 
@@ -455,6 +457,7 @@ class TimedMotion extends CueMotion {
 /// [CueSpringSimulation]. The type parameter lets call sites and tooling
 /// reason about the concrete simulation without a cast.
 abstract class SimulationMotion<S extends CueSimulation> extends CueMotion {
+  /// Creates a SimulationMotion.
   const SimulationMotion();
 }
 
@@ -598,8 +601,10 @@ class SimulationBuildData {
 
   /// The value the simulation should reach. Defaults to `1.0` when
   /// [forward] is `true`, `0.0` when `false`.
+  /// The end value for the simulation.
   double get endValue => _endValue ?? (forward ? 1.0 : 0.0);
 
+  /// Creates a SimulationBuildData with the given configuration.
   const SimulationBuildData({
     required this.forward,
     required this.startValue,

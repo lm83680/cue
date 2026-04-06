@@ -14,12 +14,15 @@ enum CueDragReleaseMode {
   /// Stays wherever the drag stopped — no completion animation.
   none,
 }
+
 /// Controls the direction of scrubbing when the user drags to scrub the animation.
 enum CueScrubDirection {
   /// this will set progress(value,forward: true) when scrubbed
-  forward, 
+  forward,
+
   /// this will set progress(value,forward: false) when scrubbed
   reverse,
+
   /// this will set progress(value,forward: true/false) based on whether the controller is currently completed or dismissed when the drag starts. If the controller is in a mid-progress state, it will default to forward.
   auto,
 }
@@ -42,6 +45,7 @@ enum CueScrubDirection {
 /// )
 /// ```
 class CueDragScrubber extends StatefulWidget {
+  /// Creates a CueDragScrubber with the given configuration.
   const CueDragScrubber({
     super.key,
     required this.child,
@@ -54,9 +58,17 @@ class CueDragScrubber extends StatefulWidget {
     this.onAnimationEnd,
     this.scrubDirection = CueScrubDirection.auto,
   });
+
+  /// Callback fired when the animation completes or is dismissed.
   final ValueChanged<bool>? onAnimationEnd;
+
+  /// How to handle hit testing within the scrubber.
   final HitTestBehavior? hitTestBehavior;
+
+  /// Whether to use linear interpolation during scrubbing (ignores motion curves).
   final bool forceLinearScrubing;
+
+  /// The direction to scrub based on current animation state.
   final CueScrubDirection scrubDirection;
 
   /// The widget below this widget in the tree.
@@ -80,8 +92,12 @@ class CueDragScrubber extends StatefulWidget {
     super.debugFillProperties(properties);
     properties.add(DoubleProperty('distance', distance));
     properties.add(EnumProperty<Axis>('axis', axis, defaultValue: Axis.vertical));
-    properties.add(EnumProperty<CueDragReleaseMode>('releaseMode', releaseMode, defaultValue: CueDragReleaseMode.fling));
-    properties.add(EnumProperty<CueScrubDirection>('scrubDirection', scrubDirection, defaultValue: CueScrubDirection.auto));
+    properties.add(
+      EnumProperty<CueDragReleaseMode>('releaseMode', releaseMode, defaultValue: CueDragReleaseMode.fling),
+    );
+    properties.add(
+      EnumProperty<CueScrubDirection>('scrubDirection', scrubDirection, defaultValue: CueScrubDirection.auto),
+    );
     properties.add(FlagProperty('forceLinearScrubing', value: forceLinearScrubing, ifTrue: 'forceLinearScrubing'));
     properties.add(DiagnosticsProperty<CueController>('controller', controller, defaultValue: null));
   }

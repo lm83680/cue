@@ -36,6 +36,7 @@ class FKeyframe<T> extends KeyframeBase<T> {
     : assert(at >= 0.0 && at <= 1.0, 'Relative Keyframe time must be between 0 and 1'),
       super._();
 
+  /// Creates a fractional keyframe with the shorthand `.key` syntax.
   const FKeyframe.key(super.value, {required this.at, this.curve})
     : assert(at >= 0.0 && at <= 1.0, 'Relative Keyframe time must be between 0 and 1'),
       super._();
@@ -52,6 +53,7 @@ class FKeyframe<T> extends KeyframeBase<T> {
   @override
   int get hashCode => Object.hash(value, at, curve);
 
+  /// Creates a copy of this keyframe with optional field overrides.
   FKeyframe<T> copyWith({T? value, double? at, Curve? curve}) {
     return FKeyframe<T>(
       value ?? this.value,
@@ -81,8 +83,10 @@ class Keyframe<T> extends KeyframeBase<T> {
   /// If not provided, the default motion from [MotionKeyframes.motion] is used.
   final CueMotion? motion;
 
+  /// Creates a keyframe with explicit motion timing.
   const Keyframe(super.value, {this.motion}) : super._();
 
+  /// Creates a keyframe with shorthand `.key` syntax.
   const Keyframe.key(super.value, {this.motion}) : super._();
 
   @override
@@ -93,6 +97,7 @@ class Keyframe<T> extends KeyframeBase<T> {
   @override
   int get hashCode => Object.hash(value, motion);
 
+  /// Creates a copy of this keyframe with optional field overrides.
   Keyframe<T> copyWith({T? value, CueMotion? motion}) {
     return Keyframe<T>(
       value ?? this.value,
@@ -144,12 +149,16 @@ sealed class Keyframes<T> {
     Curve? curve,
   }) = FractionalKeyframes<T>;
 
+  /// The final target value in the keyframe sequence.
   T get lastTarget;
 
+  /// Maps each value in the keyframes to a new type.
   Keyframes<E> mapValues<E>(E Function(T value) transform);
 
+  /// All target values in the keyframe sequence.
   List<T> get values;
 
+  /// The keyframe sequence reversed.
   Keyframes<T> get reversed;
 }
 
@@ -160,12 +169,17 @@ sealed class Keyframes<T> {
 final class MotionKeyframes<T> implements Keyframes<T> {
   /// The ordered list of keyframes with explicit motion.
   final List<Keyframe<T>> frames;
+
+  /// The default motion used when a keyframe doesn't specify one.
   final CueMotion motion;
+
+  /// Creates a MotionKeyframes with explicit motion timing.
   const MotionKeyframes(this.frames, {required this.motion});
 
   @override
   List<T> get values => List.unmodifiable(frames.map((f) => f.value));
 
+  /// Extracts motions from each keyframe, optionally including the first.
   List<CueMotion> extractMotion({bool includeFirst = false}) {
     final motions = frames.map((f) => f.motion ?? motion);
     return List<CueMotion>.unmodifiable(includeFirst ? motions : motions.skip(1));
@@ -200,7 +214,10 @@ final class MotionKeyframes<T> implements Keyframes<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MotionKeyframes && runtimeType == other.runtimeType && listEquals(frames, other.frames) && motion == other.motion;
+      other is MotionKeyframes &&
+          runtimeType == other.runtimeType &&
+          listEquals(frames, other.frames) &&
+          motion == other.motion;
 
   @override
   int get hashCode => Object.hashAll([...frames, motion]);
@@ -228,6 +245,7 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
   /// If a keyframe has its own curve, it takes precedence over this default.
   final Curve? curve;
 
+  /// Creates a FractionalKeyframes with the given frames and optional duration/curve.
   const FractionalKeyframes(this.frames, {this.duration, this.curve});
 
   @override
@@ -342,6 +360,7 @@ class Phase<T extends Object?> {
   /// The ending value for this animation segment.
   final T end;
 
+  /// Creates a Phase with the given begin and end values.
   const Phase({
     required this.begin,
     required this.end,
@@ -355,6 +374,7 @@ class Phase<T extends Object?> {
   @override
   int get hashCode => Object.hash(begin, end);
 
+  /// Whether this phase is always stopped (begin equals end).
   bool get isAlwaysStopped => begin == end;
 
   /// Resolves fractional keyframes into animation phases.

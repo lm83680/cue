@@ -71,18 +71,30 @@ part of 'base/act.dart';
 /// ```
 /// {@endtemplate}
 class SizedClipAct extends DeferredTweenAct<Size?> {
-  
   @override
   final ActKey key = const ActKey('SizedClip');
 
+  /// The alignment of the child within the clipped bounds.
   final AlignmentGeometry? alignment;
+
+  /// How to clip content that overflows the size.
   final Clip clipBehavior;
+
+  /// The starting size (null means use child's natural size).
   final NSize? from;
+
+  /// The ending size (null means use child's natural size).
   final NSize? to;
+
+  /// Keyframes for size animation.
   final Keyframes<NSize>? frames;
+
+  /// The reverse behavior configuration.
   final ReverseBehaviorBase<NSize> _reverse;
+
+  /// The geometry shape for clipping.
   final ClipGeometry clipGeometry;
-  
+
   /// {@template act.sized_clip}
   /// Animates between two sizes with content clipping.
   ///
@@ -549,7 +561,7 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
       reverse: _reverse.mapValues((v) => _resolveSize(v, maxConstrains, childSize)),
       tweenBuilder: (begin, end) => SizeTween(begin: begin, end: end),
     );
-    
+
     _driver.setAnimatable(builder.buildAnimtable(_driver.context));
     // Build and cache the animation
     _cachedMaxSize = tween.end ?? Size.zero;
@@ -613,7 +625,7 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
         clipBehavior: _clipBehavior,
       );
     } else {
-       _clipGeometryHandler.invalidate();
+      _clipGeometryHandler.invalidate();
       super.paint(context, offset);
     }
   }
@@ -735,12 +747,21 @@ class _ClipSuperEllipseGeometry extends _ClipGeometryHandler<ClipRSuperellipseLa
   int get hashCode => Object.hash(runtimeType, borderRadius);
 }
 
+/// Defines the geometry shape for clipping operations.
 class ClipGeometry {
+  /// The border radius for rounded clipping.
   final BorderRadiusGeometry? borderRadius;
+
+  /// Whether to use superellipse optimization.
   final bool useSuperEllipse;
 
+  /// Creates a rectangular (no border radius) clip geometry.
   const ClipGeometry.rect() : borderRadius = null, useSuperEllipse = false;
+
+  /// Creates a rounded rectangle clip geometry.
   const ClipGeometry.rrect(BorderRadiusGeometry this.borderRadius) : useSuperEllipse = false;
+
+  /// Creates a super-ellipse clip geometry for smoother rounded corners.
   const ClipGeometry.superEllipse(BorderRadiusGeometry this.borderRadius) : useSuperEllipse = true;
 
   @override
@@ -784,11 +805,16 @@ class NSize {
   /// `double.infinity` means use the maximum available height constraint.
   final double? h;
 
+  /// Creates an NSize with optional width and height.
   const NSize({this.w, this.h});
 
   /// Both axes follow the child's natural size (no constraint on either axis).
   static const NSize childSize = NSize();
+
+  /// Both axes use the maximum available constraint.
   static const NSize infinity = NSize(w: double.infinity, h: double.infinity);
+
+  /// Both axes set to zero.
   static const NSize zero = NSize(w: 0, h: 0);
 
   /// Creates an [NSize] from a Flutter [Size] (no nulls).

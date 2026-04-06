@@ -77,9 +77,16 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
   @override
   final ActKey key = const ActKey('SizedBox');
 
+  /// The width animation (null means unchanged).
   final AnimatableValue<double>? width;
+
+  /// The height animation (null means unchanged).
   final AnimatableValue<double>? height;
+
+  /// The alignment of the child within the sized box.
   final AlignmentGeometry alignment;
+
+  /// Keyframes for size animation.
   final Keyframes<Size>? frames;
 
   /// {@template act.sized_box}

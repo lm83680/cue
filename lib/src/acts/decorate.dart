@@ -79,9 +79,17 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
 
   /// Animates gradient overlay. Use `.tween(from, to)` or `.fixed(value)`.
   final AnimatableValue<Gradient>? gradient;
+
+  /// The shape of the decoration (rectangle or circle).
   final BoxShape shape;
+
+  /// Whether the decoration is in the background or foreground.
   final DecorationPosition position;
+
+  /// Keyframes for the decoration properties.
   final Keyframes<Decoration>? frames;
+
+  /// The image to paint in the decoration.
   final DecorationImage? image;
 
   /// {@macro act.decorate}
@@ -273,18 +281,43 @@ class DecoratedBoxActor extends StatelessWidget {
   /// )
   /// ```
   /// {@endtemplate}
+  /// The background color animation.
   final AnimatableValue<Color>? color;
+
+  /// The border radius animation.
   final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+
+  /// The border animation.
   final AnimatableValue<BoxBorder>? border;
+
+  /// The box shadow animation.
   final AnimatableValue<List<BoxShadow>>? boxShadow;
+
+  /// The gradient animation.
   final AnimatableValue<Gradient>? gradient;
+
+  /// The shape of the decoration.
   final BoxShape shape;
+
+  /// The child widget.
   final Widget? child;
+
+  /// The forward motion.
   final CueMotion? motion;
+
+  /// The reverse motion.
   final CueMotion? reverseMotion;
+
+  /// The position of the decoration.
   final DecorationPosition position;
+
+  /// The delay before animation starts.
   final Duration delay;
+
+  /// The reverse behavior.
   final ReverseBehavior<Decoration> reverse;
+
+  /// The decoration image.
   final DecorationImage? image;
 
   /// {@macro actor.decorate}

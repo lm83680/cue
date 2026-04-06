@@ -3,10 +3,10 @@ part of 'cue.dart';
 /// {@template cue.on_change}
 /// A [Cue] that replays its animation whenever [value] changes.
 ///
-/// Resets to `0` and plays forward on each [value] change. Useful 
+/// Resets to `0` and plays forward on each [value] change. Useful
 ///
 /// [skipFirstAnimation] (defaults to `true`) completes immediately on the
-/// first build without playing. 
+/// first build without playing.
 ///
 /// ## Implicit-style animation
 ///
@@ -39,6 +39,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class OnChangeCue extends OnMountCue {
+  /// Creates an OnChangeCue that replays animation when value changes.
   const OnChangeCue({
     super.key,
     required super.child,
@@ -50,8 +51,13 @@ class OnChangeCue extends OnMountCue {
     super.acts,
   });
 
+  /// The value to watch for changes. Animation replays when this changes.
   final Object? value;
+
+  /// Whether to skip animation on first build (defaults to true).
   final bool skipFirstAnimation;
+
+  /// Whether to animate from current value (like Flutter's implicit animations).
   final bool fromCurrentValue;
 
   @override
@@ -67,8 +73,6 @@ class OnChangeCue extends OnMountCue {
 }
 
 class _OnChangeCueState extends SelfAnimatedCueState<OnChangeCue> {
-
-
   @override
   String get debugName => 'OnChangeCue';
 

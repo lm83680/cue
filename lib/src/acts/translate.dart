@@ -345,7 +345,6 @@ abstract class TranslateAct extends Act {
 }
 
 class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
-
   @override
   final ActKey key = const ActKey('Translate');
 
@@ -354,7 +353,7 @@ class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
     super.to = Offset.zero,
     super.motion,
     super.reverse,
-    super.delay ,
+    super.delay,
   }) : super.tween();
 
   const _TranslateOffset.keyframed({
@@ -370,7 +369,6 @@ class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
 }
 
 class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAct {
-
   @override
   final ActKey key = const ActKey('Translate');
 
@@ -422,23 +420,28 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
   Widget apply(BuildContext context, CueAnimation<Offset> animation, Widget child) {
     return TranslateTransition(offset: animation, child: child);
   }
-  
+
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is _AxisTranslate && super == (other) && _axis == other._axis;
+    return identical(this, other) || other is _AxisTranslate && super == (other) && _axis == other._axis;
   }
 
   @override
   int get hashCode => Object.hash(super.hashCode, _axis);
-
 }
 
+/// A widget that applies a translate transform based on an animation.
 class TranslateTransition extends AnimatedWidget {
+  /// The child widget to transform.
   final Widget child;
+
+  /// The animation that provides the offset values.
   final Animation<Offset> offset;
+
+  /// Whether to transform hit tests to match the visual translation.
   final bool transformHitTests;
 
+  /// Creates a TranslateTransition with the given configuration.
   const TranslateTransition({
     super.key,
     required this.child,
@@ -457,7 +460,6 @@ class TranslateTransition extends AnimatedWidget {
 }
 
 class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAct {
-  
   @override
   final ActKey key = const ActKey('Translate');
 
