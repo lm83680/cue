@@ -29,17 +29,6 @@ Cue separates animation into a few small pieces:
 
 That separation keeps animation code readable, reusable, and easy to scale across a subtree.
 
-## Install
-
-```bash
-flutter pub add cue
-```
-
-```dart
-import 'package:cue/cue.dart';
-import 'package:flutter/foundation.dart';
-```
-
 ## Quick Start
 
 ```dart
@@ -86,7 +75,7 @@ MaterialApp(
 
 ### 1. `Cue`: the trigger
 
-`Cue` publishes a `CueController` to its subtree through `CueScope`. Any `Actor` below it automatically subscribes to that controller.
+`Cue` publishes a `CueController` to its subtree through `CueScope`. Any `Actor` below it can use it to build animations.
 
 Use the factory that matches the trigger you want:
 
@@ -132,7 +121,7 @@ Cue.onToggle(
 
 Important rules:
 
-- `Actor` is passive. Without an ancestor `Cue`, it does nothing.
+- `Actor` is passive. Without an ancestor `Cue`, it will throw.
 - One `Actor` can apply multiple acts at once.
 - Acts eventually resolve into nested widget wrappers around the child, so ordering matters. For example, clipping before transforming is not always the same as transforming before clipping.
 - Only one act per act key is allowed in the same `Actor`. For example, two slide variants in one `Actor` are not allowed because they share the same key.
@@ -150,7 +139,7 @@ ElevatedButton(
 ])
 ```
 
-### 3. `Act`: what changes
+### 3. `Act`: the effect
 
 An `Act` is an immutable description of one animated property. Prefer the shorthand factories in normal app code.
 
@@ -424,12 +413,26 @@ Actor(
 
 Use the trigger factories first. Reach for controllers when you need explicit orchestration.
 
+`CueController` is an `AnimationController` backed by a `CueTimeline`. It keeps Cue's motion and track system available even when you are driving animation manually.
+
+Important differences from a normal `AnimationController`:
+
+- Duration is derived from the timeline motion. You do not set `duration` or `reverseDuration` directly.
+- The timeline manages tracks, and each track can have its own motion.
+- To remove a track from the timeline, every obtainer of that track must release it.
+- If you rebuild the timeline with a new default motion, previously obtained tracks become stale and must be obtained again.
+
 Available controller types include:
 
 - `CueController` for direct control.
 - `CuePageController` and `CueTabController` for navigation-driven progress.
 - `CueIndexController` and `IndexedCueController` for sequences and staggered lists.
 - `SelfAnimatedCue` for self-contained animation ownership.
+
+When working manually with `CueController`, there are two levels of API:
+
+- High-level: pass the controller into `Cue(controller: ...)` and let `Actor`s consume it through `CueScope`.
+- Low-level: obtain tracks with `obtainTrack`, `tweenTrack`, or `keyframedTrack` when you need typed imperative animations outside the normal widget helpers.
 
 ```dart
 late final CueController controller;
@@ -440,6 +443,7 @@ void initState() {
 	controller = CueController(vsync: this, motion: .smooth());
 }
 
+
 @override
 Widget build(BuildContext context) {
 	return Cue(
@@ -449,6 +453,51 @@ Widget build(BuildContext context) {
 	);
 }
 ```
+
+If you obtain typed animations directly, remember that they hold timeline tracks underneath:
+
+```dart
+late final CueController controller;
+late final CueAnimation<double> opacity;
+late final CueAnimation<double> scale;
+
+@override
+void initState() {
+	super.initState();
+	controller = CueController(vsync: this, motion: .smooth());
+	opacity = controller.tweenTrack<double>(
+		from: 0,
+		to: 1,
+	);
+	scale = controller.keyframedTrack<double>(
+		frames: Keyframes([
+			.key(0.92),
+			.key(1.06),
+			.key(1.0),
+		], motion: .smooth()),
+	);
+}
+
+@override
+void dispose() {
+	controller.dispose();
+	super.dispose();
+}
+```
+
+If the controller itself is being disposed, you do not need to release those tracks manually. Disposing the controller disposes the timeline and everything attached to it.
+
+If the controller stays alive but a specific imperative animation is no longer needed, release that animation so its underlying track can be removed when no other obtainers still hold it.
+
+Track lifecycle matters here:
+
+- `obtainTrack` returns a track plus a `ReleaseToken`.
+- `tweenTrack` and `keyframedTrack` wrap that same mechanism and expose `CueAnimation.release()`.
+- A track is only removed after every token for it has been released.
+
+If you call `rebuildTimeline(...)` because the default motion changed, all previously obtained tracks become stale, including tracks that had their own motion override. Re-obtain them after rebuilding.
+
+Cue widgets handle all of this automatically. These details only matter when you use the controller as a low-level imperative API.
 
 ## Higher-Level Helpers
 
@@ -508,26 +557,37 @@ Use route integration when modal transitions should be driven by Cue instead of 
 
 Attach drag-based scrubbing to any subtree driven by a `Cue` controller.
 
-### `CueDebugTools`
+## Custom Animations
 
-In debug builds, wrap your app to inspect and scrub completed Cue animations.
+When the built-in acts are not enough, there are two main paths:
+
+- Build your own `Act` when you want a reusable effect that fits naturally into normal `Actor(acts: [...])` composition.
+- Use `TweenActor<T>` when you want to animate a custom value and render it directly with a builder.
+
+`TweenActor` is the simplest custom entry point. You provide `from`, `to`, and a `builder`, and Cue gives you an animation you can use to drive any widget tree:
 
 ```dart
-MaterialApp(
-	builder: (context, child) {
-		if (kDebugMode) {
-			return CueDebugTools(child: child!);
-		}
-		return child!;
+TweenActor<double>(
+	from: 0,
+	to: 1,
+	motion: .smooth(),
+	builder: (context, animation) {
+		return FadeTranstion(
+			opacity: animation,
+			child: const Text('Custom animation'),
+		);
 	},
 )
 ```
 
-## Custom Animations
+Cue also ships composed actor helpers for common cases where the act and widget shape already belong together:
 
-When the built-in acts are not enough, you can build animations directly with `CueValueAnimator`, create a custom `TweenAct`, or implement your own `Act`.
+- `PositionedActor` for animating `Position` inside a `Stack`
+- `DecoratedBoxActor` for animated box decoration
+- `CardActor` for animated card properties
+- `PaintActor` for painting with animation progress
 
-That keeps custom behavior inside the same timeline and motion system instead of mixing unrelated animation patterns.
+Use those when they match the job, and build your own `Act` or `TweenActor` when they do not.
 
 ## Recommended Style
 
@@ -541,8 +601,3 @@ Cue works best when call sites stay terse.
 
 In short: use the shorthand named constructors whenever possible. That is the cleanest API Cue offers.
 
-## Where To Look Next
-
-- The `example` app contains full compositions such as contextual menus, expanding cards, and animated controls.
-- `README_CUE_USAGE.md` contains additional package notes and API inventory.
-- Inline docs in `lib/src` cover detailed behavior for each act, motion preset, and helper widget.
