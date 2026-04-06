@@ -81,6 +81,93 @@ part '../path_motion.dart';
 /// )
 /// ```
 ///
+/// ## Available Acts
+///
+/// ### Transform — Position & Scale
+/// - `.scale(from: 1.0, to: 1.2)` — Scale by factor around [alignment] (default: `from: 1.0`)
+///   - Presets: `.zoomIn()` (→ 1.1), `.zoomOut()` (→ 0.8)
+/// - `.rotate(from: 0, to: 180)` — Rotate around 2D [alignment] in degrees
+///   - Variants: `.rotate3D(to: Rotation3D(x: 90, y: 0, z: 0))`, `.flipX()`, `.flipY()`
+/// - `.rotateLayout(to: 90)` — Rotate while recomputing layout space; prefer `.rotate` for performance
+/// - `.translate(from: Offset.zero, to: Offset(100, 0))` — Translate by pixels
+///   - Variants: `.translateX()`, `.translateY()`, `.translateFromGlobal()`,
+///     `.translateFromGlobalRect()`, `.translateFromGlobalKey()`
+/// - `.slide(from: Offset.zero, to: Offset(1, 0))` — Slide by widget-size fraction
+///   - Presets: `.slideUp()` (→ `Offset(0,-1)`), `.slideDown()`, `.slideFromLeading()`,
+///     `.slideFromTrailing()`, `.slideX(from: -1)`, `.slideY(from: 0.5)`
+/// - `.stretch(from: Stretch.none, to: Stretch(x: 1.2, y: 0.8))` — Scale axes independently
+/// - `.skew(from: Skew.zero, to: Skew(x: 0.3))` — Skew transformation
+/// - `.transform(to: matrix)` — Custom Matrix4 transformation (from defaults to identity)
+/// - `.parallax(slide: 0.5, axis: Axis.vertical)` — slides the child when the timeline plays or scrubs (scroll-based),
+///
+/// ### Visual Effects — Opacity & Filters
+/// - `.opacity(from: 0.0, to: 1.0)` — Animate opacity
+///   - Presets: `.fadeIn(from: 0.0)` (→ 1.0), `.fadeOut(from: 1.0)` (→ 0.0)
+/// - `.blur(from: 0.0, to: 10.0)` — Apply Gaussian blur
+///   - Presets: `.focus(from: 10.0)` (→ 0), `.unfocus(to: 10.0)` (0 → x)
+/// - `.backdropBlur(from: 0.0, to: 10.0)` — Blur content rendered behind this widget
+/// - `.colorTint(from: Colors.transparent, to: color)` — Color overlay tint
+///
+/// ### Layout — Size & Clipping
+/// - `.sizedClip(from: NSize, to: NSize)` — Animate size with clipping
+///   - `NSize.width(200)` — fixed width, child height
+///   - `NSize.height(double.infinity)` — fixed height (∞ resolves to max constraint)
+///   - `NSize.childSize` — both axes follow child (`NSize(w: null, h: null)`)
+/// - `.sizedBox(width: .tween(80, 200), height: .fixed(100))` — Animate container size;
+///   `double.infinity` resolves to parent's max constraint
+/// - `.fractionalSize(widthFactor: .tween(.2, 1.0), heightFactor: .fixed(.5))` — Size as fraction of parent
+/// - `.clipHeight(fromFactor: 0.0, toFactor: 1.0)` — Clip height by fraction (0 = fully clipped).
+/// - `.clipWidth(fromFactor: 0.0, toFactor: 1.0)` — Clip width by fraction.
+/// - `.clip(borderRadius: .circular(12))` — Expand/contract clip with rounded corners.
+/// - `.circularClip()` — Circular reveal/hide from [alignment] (default: `topLeft`).
+/// - `.padding(from: EdgeInsets.zero, to: EdgeInsets.all(16))` — Animate padding
+/// - `.align(from: .center, to: .topLeft)` — Change alignment within parent
+///
+/// ### Decoration — Style & Visual Properties
+/// - `.decorate(color: .tween(Colors.white, Colors.blue), borderRadius: .fixed(.circular(8)))` —
+///   Animate box decoration properties. Each property independently accepts `.tween()` or `.fixed()`:
+///   `color`, `borderRadius`, `border`, `boxShadow`, `gradient`.
+///   Prefer [DecoratedBoxActor] for composing multiple animated decoration layers.
+/// - `.textStyle(from: style1, to: style2)` — Interpolate text style properties
+/// - `.iconTheme(from: theme1, to: theme2)` — Interpolate icon theme properties
+///
+/// ### Positional — Stack-based Layout
+/// - `.position(start: 0, top: 0, end: 0, bottom: 0)` — Animate [Positioned] properties;
+///   use `Position.fill(...)` or `Position(start: 10, top: 20, width: 100)`
+///
+/// ### Specialized Acts (no `Act.` shorthand — use class directly)
+/// - `CardAct(elevation: .tween(2, 8), color: .tween(white, grey))` —
+///   Animate card surface: elevation, background color, shadow color, border radius, margin.
+///   Prefer [CardActor] for better readability (similar to [DecoratedBoxActor])
+/// - `PaintAct(painter: myPainter)` —
+///   Animate a progress value (0 → 1) passed to a custom [Painter]; use `paintOnTop: true` for foreground
+/// - `PathMotionAct(path: myPath)` —
+///   Move the widget along a custom [Path]; set `rotateToTangent: true` to face the movement direction
+///
+/// ## Keyframed Variants
+///
+/// **Most acts support keyframed animations** for multi-step sequences:
+///
+/// ```dart
+/// // Motion-based keyframes (each keyframe can have its own motion):
+/// ScaleAct.keyframed(
+///   frames: Keyframes([
+///     .key(0.8),
+///     .key(1.2, motion: .bouncy()),
+///     .key(1.0),
+///   ], motion: .smooth()),
+/// )
+///
+/// // Time-positioned keyframes (at 0%, 40%, 100% of duration):
+/// ScaleAct.keyframed(
+///   frames: Keyframes.fractional([
+///     .key(0.8, at: 0.0),
+///     .key(1.2, at: 0.4),
+///     .key(1.0, at: 1.0),
+///   ], duration: Duration(milliseconds: 600)),
+/// )
+/// ```
+///
 /// ## Keys and uniqueness
 ///
 /// Every act has a [key] — an [ActKey] that identifies its type. An [Actor]
