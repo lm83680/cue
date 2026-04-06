@@ -6,9 +6,10 @@ class ThreeDotsAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return CueModalTransition(
       barrierColor: Colors.black12,
-      motion: .smooth(),
+      motion: .bouncy(),
       reverseMotion: .snappy(),
       alignment: Alignment.bottomCenter,
       triggerBuilder: (context, showModal) => FloatingActionButton(
@@ -24,7 +25,7 @@ class ThreeDotsAction extends StatelessWidget {
             for (var i = 0; i < 3; i++)
               CircleAvatar(
                 radius: 2.5,
-                backgroundColor: Colors.black,
+                backgroundColor: colors.onSurface,
               ),
           ],
         ),
@@ -74,7 +75,7 @@ class ThreeDotsAction extends StatelessWidget {
                         ],
                         child: FloatingActionButton(
                           mini: true,
-                          backgroundColor: Colors.black,
+                          backgroundColor: colors.onSurface,
                           elevation: 1,
                           shape: CircleBorder(),
                           heroTag: null,
@@ -85,7 +86,7 @@ class ThreeDotsAction extends StatelessWidget {
                               .zoomIn(),
                               .fadeIn(),
                             ],
-                            child: Icon(icon, color: Colors.white, size: 20),
+                            child: Icon(icon, color: colors.onPrimary, size: 20),
                           ),
                         ),
                       ),

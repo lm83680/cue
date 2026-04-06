@@ -14,10 +14,10 @@ class DeleteConfirmationDialog extends StatelessWidget {
       alignment: Alignment.bottomRight,
       barrierColor: Colors.transparent,
       hideTriggerOnTransition: true,
-      motion: Spring.wobbly(dampingRatio: .6),
+      motion: Spring.wobbly(dampingRatio: .7),
       triggerBuilder: (context, open) => FloatingActionButton(
         onPressed: open,
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor: theme.colorScheme.surfaceContainer,
         foregroundColor: theme.colorScheme.error,
         elevation: .5,
         shape: CircleBorder(),
@@ -29,12 +29,16 @@ class DeleteConfirmationDialog extends StatelessWidget {
           child: Material(
             clipBehavior: .hardEdge,
             borderRadius: BorderRadius.circular(32),
-            color: theme.colorScheme.surface,
+            color: theme.colorScheme.surfaceContainer,
             elevation: 2,
             shadowColor: Colors.black.withValues(alpha: .3),
             child: Actor(
               acts: [
-                .sizedClip(from: .size(rect.size), to: .width(220), alignment: .bottomRight),
+                .sizedClip(
+                  from: .size(rect.size),
+                  to: .width(220),
+                  alignment: .bottomRight,
+                ),
                 .slideY(from: 0.4),
               ],
               child: Column(

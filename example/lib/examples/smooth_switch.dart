@@ -15,7 +15,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     final theme = Theme.of(context);
     final height = 44.0;
     final width = height * 2;
-    final trackColor = theme.colorScheme.surface;
+    final trackColor = Colors.grey.shade800;
     final thumbColor = theme.colorScheme.onSurface;
     const duration = Duration(milliseconds: 300);
     return Cue.onToggle(

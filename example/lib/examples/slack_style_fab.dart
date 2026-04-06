@@ -17,8 +17,7 @@ class SlackStyleFab extends StatelessWidget {
       triggerBuilder: (_, showModal) {
         return CueModalTransition(
           alignment: .bottomCenter,
-          barrierColor: Colors.black87,
-          hideTriggerOnTransition: true,
+          barrierColor: Colors.black12,
           barrierDismissible: true,
           motion: .smooth(),
           triggerBuilder: (context, showModal2) {
@@ -83,7 +82,7 @@ class SlackStyleFab extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: theme.primaryColor,
+                          color: theme.colorScheme.primary,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -185,7 +184,7 @@ class _LongPressContent extends StatelessWidget {
                   Text(
                     'Jhon Doe',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onPrimary,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   SizedBox(width: 12),

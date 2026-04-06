@@ -19,6 +19,7 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Column(
       children: [
         SizedBox(
@@ -44,9 +45,9 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                     clipBehavior: .antiAlias,
                     shape: RoundedSuperellipseBorder(borderRadius: .circular(32)),
                     child: Actor(
-                      acts: [.parallax(slide: .15, axis: .vertical)],
+                      acts: [.parallax(slide: .3, axis: .horizontal)],
                       child: Image.network(
-                        'https://picsum.photos/400/300?random=$index',
+                        'https://picsum.photos/600/500?random=$index',
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -56,8 +57,9 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
             },
           ),
         ),
+
         SizedBox(
-          height: 80,
+          height: 120,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -72,7 +74,7 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                         padding: const EdgeInsets.all(4.0),
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: colors .onSurface,
                             borderRadius: BorderRadius.circular(32),
                           ),
                           child: Actor(
@@ -93,12 +95,12 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                                         Text(
                                           'Let’s Go',
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(color: Colors.white, fontSize: 15),
+                                          style: TextStyle(color: colors.surface, fontSize: 15),
                                         ),
                                         SizedBox(width: 6),
                                         Icon(
                                           Icons.arrow_forward_ios_rounded,
-                                          color: Colors.white,
+                                          color: colors.surface,
                                           size: 14,
                                         ),
                                       ],

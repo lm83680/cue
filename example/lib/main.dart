@@ -1,5 +1,14 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/bottom_bar.dart';
+import 'package:example/examples/delete_confirmation.dart';
+import 'package:example/examples/draggable_panel.dart';
+import 'package:example/examples/expanding_cards.dart';
+import 'package:example/examples/horizinally_expanding_cards.dart';
+import 'package:example/examples/indicator_to_button.dart';
 import 'package:example/examples/ios_context_menu.dart';
+import 'package:example/examples/slack_style_fab.dart';
+import 'package:example/examples/smooth_switch.dart';
+import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -20,14 +29,15 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       home: const DemoPage(),
-      builder: (context, child) {
-        if (kDebugMode) {
-          return CueDebugTools(child: child!);
-        }
-        return child!;
-      },
+      debugShowCheckedModeBanner: false,
+      // builder: (context, child) {
+      //   if (kDebugMode) {
+      //     return CueDebugTools(child: child!);
+      //   }
+      //   return child!;
+      // },
     );
   }
 }
@@ -46,11 +56,12 @@ class _DemoPageState extends State<DemoPage> {
       appBar: AppBar(title: const Text('Cue')),
       body: SizedBox.expand(
         child: Padding(
-          padding: const EdgeInsets.all(0.0),
+          padding: const EdgeInsets.only(bottom: 150),
           child: Column(
             mainAxisAlignment: .center,
+            crossAxisAlignment: .center,
             children: [
-             Expanded(child: IosContextMenu())
+            SmoothSwitch()
             ],
           ),
         ),
