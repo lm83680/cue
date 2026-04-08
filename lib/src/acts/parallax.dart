@@ -100,7 +100,6 @@ class ParallaxAct extends DeferredTweenAct<Offset> {
     );
   }
 
-
   @override
   Widget apply(BuildContext context, covariant DeferredCueAnimation<Offset> animation, Widget child) {
     return _AnimatedParallax(

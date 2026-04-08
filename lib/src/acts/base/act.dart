@@ -749,7 +749,8 @@ class ActContext {
       implicitFrom: implicitFrom ?? this.implicitFrom,
     );
   }
-   /// Checks if this context has the same motion, reverse motion, and delays as another.
+
+  /// Checks if this context has the same motion, reverse motion, and delays as another.
   bool hasSameMotion(ActContext? other) =>
       other != null &&
       motion == other.motion &&

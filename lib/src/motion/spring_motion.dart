@@ -519,7 +519,6 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
     return Duration(milliseconds: milliseconds);
   }
 
-
   @override
   String toString() {
     if (_rawDesc != null) {

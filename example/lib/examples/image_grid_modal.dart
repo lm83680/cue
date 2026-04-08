@@ -125,7 +125,7 @@ class _ImageModalContent extends StatelessWidget {
         SafeArea(
           bottom: false,
           child: Padding(
-            padding:  .only(top: kToolbarHeight),
+            padding: .only(top: kToolbarHeight),
             child: ClipRect(
               child: Transform.translate(
                 offset: Offset(0, -kToolbarHeight), // make up for the padding

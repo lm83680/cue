@@ -333,6 +333,7 @@ abstract class CueState<T extends Cue> extends State<Cue> {
             });
           }
         }
+
         controller.removeStatusListener(statusListener);
         controller.addStatusListener(statusListener);
       }

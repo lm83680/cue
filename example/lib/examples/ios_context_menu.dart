@@ -9,7 +9,7 @@ class IosContextMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     const emojis = ['💜', '😂', '😮', '😢', '✊🏽', '🤢', '🤯', '👋🏽'];
     final theme = Theme.of(context);
-    
+
     return ListView.builder(
       itemCount: 10,
       itemBuilder: (context, index) {

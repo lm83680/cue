@@ -559,7 +559,7 @@ class _TranslateFromGlobalTransition extends SingleChildRenderObjectWidget {
       ..globalKey = globalKey
       ..alignment = alignment
       ..toLocal = toLocal
-      ..textDirection =  Directionality.maybeOf(context);
+      ..textDirection = Directionality.maybeOf(context);
   }
 }
 

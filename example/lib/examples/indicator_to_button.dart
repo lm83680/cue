@@ -74,7 +74,7 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                         padding: const EdgeInsets.all(4.0),
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            color: colors .onSurface,
+                            color: colors.onSurface,
                             borderRadius: BorderRadius.circular(32),
                           ),
                           child: Actor(

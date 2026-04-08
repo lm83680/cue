@@ -297,8 +297,8 @@ class ActorState extends State<Actor> {
     for (final entry in _acts) {
       final (act, actContext) = entry;
       final existing = _animations[act.key];
-      
-      if (existing?.act == act &&  actContext.hasSameMotion(existing?.context)) continue;
+
+      if (existing?.act == act && actContext.hasSameMotion(existing?.context)) continue;
       final implicitFrom = scope.reanimateFromCurrent ? _animationSnapshots[act.key] : null;
       final animation = act.buildAnimation(
         scope.controller.timeline,

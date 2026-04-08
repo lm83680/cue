@@ -1,6 +1,7 @@
 import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+
 // Ai-generate code
 class WalletPage extends StatelessWidget {
   const WalletPage({super.key});

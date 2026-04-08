@@ -211,7 +211,6 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
     );
   }
 
- 
   @override
   Widget apply(BuildContext context, covariant DeferredCueAnimation<Size> animation, Widget child) {
     return _AnimatedSizedBox(
