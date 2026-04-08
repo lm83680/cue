@@ -40,8 +40,6 @@ class _ImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Material(
       color: Colors.transparent,
       clipBehavior: Clip.hardEdge,
@@ -50,14 +48,13 @@ class _ImageCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           CueModalTransition(
-            // motion: .easeInOut(300.ms),
-            motion: .smooth(),
+            motion: .easeInOut(300.ms),
             hideTriggerOnTransition: true,
             barrierColor: Colors.black.withValues(alpha: .9),
             triggerBuilder: (context, open) => GestureDetector(
               onTap: open,
               child: Image.network(
-                'https://picsum.photos/id/${60 + imageId}/400/500',
+                'https://picsum.photos/id/${80 + imageId}/400/500',
                 fit: BoxFit.cover,
               ),
             ),
@@ -128,21 +125,24 @@ class _ImageModalContent extends StatelessWidget {
         SafeArea(
           bottom: false,
           child: Padding(
-            padding: const EdgeInsets.only(top: kToolbarHeight),
+            padding:  .only(top: kToolbarHeight),
             child: ClipRect(
-              child: Actor(
-                acts: [
-                  .translateFromGlobalRect(triggerRect),
-                  .sizedBox(width: .tween(triggerRect.width, .infinity)),
-                ],
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 0.8,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        'https://picsum.photos/id/${60 + imageId}/400/500',
-                        fit: BoxFit.cover,
+              child: Transform.translate(
+                offset: Offset(0, -kToolbarHeight), // make up for the padding
+                child: Actor(
+                  acts: [
+                    .translateFromGlobalRect(triggerRect),
+                    .sizedBox(width: .tween(triggerRect.width, .infinity)),
+                  ],
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 0.8,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          'https://picsum.photos/id/${80 + imageId}/400/500',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
@@ -151,7 +151,7 @@ class _ImageModalContent extends StatelessWidget {
             ),
           ),
         ),
-        
+
         Positioned(
           top: 0,
           left: 16,
