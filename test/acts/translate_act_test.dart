@@ -275,7 +275,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(Visibility), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
     });
 
     testWidgets('fromGlobalRect applies translation', (tester) async {
@@ -299,7 +299,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(Visibility), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
     });
 
     testWidgets('fromGlobal with globalKey applies translation', (tester) async {
@@ -330,7 +330,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(Visibility), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
     });
 
     testWidgets('fromGlobal updates when offset changes', (tester) async {
@@ -366,7 +366,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(Visibility), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
     });
 
     testWidgets('fromGlobalRect updates when rect changes', (tester) async {
@@ -402,7 +402,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(Visibility), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
     });
 
     testWidgets('fromGlobal with valid globalKey measures correctly', (tester) async {
@@ -436,7 +436,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       // The widget should render with the global key
-      expect(find.byType(Visibility), findsWidgets);
+      expect(find.byType(SizedBox), findsWidgets);
     });
   });
 }

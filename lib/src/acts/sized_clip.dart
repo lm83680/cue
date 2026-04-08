@@ -256,17 +256,6 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   int get hashCode => Object.hash(alignment, clipBehavior, from, to, delay, _reverse, frames, clipGeometry);
 
   @override
-  CueAnimation<Size?> buildAnimation(CueTimeline timline, ActContext context) {
-    final trackConfig = TrackConfig(
-      motion: context.motion,
-      reverseMotion: context.reverseMotion,
-      reverseType: reverse.type,
-    );
-    final (track, token) = timline.obtainTrack(trackConfig);
-    return DeferredCueAnimation<Size?>(parent: track, token: token, context: context);
-  }
-
-  @override
   Widget apply(BuildContext context, DeferredCueAnimation<Size?> animation, Widget child) {
     return _AnimatedSizeClip(
       driver: animation,

@@ -345,7 +345,6 @@ abstract class TranslateAct extends Act {
 }
 
 class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
-  
   @override
   final ActKey key = const ActKey('Translate');
 
@@ -460,7 +459,7 @@ class TranslateTransition extends AnimatedWidget {
   }
 }
 
-class _TranslateFromGlobalAct extends TweenAct<double> implements TranslateAct {
+class _TranslateFromGlobalAct extends DeferredTweenAct<Offset> implements TranslateAct {
   @override
   final ActKey key = const ActKey('Translate');
 
@@ -477,8 +476,7 @@ class _TranslateFromGlobalAct extends TweenAct<double> implements TranslateAct {
     super.motion,
   }) : rect = null,
        alignment = null,
-       globalKey = null,
-       super.tween(from: 0, to: 1);
+       globalKey = null;
 
   const _TranslateFromGlobalAct.fromRect(
     this.rect, {
@@ -487,8 +485,7 @@ class _TranslateFromGlobalAct extends TweenAct<double> implements TranslateAct {
     super.motion,
     super.delay,
   }) : offset = null,
-       globalKey = null,
-       super.tween(from: 0, to: 1);
+       globalKey = null;
 
   const _TranslateFromGlobalAct.fromKey(
     GlobalKey this.globalKey, {
@@ -497,13 +494,12 @@ class _TranslateFromGlobalAct extends TweenAct<double> implements TranslateAct {
     super.motion,
     super.delay,
   }) : offset = null,
-       rect = null,
-       super.tween(from: 0, to: 1);
+       rect = null;
 
   @override
-  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
-    return _TranslateFromGlobalTranstion(
-      animation: animation,
+  Widget apply(BuildContext context, DeferredCueAnimation<Offset> animation, Widget child) {
+    return _TranslateFromGlobalTransition(
+      driver: animation,
       globalOffset: offset,
       globalRect: rect,
       globalKey: globalKey,
@@ -512,100 +508,187 @@ class _TranslateFromGlobalAct extends TweenAct<double> implements TranslateAct {
       child: child,
     );
   }
+
+  @override
+  ActContext resolve(ActContext context) {
+    return TweenActBase.resolveMotion(
+      context,
+      reverse: reverse,
+      motion: motion,
+    );
+  }
 }
 
-class _TranslateFromGlobalTranstion extends StatefulWidget {
+class _TranslateFromGlobalTransition extends SingleChildRenderObjectWidget {
   final Offset? globalOffset;
   final Rect? globalRect;
   final AlignmentGeometry? alignment;
   final Offset toLocal;
   final GlobalKey? globalKey;
-  final Widget child;
-  final Animation<double> animation;
+  final DeferredCueAnimation<Offset> driver;
 
-  const _TranslateFromGlobalTranstion({
+  const _TranslateFromGlobalTransition({
+    super.child,
     this.globalOffset,
     this.globalRect,
     this.alignment,
     this.globalKey,
-    required this.animation,
+    required this.driver,
     this.toLocal = Offset.zero,
-    required this.child,
   });
 
   @override
-  State<StatefulWidget> createState() => _TranslateFromGlobalTranstionState();
+  RenderObject createRenderObject(BuildContext context) {
+    return _RenderTranslateFromGlobal(
+      driver: driver,
+      globalOffset: globalOffset,
+      globalRect: globalRect,
+      globalKey: globalKey,
+      alignment: alignment,
+      toLocal: toLocal,
+      textDirection: Directionality.maybeOf(context),
+    );
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderTranslateFromGlobal renderObject) {
+    renderObject
+      ..driver = driver
+      ..globalOffset = globalOffset
+      ..globalRect = globalRect
+      ..globalKey = globalKey
+      ..alignment = alignment
+      ..toLocal = toLocal
+      ..textDirection =  Directionality.maybeOf(context);
+  }
 }
 
-class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTranstion> {
-  final _key = GlobalKey();
-  Tween<Offset>? _deltaTween;
-  bool _measured = false;
+class _RenderTranslateFromGlobal extends RenderProxyBox {
+  _RenderTranslateFromGlobal({
+    required DeferredCueAnimation<Offset> driver,
+    Offset? globalOffset,
+    Rect? globalRect,
+    GlobalKey? globalKey,
+    AlignmentGeometry? alignment,
+    required Offset toLocal,
+    TextDirection? textDirection,
+  }) : _driver = driver,
+       _globalOffset = globalOffset,
+       _globalRect = globalRect,
+       _globalKey = globalKey,
+       _alignment = alignment,
+       _toLocal = toLocal,
+       _textDirection = textDirection {
+    _driver.addListener(markNeedsPaint);
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
+  DeferredCueAnimation<Offset> _driver;
+  set driver(DeferredCueAnimation<Offset> value) {
+    if (_driver == value) return;
+    _driver.removeListener(markNeedsPaint);
+    _driver = value;
+    _driver.addListener(markNeedsPaint);
+    markNeedsLayout();
+  }
+
+  Offset? _globalOffset;
+  set globalOffset(Offset? value) {
+    if (_globalOffset == value) return;
+    _globalOffset = value;
+    _markNeedsMeasure();
+  }
+
+  Rect? _globalRect;
+  set globalRect(Rect? value) {
+    if (_globalRect == value) return;
+    _globalRect = value;
+    _markNeedsMeasure();
+  }
+
+  GlobalKey? _globalKey;
+  set globalKey(GlobalKey? value) {
+    if (_globalKey == value) return;
+    _globalKey = value;
+    _markNeedsMeasure();
+  }
+
+  AlignmentGeometry? _alignment;
+  set alignment(AlignmentGeometry? value) {
+    if (_alignment == value) return;
+    _alignment = value;
+    _markNeedsMeasure();
+  }
+
+  Offset _toLocal;
+  set toLocal(Offset value) {
+    if (_toLocal == value) return;
+    _toLocal = value;
+    _markNeedsMeasure();
+  }
+
+  TextDirection? _textDirection;
+  set textDirection(TextDirection? value) {
+    if (_textDirection == value) return;
+    _textDirection = value;
+    _markNeedsMeasure();
+  }
+
+  void _markNeedsMeasure() {
+    _driver.setAnimatable(null);
+    markNeedsPaint();
   }
 
   @override
-  void didUpdateWidget(_TranslateFromGlobalTranstion oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.globalOffset != widget.globalOffset || oldWidget.globalRect != widget.globalRect) {
-      _measured = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
-    }
+  void detach() {
+    _driver.removeListener(markNeedsPaint);
+    super.detach();
   }
 
-  void _measure() {
-    if (!mounted) return;
-    final renderBox = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null || !renderBox.hasSize) return;
+  void _measure(Offset parentOffset) {
+    final renderBox = this;
+    if (!renderBox.hasSize) return;
+
     final targetGlobal = renderBox.localToGlobal(Offset.zero);
+    Offset beginOffset;
 
-    if (widget.globalOffset case final global?) {
-      final newDelta = global - targetGlobal;
-      if (_deltaTween?.begin != newDelta) {
-        setState(() {
-          _deltaTween = Tween(begin: newDelta, end: widget.toLocal);
-          _measured = true;
-        });
-      }
+    if (_globalOffset case final global?) {
+      beginOffset = global - targetGlobal;
     } else {
-      final rect = widget.globalRect ?? _rectFor(widget.globalKey!);
-      final alignment = widget.alignment!.resolve(Directionality.maybeOf(context));
+      final rect = _globalRect ?? _rectFor(_globalKey!);
+      final alignment = _alignment!.resolve(_textDirection ?? TextDirection.ltr);
       final targetRect = alignment.inscribe(renderBox.size, rect);
-      final newDelta = targetRect.topLeft - targetGlobal;
-      if (_deltaTween?.begin != newDelta) {
-        setState(() {
-          _deltaTween = Tween(begin: newDelta, end: widget.toLocal);
-          _measured = true;
-        });
-      }
+      beginOffset = targetRect.topLeft - targetGlobal;
     }
+    final builder = CueTweenBuildHelper(
+      from: beginOffset,
+      to: _toLocal,
+      tweenBuilder: (from, to) => Tween<Offset>(begin: from, end: to),
+    );
+
+    _driver.setAnimatable(builder.buildAnimtable(_driver.context));
   }
 
   Rect _rectFor(GlobalKey key) {
     final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null || !renderBox.hasSize) {
-      throw FlutterError(
-        'Could not determine global rect for translation. Ensure the target widget has been rendered and has a size.',
-      );
+      return Rect.zero;
     }
     final targetGlobal = renderBox.localToGlobal(Offset.zero);
     return targetGlobal & renderBox.size;
   }
 
   @override
-  Widget build(BuildContext context) {
-    final offsetTween = _deltaTween ?? Tween(begin: Offset.zero, end: widget.toLocal);
-    return Visibility.maintain(
-      key: _key,
-      visible: _deltaTween != null && _measured,
-      child: TranslateTransition(
-        offset: offsetTween.animate(widget.animation),
-        child: widget.child,
-      ),
-    );
+  void paint(PaintingContext context, Offset offset) {
+    if (!_driver.hasAnimatable) {
+      _measure(offset);
+    }
+    final translation = _driver.value;
+    super.paint(context, offset + translation);
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    if (!_driver.hasAnimatable) return false;
+    return child!.hitTest(result, position: position - _driver.value);
   }
 }

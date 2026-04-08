@@ -100,16 +100,6 @@ class ParallaxAct extends DeferredTweenAct<Offset> {
     );
   }
 
-  @override
-  CueAnimation<Offset> buildAnimation(CueTimeline timline, ActContext context) {
-    final trackConfig = TrackConfig(
-      motion: context.motion,
-      reverseMotion: context.reverseMotion,
-      reverseType: reverse.type,
-    );
-    final (track, token) = timline.obtainTrack(trackConfig);
-    return DeferredCueAnimation<Offset>(parent: track, token: token, context: context);
-  }
 
   @override
   Widget apply(BuildContext context, covariant DeferredCueAnimation<Offset> animation, Widget child) {

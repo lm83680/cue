@@ -128,7 +128,7 @@ class _ImageModalContent extends StatelessWidget {
         SafeArea(
           bottom: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: kToolbarHeight),
+            padding: const EdgeInsets.only(top: kToolbarHeight),
             child: ClipRect(
               child: Actor(
                 acts: [

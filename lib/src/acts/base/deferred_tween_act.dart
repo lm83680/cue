@@ -1,5 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/animatable_act.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/widgets.dart';
 
 /// Base class for acts that construct their tween asynchronously via a
@@ -47,5 +48,16 @@ abstract class DeferredTweenAct<T extends Object?> extends AnimtableAct<T, T> {
     throw StateError(
       'DeferredTweenAct does not build a tween directly. It should be used with a DeferredCueAnimation that will set the tween later.',
     );
+  }
+
+  @override
+  DeferredCueAnimation<T> buildAnimation(CueTimeline timline, ActContext context) {
+    final trackConfig = TrackConfig(
+      motion: context.motion,
+      reverseMotion: context.reverseMotion,
+      reverseType: reverse.type,
+    );
+    final (track, token) = timline.obtainTrack(trackConfig);
+    return DeferredCueAnimation<T>(parent: track, token: token, context: context);
   }
 }
