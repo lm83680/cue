@@ -268,7 +268,7 @@ abstract class TranslateAct extends Act {
     Offset toLocal,
     CueMotion? motion,
     Duration delay,
-  }) = _TranslateFromGlobalEffect.offset;
+  }) = _TranslateFromGlobalAct.offset;
 
   /// {@template act.translate.fromGlobalRect}
   /// Translates a widget from a global [Rect] to its current local position.
@@ -302,7 +302,7 @@ abstract class TranslateAct extends Act {
     Offset toLocal,
     CueMotion? motion,
     Duration delay,
-  }) = _TranslateFromGlobalEffect.fromRect;
+  }) = _TranslateFromGlobalAct.fromRect;
 
   /// {@template act.translate.fromGlobalKey}
   /// Translates a widget from another widget's global position (identified by key).
@@ -341,7 +341,7 @@ abstract class TranslateAct extends Act {
     Offset toLocal,
     CueMotion? motion,
     Duration delay,
-  }) = _TranslateFromGlobalEffect.fromKey;
+  }) = _TranslateFromGlobalAct.fromKey;
 }
 
 class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
@@ -460,7 +460,7 @@ class TranslateTransition extends AnimatedWidget {
   }
 }
 
-class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAct {
+class _TranslateFromGlobalAct extends TweenAct<double> implements TranslateAct {
   @override
   final ActKey key = const ActKey('Translate');
 
@@ -470,7 +470,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
   final GlobalKey? globalKey;
   final Offset toLocal;
 
-  const _TranslateFromGlobalEffect.offset({
+  const _TranslateFromGlobalAct.offset({
     required Offset this.offset,
     this.toLocal = Offset.zero,
     super.delay,
@@ -480,7 +480,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
        globalKey = null,
        super.tween(from: 0, to: 1);
 
-  const _TranslateFromGlobalEffect.fromRect(
+  const _TranslateFromGlobalAct.fromRect(
     this.rect, {
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
@@ -490,7 +490,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
        globalKey = null,
        super.tween(from: 0, to: 1);
 
-  const _TranslateFromGlobalEffect.fromKey(
+  const _TranslateFromGlobalAct.fromKey(
     GlobalKey this.globalKey, {
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
