@@ -371,6 +371,17 @@ class StretchAct extends TweenActBase<Stretch, Matrix4> {
   @override
   final ActKey key = const ActKey('Stretch');
 
+  /// The alignment point around which stretching occurs.
+  ///
+  /// Defaults to [Alignment.center]. Use other alignments to stretch from
+  /// corners or edges:
+  ///
+  /// ```dart
+  /// // Stretch from top-left corner
+  /// Act.stretch(to: Stretch(x: 1.5, y: 1.0), alignment: Alignment.topLeft)
+  /// ```
+  final AlignmentGeometry alignment;
+
   /// {@template act.stretch}
   /// Animates non-uniform scaling with separate X and Y factors.
   ///
@@ -402,6 +413,7 @@ class StretchAct extends TweenActBase<Stretch, Matrix4> {
     super.motion,
     super.reverse,
     super.delay,
+    this.alignment = Alignment.center,
   }) : super.tween();
 
   /// {@template act.stretch.keyframed}
@@ -440,6 +452,7 @@ class StretchAct extends TweenActBase<Stretch, Matrix4> {
     required super.frames,
     super.reverse,
     super.delay,
+    this.alignment = Alignment.center,
   }) : super.keyframed(from: Stretch.none);
 
   @override
@@ -459,13 +472,22 @@ class StretchAct extends TweenActBase<Stretch, Matrix4> {
       builder: (context, child) {
         return Transform(
           transform: animation.value,
-          alignment: Alignment.center,
+          alignment: alignment,
           child: child,
         );
       },
       child: child,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is StretchAct && super == other && other.alignment == alignment;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, alignment);
 }
 
 /// {@template stretch}

@@ -280,10 +280,11 @@ abstract class Act {
   /// {@macro act.stretch}
   const factory Act.stretch({
     Stretch from,
-    required Stretch to,
+    Stretch to,
     CueMotion? motion,
-    Duration delay,
     ReverseBehavior<Stretch> reverse,
+    Duration delay,
+    AlignmentGeometry alignment,
   }) = StretchAct;
 
   /// {@macro act.fractional_size}
