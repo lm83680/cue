@@ -64,6 +64,23 @@ void main() {
 
       expect(widget.threshold, equals(0.5));
     });
+
+    testWidgets('creates RenderGooeyZone render object', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: const SizedBox(),
+          ),
+        ),
+      );
+
+      final renderObject = tester.renderObject<RenderBox>(
+        find.byType(GooeyZone),
+      );
+
+      expect(renderObject, isNotNull);
+    });
   });
 
   group('GooeyBlob', () {
@@ -131,6 +148,79 @@ void main() {
 
       expect(find.byType(GooeyBlob), findsOneWidget);
     });
+
+    testWidgets('renders multiple blobs in zone', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: Column(
+              children: [
+                GooeyBlob(child: const SizedBox(width: 30, height: 30)),
+                GooeyBlob(child: const SizedBox(width: 30, height: 30)),
+                GooeyBlob(child: const SizedBox(width: 30, height: 30)),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyBlob), findsNWidgets(3));
+    });
+
+    testWidgets('updates when widget key is same', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: GooeyBlob(
+              key: key,
+              shape: const BlobShape.circle(),
+              child: const SizedBox(width: 50, height: 50),
+            ),
+          ),
+        ),
+      );
+
+      var blob = tester.widget<GooeyBlob>(find.byKey(key));
+      expect(blob.shape, equals(const BlobShape.circle()));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: GooeyBlob(
+              key: key,
+              shape: BlobShape.rounded(BorderRadius.circular(8)),
+              child: const SizedBox(width: 50, height: 50),
+            ),
+          ),
+        ),
+      );
+
+      blob = tester.widget<GooeyBlob>(find.byKey(key));
+      expect(blob.shape, isA<BlobShape>());
+    });
+
+    testWidgets('creates RenderGooeyBlob render object', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: GooeyBlob(
+              child: const SizedBox(width: 50, height: 50),
+            ),
+          ),
+        ),
+      );
+
+      final renderObject = tester.renderObject<RenderBox>(
+        find.byType(GooeyBlob),
+      );
+
+      expect(renderObject, isNotNull);
+    });
   });
 
   group('BlobShape', () {
@@ -164,18 +254,209 @@ void main() {
       expect(shape, isA<BlobShape>());
     });
 
-    test('different borderRadius values create different shapes', () {
+    test('different borderRadius values are not equal', () {
       final shape1 = BlobShape.rounded(BorderRadius.circular(8));
       final shape2 = BlobShape.rounded(BorderRadius.circular(16));
 
       expect(shape1, isNot(equals(shape2)));
     });
 
-    test('different borderRadius values create different superEllipse shapes', () {
+    test('different superEllipse borderRadius values are not equal', () {
       final shape1 = BlobShape.superEllipse(BorderRadius.circular(8));
       final shape2 = BlobShape.superEllipse(BorderRadius.circular(16));
 
       expect(shape1, isNot(equals(shape2)));
+    });
+
+    test('circle is equal to another circle', () {
+      const shape1 = BlobShape.circle();
+      const shape2 = BlobShape.circle();
+
+      expect(shape1, equals(shape2));
+    });
+
+    test('rounded shapes with same borderRadius are equal', () {
+      final shape1 = BlobShape.rounded(BorderRadius.circular(12));
+      final shape2 = BlobShape.rounded(BorderRadius.circular(12));
+
+      expect(shape1, equals(shape2));
+    });
+
+    test('superEllipse shapes with same borderRadius are equal', () {
+      final shape1 = BlobShape.superEllipse(BorderRadius.circular(12));
+      final shape2 = BlobShape.superEllipse(BorderRadius.circular(12));
+
+      expect(shape1, equals(shape2));
+    });
+
+    test('circle has same hashCode for equal instances', () {
+      const shape1 = BlobShape.circle();
+      const shape2 = BlobShape.circle();
+
+      expect(shape1.hashCode, equals(shape2.hashCode));
+    });
+
+    test('rounded has same hashCode for equal instances', () {
+      final shape1 = BlobShape.rounded(BorderRadius.circular(12));
+      final shape2 = BlobShape.rounded(BorderRadius.circular(12));
+
+      expect(shape1.hashCode, equals(shape2.hashCode));
+    });
+
+    test('superEllipse has same hashCode for equal instances', () {
+      final shape1 = BlobShape.superEllipse(BorderRadius.circular(12));
+      final shape2 = BlobShape.superEllipse(BorderRadius.circular(12));
+
+      expect(shape1.hashCode, equals(shape2.hashCode));
+    });
+
+    test('circle is not equal to rounded', () {
+      const circle = BlobShape.circle();
+      final rounded = BlobShape.rounded(BorderRadius.circular(12));
+
+      expect(circle, isNot(equals(rounded)));
+    });
+
+    test('circle is not equal to superEllipse', () {
+      const circle = BlobShape.circle();
+      final superEllipse = BlobShape.superEllipse(BorderRadius.circular(12));
+
+      expect(circle, isNot(equals(superEllipse)));
+    });
+
+    test('rounded is not equal to superEllipse', () {
+      final rounded = BlobShape.rounded(BorderRadius.circular(12));
+      final superEllipse = BlobShape.superEllipse(BorderRadius.circular(12));
+
+      expect(rounded, isNot(equals(superEllipse)));
+    });
+  });
+
+  group('Integration', () {
+    testWidgets('blob attaches to zone on mount', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: GooeyBlob(
+              child: const SizedBox(width: 50, height: 50),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyZone), findsOneWidget);
+      expect(find.byType(GooeyBlob), findsOneWidget);
+    });
+
+    testWidgets('zone widget renders without errors', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: const SizedBox(),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyZone), findsOneWidget);
+    });
+
+    testWidgets('nested GooeyBlob widgets in zone', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: Column(
+              children: [
+                GooeyBlob(child: const Text('first')),
+                GooeyBlob(child: const Text('second')),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyBlob), findsNWidgets(2));
+    });
+  });
+
+  group('Edge Cases', () {
+    testWidgets('zone with single child renders', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: const Text('single'),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyZone), findsOneWidget);
+      expect(find.text('single'), findsOneWidget);
+    });
+
+    testWidgets('multiple nested blobs in column', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: Column(
+              children: [
+                GooeyBlob(child: const Text('first')),
+                GooeyBlob(child: const Text('second')),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyBlob), findsNWidgets(2));
+      expect(find.text('first'), findsOneWidget);
+      expect(find.text('second'), findsOneWidget);
+    });
+
+    testWidgets('Zone with custom key', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            key: const ValueKey('gooey-zone'),
+            color: Colors.indigo,
+            child: const SizedBox(),
+          ),
+        ),
+      );
+
+      expect(find.byKey(const ValueKey('gooey-zone')), findsOneWidget);
+    });
+
+    testWidgets('Blob with custom key', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.indigo,
+            child: GooeyBlob(
+              key: const ValueKey('gooey-blob'),
+              child: const SizedBox(),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byKey(const ValueKey('gooey-blob')), findsOneWidget);
+    });
+
+    testWidgets('Zone with transparent color', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GooeyZone(
+            color: Colors.transparent,
+            child: const SizedBox(),
+          ),
+        ),
+      );
+
+      expect(find.byType(GooeyZone), findsOneWidget);
     });
   });
 }

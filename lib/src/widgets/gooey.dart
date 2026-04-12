@@ -26,6 +26,7 @@ class GooeyZone extends SingleChildRenderObjectWidget {
     required this.color,
     this.blurRadius = 12.0,
     this.threshold = 0.5,
+    this.blobOpacity = 1.0,
     required super.child,
   });
 
@@ -42,12 +43,17 @@ class GooeyZone extends SingleChildRenderObjectWidget {
   /// Defaults to 0.5.
   final double threshold;
 
+  /// Opacity applied to the blob layer only (not the child content).
+  /// At 1.0 (default) no extra layer is pushed. At 0.0 blobs are skipped entirely.
+  final double blobOpacity;
+
   @override
   RenderGooeyZone createRenderObject(BuildContext context) {
     return RenderGooeyZone(
       color: color,
       blurRadius: blurRadius,
       threshold: threshold,
+      blobOpacity: blobOpacity,
     );
   }
 
@@ -56,7 +62,17 @@ class GooeyZone extends SingleChildRenderObjectWidget {
     renderObject
       ..color = color
       ..blurRadius = blurRadius
-      ..threshold = threshold;
+      ..threshold = threshold
+      ..blobOpacity = blobOpacity;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(ColorProperty('color', color));
+    properties.add(DoubleProperty('blurRadius', blurRadius));
+    properties.add(DoubleProperty('threshold', threshold));
+    properties.add(DoubleProperty('blobOpacity', blobOpacity));
   }
 }
 
@@ -82,16 +98,42 @@ sealed class BlobShape {
 
 class _CircleBlob extends BlobShape {
   const _CircleBlob();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || other is _CircleBlob && runtimeType == other.runtimeType;
+  }
+
+  @override
+  int get hashCode => 0;
 }
 
 class _RoundedRectBlob extends BlobShape {
   const _RoundedRectBlob(this.borderRadius);
   final BorderRadiusGeometry borderRadius;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is _RoundedRectBlob && runtimeType == other.runtimeType && borderRadius == other.borderRadius;
+  }
+
+  @override
+  int get hashCode => borderRadius.hashCode;
 }
 
 class _SuperEllipseBlob extends BlobShape {
   const _SuperEllipseBlob(this.borderRadius);
   final BorderRadiusGeometry borderRadius;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is _SuperEllipseBlob && runtimeType == other.runtimeType && borderRadius == other.borderRadius;
+  }
+
+  @override
+  int get hashCode => borderRadius.hashCode;
 }
 
 /// A per-child configuration widget for [GooeyZone].
@@ -104,19 +146,32 @@ class GooeyBlob extends SingleChildRenderObjectWidget {
     super.key,
     required super.child,
     this.shape = const BlobShape.circle(),
+    this.cutout = false,
   });
+
+  /// If true, this blob will punch a hole in the goo instead of adding to it.
+  final bool cutout;
 
   /// Shape of the blob drawn behind this child.
   final BlobShape shape;
 
   @override
   RenderGooeyBlob createRenderObject(BuildContext context) {
-    return RenderGooeyBlob(shape: shape);
+    return RenderGooeyBlob(shape: shape, cutout: cutout);
   }
 
   @override
   void updateRenderObject(BuildContext context, RenderGooeyBlob renderObject) {
-    renderObject.shape = shape;
+    renderObject
+      ..shape = shape
+      ..cutout = cutout;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<BlobShape>('shape', shape));
+    properties.add(FlagProperty('cutout', value: cutout, ifTrue: 'cutout'));
   }
 }
 
@@ -128,13 +183,22 @@ class RenderGooeyBlob extends RenderProxyBox {
   RenderGooeyBlob({
     required BlobShape shape,
     RenderBox? child,
+    bool cutout = false,
   }) : _shape = shape,
+       _cutout = cutout,
        super(child);
 
   BlobShape _shape;
   set shape(BlobShape value) {
     if (_shape == value) return;
     _shape = value;
+    markNeedsPaint();
+  }
+
+  bool _cutout;
+  set cutout(bool value) {
+    if (_cutout == value) return;
+    _cutout = value;
     markNeedsPaint();
   }
 
@@ -175,6 +239,9 @@ class RenderGooeyBlob extends RenderProxyBox {
     canvas.save();
     canvas.transform(matrix.storage);
 
+    if (_cutout) {
+      paint.blendMode = BlendMode.clear;
+    }
     // Draw blob at local coordinates (already transformed by matrix)
     final blobCenter = childSize.center(Offset.zero);
     final shape = _shape;
@@ -214,10 +281,12 @@ class RenderGooeyZone extends RenderProxyBox {
     required Color color,
     required double blurRadius,
     required double threshold,
+    double blobOpacity = 1.0,
     RenderBox? child,
   }) : _color = color,
        _blurRadius = blurRadius,
        _threshold = threshold,
+       _blobOpacity = blobOpacity,
        super(child);
 
   final List<RenderGooeyBlob> _blobs = [];
@@ -226,6 +295,7 @@ class RenderGooeyZone extends RenderProxyBox {
   Paint? _cachedBlurFilterPaint;
   Paint? _cachedThresholdFilterPaint;
   Paint? _blobPaint;
+  final _opacityLayerHandle = LayerHandle<OpacityLayer>();
 
   void _registerBlob(RenderGooeyBlob blob) {
     _blobs.add(blob);
@@ -241,7 +311,7 @@ class RenderGooeyZone extends RenderProxyBox {
   set color(Color value) {
     if (_color == value) return;
     _color = value;
-    _cachedBlurFilterPaint = null; // Invalidate cache
+    _blobPaint = null; // Invalidate blob paint cache
     markNeedsPaint();
   }
 
@@ -261,26 +331,55 @@ class RenderGooeyZone extends RenderProxyBox {
     markNeedsPaint();
   }
 
+  double _blobOpacity;
+  set blobOpacity(double value) {
+    if (_blobOpacity == value) return;
+    _blobOpacity = value;
+    markNeedsPaint();
+  }
+
   @override
   bool get isRepaintBoundary => true;
 
   @override
-  void paint(PaintingContext context, Offset offset) {
+  void dispose() {
+    _opacityLayerHandle.layer = null;
+    super.dispose();
+  }
+
+  void _paintBlobs(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
-    if (_blobs.isNotEmpty) {
-      final expand = _blurRadius * 3;
-      final layerRect = (offset - Offset(expand, expand)) & Size(size.width + expand * 2, size.height + expand * 2);
+    final expand = _blurRadius * 3;
+    final layerRect = (offset - Offset(expand, expand)) & Size(size.width + expand * 2, size.height + expand * 2);
 
-      canvas.saveLayer(layerRect, _getThresholdFilterPaint());
-      canvas.saveLayer(layerRect, _getBlurFilterPaint());
+    canvas.saveLayer(layerRect, _getThresholdFilterPaint());
+    canvas.saveLayer(layerRect, _getBlurFilterPaint());
 
-      final overdraw = _blurRadius * 0.2;
-      final paint = _blobPaint ??= Paint()..color = _color;
-      for (final blob in _blobs) {
-        blob.paintBlob(canvas, this, overdraw, paint);
+    final overdraw = _blurRadius * 0.2;
+    final paint = _blobPaint ??= Paint()..color = _color;
+    for (final blob in _blobs) {
+      blob.paintBlob(canvas, this, overdraw, paint);
+    }
+    canvas.restore(); // apply blur
+    canvas.restore(); // apply threshold
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (_blobs.isNotEmpty && _blobOpacity > 0.0) {
+      if (_blobOpacity < 1.0) {
+        _opacityLayerHandle.layer = context.pushOpacity(
+          offset,
+          (_blobOpacity * 255).round(),
+          _paintBlobs,
+          oldLayer: _opacityLayerHandle.layer,
+        );
+      } else {
+        _opacityLayerHandle.layer = null;
+        _paintBlobs(context, offset);
       }
-      canvas.restore(); // apply blur
-      canvas.restore(); // apply threshold
+    } else {
+      _opacityLayerHandle.layer = null;
     }
 
     super.paint(context, offset);
