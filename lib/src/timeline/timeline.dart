@@ -37,14 +37,10 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   Map<TrackConfig, TrackEntry> get tracks => _tracks;
 
-  late final Map<TrackConfig, TrackEntry> _tracks;
+   final Map<TrackConfig, TrackEntry> _tracks = {};
 
-  /// Creates a timeline implementation with the given default track config.
-  CueTimelineImpl(this.defaultConfig) {
-    _tracks = {
-      defaultConfig: TrackEntry(buildTrack(defaultConfig)),
-    };
-  }
+  /// Creates a timeline implementation 
+  CueTimelineImpl(this.defaultConfig);
 
   /// Creates a timeline from a single motion (forward and reverse use the same).
   factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion}) {
@@ -116,6 +112,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   /// when all tokens are released AND it's not the default track.
   @override
   (CueTrack track, ReleaseToken token) obtainTrack(TrackConfig config) {
+   
     final entry = tracks.putIfAbsent(
       config,
       () => TrackEntry(buildTrack(config)),
