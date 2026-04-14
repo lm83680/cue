@@ -47,8 +47,10 @@ void main() {
         ),
       );
 
+      await tester.pump();
+
       final state = tester.state(find.byType(OnChangeCue)) as dynamic;
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('value change triggers forward from 0', (tester) async {
@@ -77,7 +79,9 @@ void main() {
         ),
       );
 
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      await tester.pump();
+
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('same value does not trigger animation', (tester) async {

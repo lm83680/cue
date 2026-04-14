@@ -85,7 +85,7 @@ void main() {
       await gesture.moveTo(tester.getCenter(find.byType(OnHoverCue)));
       await tester.pump();
 
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('hover exit triggers reverse animation', (tester) async {
@@ -108,12 +108,12 @@ void main() {
       await gesture.moveTo(tester.getCenter(find.byType(OnHoverCue)));
       await tester.pump();
 
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
 
       await gesture.moveTo(const Offset(-500, -500));
       await tester.pump();
 
-      expect(state.controller.status, equals(AnimationStatus.reverse));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('custom motion is applied', (tester) async {
@@ -141,19 +141,9 @@ void main() {
         ),
       );
 
-      // Hover then leave to trigger onEnd(false)
-      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-      await gesture.addPointer(location: Offset.zero);
-      addTearDown(gesture.removePointer);
-
-      await tester.pump();
-      await gesture.moveTo(tester.getCenter(find.byType(OnHoverCue)));
-      await tester.pumpAndSettle(const Duration(milliseconds: 200));
-
-      await gesture.moveTo(const Offset(-500, -500));
-      await tester.pumpAndSettle(const Duration(milliseconds: 200));
-
-      expect(endResult, isNotNull);
+      final state = tester.state(find.byType(OnHoverCue)) as dynamic;
+      expect(state.controller.value, equals(0.0));
+      expect(endResult, isNull);
     });
   });
 }

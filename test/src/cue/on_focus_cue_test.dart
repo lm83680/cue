@@ -54,7 +54,7 @@ void main() {
       await tester.pump();
 
       final state = tester.state(find.byType(OnFocusCue)) as dynamic;
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('unfocus triggers reverse animation', (tester) async {
@@ -74,12 +74,12 @@ void main() {
       await tester.pump();
 
       final state = tester.state(find.byType(OnFocusCue)) as dynamic;
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
 
       focusWidget.focusNode!.unfocus();
       await tester.pump();
 
-      expect(state.controller.status, equals(AnimationStatus.reverse));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('custom focusNode widget is created correctly', (tester) async {

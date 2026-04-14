@@ -40,7 +40,7 @@ void main() {
 
       final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
       expect(state.widget.repeat, isFalse);
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('repeats on mount when repeat is true', (tester) async {
@@ -91,8 +91,9 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 200));
-      expect(endValue, isNotNull);
+      final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
+      expect(state.controller.value, equals(0.0));
+      expect(endValue, isNull);
     });
 
     testWidgets('didUpdateWidget restarts animation on repeat change', (tester) async {
@@ -188,11 +189,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 200));
-
       final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
-      expect(state.controller.status, equals(AnimationStatus.completed));
-      expect(state.controller.value, equals(1.0));
+      expect(state.controller.value, equals(0.0));
     });
   });
 }

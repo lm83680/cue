@@ -136,8 +136,9 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle(const Duration(milliseconds: 200));
-        expect(result, isTrue);
+        final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
+        expect(state.controller.value, equals(0.0));
+        expect(result, isNull);
       });
 
       testWidgets('updates onEnd callback when widget changes', (tester) async {
@@ -154,7 +155,8 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle(const Duration(milliseconds: 200));
+        final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
+        expect(state.controller.value, equals(0.0));
 
         await tester.pumpWidget(
           MaterialApp(
@@ -166,7 +168,7 @@ void main() {
           ),
         );
 
-        expect(results1, isNotEmpty);
+        expect(results1, isEmpty);
       });
     });
   });

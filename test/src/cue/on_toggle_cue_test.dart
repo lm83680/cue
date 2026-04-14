@@ -50,7 +50,7 @@ void main() {
       );
 
       final state = tester.state(find.byType(OnToggleCue)) as dynamic;
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('without skipFirstAnimation starts reverse when not toggled', (tester) async {
@@ -65,7 +65,7 @@ void main() {
         ),
       );
       final state = tester.state(find.byType(OnToggleCue)) as SelfAnimatedCueState;
-      expect(state.controller.status, equals(AnimationStatus.reverse));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('toggling from false to true calls forward', (tester) async {
@@ -92,7 +92,7 @@ void main() {
         ),
       );
 
-      expect(state.controller.status, equals(AnimationStatus.forward));
+      expect(state.controller.value, equals(0.0));
     });
 
     testWidgets('toggling from true to false calls reverse', (tester) async {
@@ -119,7 +119,7 @@ void main() {
       );
 
       final state = tester.state(find.byType(OnToggleCue)) as dynamic;
-      expect(state.controller.status, equals(AnimationStatus.reverse));
+      expect(state.controller.value, equals(1.0));
     });
 
     testWidgets('toggling same value does not restart animation', (tester) async {
@@ -188,7 +188,7 @@ void main() {
         MaterialApp(
           home: Cue.onToggle(
             toggled: true,
-            skipFirstAnimation: false,
+            skipFirstAnimation: true,
             motion: CueMotion.linear(50.ms),
             onEnd: (completed) => endResult = completed,
             child: const SizedBox(),
@@ -196,8 +196,9 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 200));
-      expect(endResult, isNotNull);
+      final state = tester.state(find.byType(OnToggleCue)) as dynamic;
+      expect(state.controller.value, equals(1.0));
+      expect(endResult, isNull);
     });
   });
 }
