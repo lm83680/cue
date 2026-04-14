@@ -1,7 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/on_scroll_parallax.dart';
-import 'package:example/examples/on_scroll_visible_example.dart';
-import 'package:example/examples/page_view_demo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +10,7 @@ class CueApp extends StatelessWidget {
   const CueApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cue',
       darkTheme: ThemeData(
@@ -22,12 +19,13 @@ class CueApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      themeMode: ThemeMode.dark,
-      home: const OnScrollVisibleExample(),
+      themeMode: ThemeMode.light,
+      showPerformanceOverlay: true,
+      home: const BasiceExample(),
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         if (kDebugMode) {
-          // return CueDebugTools(child: child!);
+          return CueDebugTools(child: child!);
         }
         return child!;
       },

@@ -18,4 +18,3 @@ export 'src/widgets/cue_modals.dart';
 export 'src/widgets/cue_route_mixin.dart';
 export 'src/acts/custom_tween_act.dart' hide CustomTweenAct;
 export 'src/widgets/cue_drag_scrubber.dart';
-export 'src/widgets/gooey.dart';
