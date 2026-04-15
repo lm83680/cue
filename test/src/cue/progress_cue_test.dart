@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
@@ -176,6 +177,26 @@ void main() {
 
       expect(find.byType(Actor), findsOneWidget);
       expect(find.text('progress'), findsOneWidget);
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties adds expected properties', () {
+      final notifier = ValueNotifier<double>(0.5);
+      final cue = Cue.onProgress(
+        listenable: notifier,
+        progress: () => notifier.value,
+        min: 0.1,
+        max: 0.9,
+        child: const SizedBox(),
+      );
+
+      final builder = DiagnosticPropertiesBuilder();
+      cue.debugFillProperties(builder);
+
+      final props = builder.properties;
+      expect(props.any((p) => p.name == 'min'), isTrue);
+      expect(props.any((p) => p.name == 'max'), isTrue);
     });
   });
 }

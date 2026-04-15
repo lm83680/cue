@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -263,6 +264,20 @@ void main() {
       );
 
       expect(widget.barrierLabel, equals('ModalTransition'));
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties does not throw', () {
+      final widget = CueModalTransition(
+        triggerBuilder: (context, _) => const SizedBox(),
+        builder: (context, rect) => const SizedBox(),
+      );
+
+      expect(
+        () => widget.debugFillProperties(DiagnosticPropertiesBuilder()),
+        returnsNormally,
+      );
     });
   });
 }

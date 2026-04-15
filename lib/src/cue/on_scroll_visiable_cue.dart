@@ -68,7 +68,6 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -142,12 +141,11 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
     final forward = (scrollOffset + viewportDimension / 2) < revealedOffset;
 
     final target = visibleFraction.clamp(0.0, 1.0);
-    if(visibleFraction == controller.value) return;
     if (target != 1 && target != 0.0 && _isFirstFrame) {
-      _isFirstFrame = false;
       _controller.animateTo(target, forward: forward);
     } else {
       _controller.setProgress(target, forward: forward);
     }
+    _isFirstFrame = false;
   }
 }

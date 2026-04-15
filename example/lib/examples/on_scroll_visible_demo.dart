@@ -22,6 +22,7 @@ class OnScrollVisibleExample extends StatelessWidget {
           return Padding(
             padding: .symmetric(vertical: 8),
             child: Cue.onScrollVisible(
+              key: ValueKey(index),
               acts: [
                 // forward from Offset(-.6, 0) to  Offset.zero
                 // reverse from Offset.zero to Offset(0, .8)

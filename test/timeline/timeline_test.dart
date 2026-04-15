@@ -27,6 +27,212 @@ void main() {
       });
     });
 
+    group('Timeline initial progress', () {
+      test('Timeline created with initial progress returns that progress when no tracks', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.5);
+
+        expect(timeline.progress, equals(0.5));
+      });
+
+      test('Timeline created with initial progress 0 returns 0 when no tracks', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.0);
+
+        expect(timeline.progress, equals(0.0));
+      });
+
+      test('Timeline created with initial progress 1 returns 1 when no tracks', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 1.0);
+
+        expect(timeline.progress, equals(1.0));
+      });
+
+      test('First track obtains initial progress when timeline has no tracks', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.75);
+
+        final (track, _) = timeline.obtainDefaultTrack();
+
+        expect(track.progress, closeTo(0.75, 0.001));
+      });
+
+      test('Initial progress is reset after first track is obtained', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.5);
+
+        timeline.obtainDefaultTrack();
+
+        final newMotion = CueMotion.linear(400.ms);
+        final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
+        final (track, token) = timeline.obtainTrack(newConfig);
+
+        expect(track.progress, closeTo(0.5, 0.001));
+
+        timeline.release(token);
+      });
+
+      test('Timeline progress reports actual track progress after tracks obtained', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.5);
+
+        timeline.obtainDefaultTrack();
+
+        timeline.setProgress(0.3, forward: true);
+
+        expect(timeline.progress, closeTo(0.3, 0.001));
+      });
+
+      test('Removing very last non-default track returns actual track progress', () {
+        final motion1 = CueMotion.linear(300.ms);
+        final motion2 = CueMotion.linear(400.ms);
+
+        final config1 = TrackConfig(motion: motion1, reverseMotion: motion1);
+        final timeline = CueTimelineImpl(config1);
+        timeline.obtainDefaultTrack();
+
+        final config2 = TrackConfig(motion: motion2, reverseMotion: motion2);
+        final (_, token) = timeline.obtainTrack(config2);
+
+        timeline.setProgress(0.5, forward: true);
+
+        timeline.release(token);
+
+        final defaultTrack = timeline.obtainDefaultTrack().$1;
+        expect(timeline.progress, equals(defaultTrack.progress));
+      });
+
+      test('Releasing default track token does not remove default track', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.6);
+
+        final (track, token) = timeline.obtainDefaultTrack();
+
+        expect(track.progress, closeTo(0.6, 0.001));
+
+        timeline.release(token);
+
+        expect(timeline.tracks.containsKey(config), isTrue);
+        expect(timeline.progress, closeTo(0.6, 0.001));
+      });
+
+      test('Timeline with initial progress has correct status', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+
+        final timelineForward = CueTimelineImpl(config, initialProgress: 0.5);
+        expect(timelineForward.status, equals(AnimationStatus.forward));
+
+        final timelineDismissed = CueTimelineImpl(config, initialProgress: 0.0);
+        expect(timelineDismissed.status, equals(AnimationStatus.dismissed));
+
+        final timelineCompleted = CueTimelineImpl(config, initialProgress: 1.0);
+        expect(timelineCompleted.status, equals(AnimationStatus.completed));
+      });
+
+      test('Initial progress with new track obtains current timeline progress', () {
+        final motion1 = CueMotion.linear(300.ms);
+        final motion2 = CueMotion.linear(500.ms);
+
+        final config1 = TrackConfig(motion: motion1, reverseMotion: motion1);
+        final timeline = CueTimelineImpl(config1);
+
+        timeline.obtainDefaultTrack();
+        timeline.setProgress(0.7, forward: true);
+
+        final config2 = TrackConfig(motion: motion2, reverseMotion: motion2);
+        final (track, _) = timeline.obtainTrack(config2);
+
+        expect(track.progress, closeTo(0.7, 0.001));
+      });
+
+      test('Initial progress applied to default track when created', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+
+        final timeline = CueTimelineImpl(config, initialProgress: 0.25);
+
+        expect(timeline.progress, equals(0.25));
+
+        final (track, _) = timeline.obtainDefaultTrack();
+
+        expect(track.progress, closeTo(0.25, 0.001));
+      });
+
+      test('fromConfig factory accepts initialProgress', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+
+        final timeline = CueTimelineImpl.fromConfig(config, initialProgress: 0.8);
+
+        expect(timeline.progress, equals(0.8));
+        expect(timeline.status, equals(AnimationStatus.forward));
+      });
+
+      test('setProgress with no tracks updates initial progress', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.5);
+
+        timeline.setProgress(0.3, forward: true);
+
+        expect(timeline.progress, equals(0.3));
+      });
+
+      test('reset clears initial progress placeholder after track is obtained', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config, initialProgress: 0.7);
+
+        timeline.obtainDefaultTrack();
+
+        timeline.setProgress(0.5, forward: true);
+
+        timeline.reset();
+
+        expect(timeline.progress, equals(0.0));
+        expect(timeline.status, equals(AnimationStatus.forward));
+      });
+
+      test('Multiple tracks with initial progress, then removing all non-default', () {
+        final motion1 = CueMotion.linear(400.ms);
+        final motion2 = CueMotion.linear(400.ms);
+        final motion3 = CueMotion.linear(600.ms);
+
+        final config1 = TrackConfig(motion: motion1, reverseMotion: motion1);
+        final timeline = CueTimelineImpl(config1, initialProgress: 0.5);
+
+        timeline.obtainDefaultTrack();
+
+        final config2 = TrackConfig(motion: motion2, reverseMotion: motion2);
+        final (track2, token2) = timeline.obtainTrack(config2);
+
+        final config3 = TrackConfig(motion: motion3, reverseMotion: motion3);
+        final (track3, token3) = timeline.obtainTrack(config3);
+
+        timeline.setProgress(0.4, forward: true);
+
+        expect(track2.progress, closeTo(0.6, 0.001));
+        expect(track3.progress, closeTo(0.4, 0.001));
+
+        timeline.release(token2);
+
+        timeline.release(token3);
+
+        final defaultTrack = timeline.obtainDefaultTrack().$1;
+        expect(timeline.progress, equals(defaultTrack.progress));
+        expect(timeline.tracks.length, equals(1));
+      });
+    });
+
     group('Timeline duration calculation', () {
       test('forwardDuration returns longest track duration', () {
         final fastMotion = CueMotion.linear(200.ms);

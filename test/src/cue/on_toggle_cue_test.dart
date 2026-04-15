@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
@@ -199,6 +200,17 @@ void main() {
       final state = tester.state(find.byType(OnToggleCue)) as dynamic;
       expect(state.controller.value, equals(1.0));
       expect(endResult, isNull);
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties does not throw', () {
+      final cue = Cue.onToggle(toggled: true, child: const SizedBox());
+
+      expect(
+        () => cue.debugFillProperties(DiagnosticPropertiesBuilder()),
+        returnsNormally,
+      );
     });
   });
 }

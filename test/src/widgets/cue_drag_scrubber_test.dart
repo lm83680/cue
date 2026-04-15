@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
@@ -291,6 +292,28 @@ void main() {
 
     test('auto has correct value', () {
       expect(CueScrubDirection.auto.index, equals(2));
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties adds expected properties', () {
+      final widget = CueDragScrubber(
+        distance: 100,
+        releaseMode: CueDragReleaseMode.snap,
+        forceLinearScrubing: true,
+        child: const SizedBox(),
+      );
+
+      final builder = DiagnosticPropertiesBuilder();
+      widget.debugFillProperties(builder);
+
+      final props = builder.properties;
+      expect(props.any((p) => p.name == 'distance'), isTrue);
+      expect(props.any((p) => p.name == 'releaseMode'), isTrue);
+      expect(props.any((p) => p.name == 'axis'), isTrue);
+      expect(props.any((p) => p.name == 'scrubDirection'), isTrue);
+      expect(props.any((p) => p.name == 'forceLinearScrubing'), isTrue);
+      expect(props.any((p) => p.name == 'controller'), isTrue);
     });
   });
 }

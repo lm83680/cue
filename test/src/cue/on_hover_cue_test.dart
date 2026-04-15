@@ -146,4 +146,19 @@ void main() {
       expect(endResult, isNull);
     });
   });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties does not throw', () {
+      final cue = Cue.onHover(
+        cursor: SystemMouseCursors.click,
+        opaque: true,
+        child: const SizedBox(),
+      );
+
+      expect(
+        () => cue.debugFillProperties(DiagnosticPropertiesBuilder()),
+        returnsNormally,
+      );
+    });
+  });
 }

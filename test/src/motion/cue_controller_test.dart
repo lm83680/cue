@@ -613,7 +613,7 @@ void main() {
       test('fling with negative velocity animates backward', () async {
         final controller = _createController(motion: CueMotion.linear(300.ms));
         controller.setProgress(1.0, forward: true);
-         controller.fling(velocity: -1.0);
+        controller.fling(velocity: -1.0);
         await _pump();
         expect(controller.value, lessThan(1.0));
       });
@@ -888,6 +888,106 @@ void main() {
 
         controller.setProgress(1.0);
         expect(animation.value, isNotNull);
+      });
+    });
+
+    group('Dynamic track addition during animation', () {
+      test('adding track while forward animating prepares track with forward direction', () async {
+        final controller = CueController(
+          vsync: TestVSync(),
+          motion: CueMotion.linear(100.ms),
+        );
+        // controller.timeline.obtainDefaultTrack();
+        addTearDown(controller.dispose);
+
+        controller.forward();
+        expect(controller.status, equals(AnimationStatus.forward));
+        final animation = controller.tweenTrack<double>(
+          from: 0.0,
+          to: 100.0,
+        );
+        await _pump(const Duration(milliseconds: 50));
+        expect(animation.value, greaterThan(0.0));
+      });
+
+      test('adding track while reverse animating prepares track with reverse direction', () async {
+        final controller = CueController(
+          vsync: TestVSync(),
+          motion: CueMotion.linear(100.ms),
+        );
+        addTearDown(controller.dispose);
+
+        controller.setProgress(1.0, forward: true);
+        controller.reverse();
+
+        expect(controller.status, equals(AnimationStatus.reverse));
+
+        final animation = controller.tweenTrack<double>(
+          from: 0.0,
+          to: 100.0,
+        );
+        await _pump(const Duration(milliseconds: 50));
+        expect(animation.value, lessThan(100.0));
+      });
+
+      test('adding track after animateTo prepares track with correct direction', () async {
+        final controller = CueController(
+          vsync: TestVSync(),
+          motion: CueMotion.linear(100.ms),
+        );
+        controller.timeline.obtainDefaultTrack();
+        addTearDown(controller.dispose);
+
+        controller.setProgress(0.5, forward: true);
+        controller.animateTo(0.8);
+        await _pump(const Duration(milliseconds: 30));
+
+        expect(controller.status, equals(AnimationStatus.forward));
+        final animation = controller.tweenTrack<double>(
+          from: 0.0,
+          to: 100.0,
+        );
+        expect(animation.value, greaterThan(50.0));
+      });
+
+      test('adding track during repeat with reverse prepares track correctly', () async {
+        final controller = CueController(
+          vsync: TestVSync(),
+          motion: CueMotion.linear(100.ms),
+        );
+        controller.timeline.obtainDefaultTrack();
+        addTearDown(controller.dispose);
+        controller.repeat(count: 2, reverse: true);
+        await _pump(const Duration(milliseconds: 50));
+
+        final animation = controller.tweenTrack<double>(
+          from: 0.0,
+          to: 100.0,
+        );
+
+        expect(animation, isNotNull);
+      });
+
+      test('adding track after animation completes uses forward direction', () async {
+        final controller = CueController(
+          vsync: TestVSync(),
+          motion: CueMotion.linear(50.ms),
+        );
+        controller.timeline.obtainDefaultTrack();
+        addTearDown(controller.dispose);
+
+        controller.forward();
+        await _pump(const Duration(milliseconds: 150));
+
+        expect(controller.status, equals(AnimationStatus.completed));
+        expect(controller.value, equals(1.0));
+
+        final animation = controller.tweenTrack<double>(
+          from: 0.0,
+          to: 100.0,
+        );
+
+        expect(animation.parent.config.motion, isNotNull);
       });
     });
   });

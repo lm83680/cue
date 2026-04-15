@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
@@ -161,6 +162,17 @@ void main() {
       );
 
       expect(find.byType(OnFocusCue), findsOneWidget);
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties does not throw', () {
+      final cue = Cue.onFocus(child: const SizedBox());
+
+      expect(
+        () => cue.debugFillProperties(DiagnosticPropertiesBuilder()),
+        returnsNormally,
+      );
     });
   });
 }

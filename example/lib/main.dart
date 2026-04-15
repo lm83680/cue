@@ -1,15 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/bottom_bar.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/expanding_cards.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
-import 'package:example/examples/on_scroll_parallax.dart';
-import 'package:example/examples/on_scroll_visible_example.dart';
-import 'package:example/examples/options_button.dart';
-import 'package:example/examples/slack_style_fab.dart';
-import 'package:example/examples/smooth_switch.dart';
-import 'package:example/examples/three_dots_action.dart';
-import 'package:example/examples/wallet_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +10,7 @@ class CueApp extends StatelessWidget {
   const CueApp({super.key});
 
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cue',
       darkTheme: ThemeData(
@@ -31,8 +20,8 @@ Widget build(BuildContext context) {
         ),
       ),
       themeMode: ThemeMode.light,
-      // showPerformanceOverlay: true,
-      home: OnScrollParallax(),
+      home: BasiceExample(),
+      showPerformanceOverlay: false,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         if (kDebugMode) {
@@ -67,10 +56,10 @@ class _BasiceExampleState extends State<BasiceExample> {
               toggled: _forward,
               motion: .wobbly(),
               acts: [
-                 .scale(to: 1.2),
-                 .slideY(to: -1),
-                 .rotate(to: 180),
-                 .colorTint(from: Colors.orange, to: Colors.green)
+                .scale(to: 1.2),
+                .slideY(to: -1),
+                .rotate(to: 180),
+                .colorTint(from: Colors.orange, to: Colors.green),
               ],
               child: Container(
                 width: 100,
@@ -81,7 +70,7 @@ class _BasiceExampleState extends State<BasiceExample> {
                 ),
               ),
             ),
-           SizedBox(height: 16),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 setState(() {

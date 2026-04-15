@@ -52,7 +52,7 @@ class OnMountCue extends SelfAnimatedCue {
     super.repeatCount,
     super.onEnd,
     super.acts,
-  }) : super();
+  });
 
   @override
   State<StatefulWidget> createState() => OnMountCueState();
@@ -68,6 +68,7 @@ class OnMountCueState extends SelfAnimatedCueState<OnMountCue> {
     if (widget.repeat) {
       controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
     } else {
+      
       controller.forward();
     }
   }

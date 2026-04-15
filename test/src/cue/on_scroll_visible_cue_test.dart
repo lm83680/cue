@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
@@ -234,6 +235,17 @@ void main() {
       final state = tester.state<OnScrollVisibleCueState>(find.byType(OnScrollVisibleCue));
       expect(state.controller, isA<CueController>());
       expect(find.byType(OnScrollVisibleCue), findsOneWidget);
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties does not throw', () {
+      final cue = Cue.onScrollVisible(child: const SizedBox());
+
+      expect(
+        () => cue.debugFillProperties(DiagnosticPropertiesBuilder()),
+        returnsNormally,
+      );
     });
   });
 }

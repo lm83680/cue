@@ -1,3 +1,4 @@
+
 import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/event_notifier.dart';
 import 'package:cue/src/timeline/track/track.dart';
@@ -138,7 +139,6 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     );
     _forwardDuration = null;
     _reverseDuration = null;
-
     if (entry.tokens.isEmpty) {
       // this mean the track is newly created
       // we attach the current timeline state to it so that it can be in sync with other tracks
@@ -243,6 +243,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   }
 
   void _updateStatus() {
+    if(tracks.isEmpty) return;
     bool allCompleted = true;
     bool allDismissed = true;
 
@@ -292,7 +293,12 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     _cycleOffset = 0.0;
     fireEvent(TimelinePrepareEvent(forward));
     _lastT = 0.0;
-    _prepareInternal(forward, from, target, velocity);
+    if (tracks.isEmpty) {
+      _progressPlaceholder = from ?? _progressPlaceholder;
+      _status = forward ? AnimationStatus.forward : AnimationStatus.reverse;
+    } else {
+      _prepareInternal(forward, from, target, velocity);
+    }
   }
 
   void _prepareInternal(bool forward, [double? from, double? target, double? velocity]) {

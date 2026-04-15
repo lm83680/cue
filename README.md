@@ -25,14 +25,14 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/on_scroll_demo.gif" alt="On scroll demo" width="100%">
       </a>
       <br/>
-      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_demo.dart">source</a>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_parallax.dart">source</a>
     </td>
     <td align="center" width="33%">
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_visiable_demo.dart">
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/on_scroll_visiable_demo.gif" alt="On scroll visible demo" width="100%">
       </a>
       <br/>
-      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_visiable_demo.dart">source</a>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_visible_demo.dart">source</a>
     </td>
     <td align="center" width="33%">
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/page_view_demo.dart">

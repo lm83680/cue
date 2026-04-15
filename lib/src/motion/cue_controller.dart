@@ -461,7 +461,7 @@ class CueController extends AnimationController {
       'with an explicit SpringSimulation if an underdamped spring is intentional.',
     );
     void listener() => timeline.setProgress(super.value.clamp(0, 1), forward: forward);
-   addListener(listener);
+    addListener(listener);
     if (forward) {
       return super.animateWith(simulation)..whenComplete(() => removeListener(listener));
     } else {

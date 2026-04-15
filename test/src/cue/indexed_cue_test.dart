@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1030,6 +1031,25 @@ void main() {
 
       expect(controller.previousIndex, 1);
       expect(controller.lastSettledIndex, 1);
+    });
+  });
+
+  group('debugFillProperties', () {
+    test('debugFillProperties adds expected properties', () {
+      final cue = Cue.indexed(
+        controller: CueIndexController(
+          length: 3,
+          vsync: const _TestTickerProvider(),
+        ),
+        index: 1,
+        child: const SizedBox(),
+      );
+
+      final builder = DiagnosticPropertiesBuilder();
+      cue.debugFillProperties(builder);
+
+      final props = builder.properties;
+      expect(props.any((p) => p.name == 'index'), isTrue);
     });
   });
 }
