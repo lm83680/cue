@@ -32,6 +32,7 @@ mixin class EventNotifier<T> {
   }
 
   @mustCallSuper
+
   /// Dispose the notifier by clearing all event listeners and marking it as disposed.
   void dispose() {
     _disposed = true;

@@ -132,12 +132,12 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
     this.borderOnForeground = true,
     this.semanticContainer = true,
     super.delay,
-  }) : frames = null,
-       assert(
-         shape == null || borderRadius == null,
-         'Cannot specify both shape and borderRadius. '
-         'Use shape for arbitrary ShapeBorder, or borderRadius for rounded rectangles.',
-       );
+  })  : frames = null,
+        assert(
+          shape == null || borderRadius == null,
+          'Cannot specify both shape and borderRadius. '
+          'Use shape for arbitrary ShapeBorder, or borderRadius for rounded rectangles.',
+        );
 
   /// {@template act.card.keyframed}
   /// Animates card properties through a sequence of keyframes.
@@ -184,16 +184,16 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
     required Keyframes<CardProps> this.frames,
     super.delay,
     KFReverseBehavior<CardProps> super.reverse = const KFReverseBehavior.mirror(),
-  }) : color = null,
-       shadowColor = const AnimatableValue.fixed(Color(0xFF000000)),
-       surfaceTintColor = null,
-       elevation = null,
-       borderRadius = null,
-       shape = null,
-       margin = null,
-       clipBehavior = Clip.none,
-       borderOnForeground = true,
-       semanticContainer = true;
+  })  : color = null,
+        shadowColor = const AnimatableValue.fixed(Color(0xFF000000)),
+        surfaceTintColor = null,
+        elevation = null,
+        borderRadius = null,
+        shape = null,
+        margin = null,
+        clipBehavior = Clip.none,
+        borderOnForeground = true,
+        semanticContainer = true;
 
   @override
   (CueAnimtable<CardProps>, CueAnimtable<CardProps>?) buildTweens(ActContext context) {
@@ -233,8 +233,7 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
     ({ShapeBorderClipper clipper, _ShapeBorderPainter? painter, bool hasBorderStroke}) resolveShape(
       CardProps props,
     ) {
-      final resolvedShape =
-          props.shape ??
+      final resolvedShape = props.shape ??
           (props.borderRadius != null
               ? RoundedRectangleBorder(borderRadius: props.borderRadius!)
               : const RoundedRectangleBorder());
@@ -306,18 +305,18 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
 
   @override
   int get hashCode => Object.hash(
-    color,
-    shadowColor,
-    surfaceTintColor,
-    elevation,
-    borderRadius,
-    shape,
-    clipBehavior,
-    borderOnForeground,
-    semanticContainer,
-    margin,
-    frames,
-  );
+        color,
+        shadowColor,
+        surfaceTintColor,
+        elevation,
+        borderRadius,
+        shape,
+        clipBehavior,
+        borderOnForeground,
+        semanticContainer,
+        margin,
+        frames,
+      );
 
   @override
   ActContext resolve(ActContext context) {
@@ -387,9 +386,9 @@ class CardProps {
     this.surfaceTintColor,
     this.margin,
   }) : assert(
-         shape == null || borderRadius == null,
-         'Cannot specify both shape and borderRadius.',
-       );
+          shape == null || borderRadius == null,
+          'Cannot specify both shape and borderRadius.',
+        );
 
   @override
   bool operator ==(Object other) {
@@ -407,14 +406,14 @@ class CardProps {
 
   @override
   int get hashCode => Object.hash(
-    elevation,
-    color,
-    shadowColor,
-    surfaceTintColor,
-    borderRadius,
-    shape,
-    margin,
-  );
+        elevation,
+        color,
+        shadowColor,
+        surfaceTintColor,
+        borderRadius,
+        shape,
+        margin,
+      );
 
   /// Linearly interpolates between two [CardProps] instances.
   static CardProps lerp(CardProps a, CardProps b, double t) {
@@ -564,10 +563,10 @@ class CardActor extends StatelessWidget {
     this.reverse = const ReverseBehavior.mirror(),
     this.delay = Duration.zero,
   }) : assert(
-         shape == null || borderRadius == null,
-         'Cannot specify both shape and borderRadius. '
-         'Use shape for arbitrary ShapeBorder, or borderRadius for rounded rectangles.',
-       );
+          shape == null || borderRadius == null,
+          'Cannot specify both shape and borderRadius. '
+          'Use shape for arbitrary ShapeBorder, or borderRadius for rounded rectangles.',
+        );
 
   @override
   Widget build(BuildContext context) {

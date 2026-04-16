@@ -108,9 +108,9 @@ class FractionalSizeAct extends AnimtableAct<FractionalSize, FractionalSize> {
     required Keyframes<FractionalSize> this.frames,
     super.delay,
     ReverseBehavior<FractionalSize> super.reverse = const ReverseBehavior.mirror(),
-  }) : widthFactor = null,
-       heightFactor = null,
-       alignment = null;
+  })  : widthFactor = null,
+        heightFactor = null,
+        alignment = null;
 
   @override
   Widget apply(BuildContext context, Animation<FractionalSize> animation, Widget child) {

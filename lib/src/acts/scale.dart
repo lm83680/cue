@@ -456,7 +456,7 @@ class StretchAct extends TweenActBase<Stretch, Matrix4> {
   }) : super.keyframed(from: Stretch.none);
 
   @override
-  Matrix4 transform(_, Stretch value) {
+  Matrix4 transform(ActContext context, Stretch value) {
     return Matrix4.diagonal3Values(value.x, value.y, 1.0);
   }
 

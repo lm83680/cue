@@ -62,7 +62,7 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
 
   late final CueController _controller = CueController(
     vsync: this,
-    motion: .linear(Duration(milliseconds: 500)),
+    motion: CueMotion.linear(const Duration(milliseconds: 500)),
     value: 1.0,
   );
   ScrollPosition? _scrollPosition;

@@ -2,6 +2,7 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
 /// Describes how a value travels from one point to another over time.
 ///
@@ -76,9 +77,9 @@ abstract class CueMotion {
   /// [phase] defaults to the first phase going forward, and the last phase
   /// going in reverse.
   CueSimulation buildBase({bool forward = true, int? phase}) => switch (forward) {
-    true => build(SimulationBuildData.forward(phase: phase ?? 0)),
-    false => build(SimulationBuildData.reverse(phase: phase ?? totalPhases - 1)),
-  };
+        true => build(SimulationBuildData.forward(phase: phase ?? 0)),
+        false => build(SimulationBuildData.reverse(phase: phase ?? totalPhases - 1)),
+      };
 
   /// Creates a delayed version of this motion with the given delay.
   @internal
@@ -479,9 +480,9 @@ class SegmentedMotion extends CueMotion {
 
   @override
   Duration get baseDuration => motions.fold(
-    Duration.zero,
-    (total, motion) => total + motion.baseDuration,
-  );
+        Duration.zero,
+        (total, motion) => total + motion.baseDuration,
+      );
 
   @override
   int get totalPhases => motions.length;
@@ -623,8 +624,8 @@ class SimulationBuildData {
     this.velocity,
     this.startProgress,
     double? endValue,
-  }) : forward = true,
-       _endValue = endValue;
+  })  : forward = true,
+        _endValue = endValue;
 
   /// A reverse run starting from [startValue] (defaults to `1.0`).
   const SimulationBuildData.reverse({
@@ -634,6 +635,6 @@ class SimulationBuildData {
     this.velocity,
     this.startProgress,
     double? endValue,
-  }) : forward = false,
-       _endValue = endValue;
+  })  : forward = false,
+        _endValue = endValue;
 }

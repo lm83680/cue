@@ -49,15 +49,15 @@ class CueController extends AnimationController {
     required super.vsync,
     required CueMotion motion,
     CueMotion? reverseMotion,
-  }) : assert(value >= 0.0 && value <= 1.0, 'The initial value must be between 0.0 and 1.0. Received: $value'),
-       _timeline = CueTimelineImpl(
-         TrackConfig(
-           motion: motion,
-           reverseMotion: reverseMotion ?? motion,
-         ),
-         initialProgress: value,
-       ),
-       super.unbounded();
+  })  : assert(value >= 0.0 && value <= 1.0, 'The initial value must be between 0.0 and 1.0. Received: $value'),
+        _timeline = CueTimelineImpl(
+          TrackConfig(
+            motion: motion,
+            reverseMotion: reverseMotion ?? motion,
+          ),
+          initialProgress: value,
+        ),
+        super.unbounded();
 
   /// Rebuilds the timeline with a new default motion.
   ///
@@ -344,19 +344,13 @@ class CueController extends AnimationController {
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0. Received: $from');
     }
     _timeline.prepare(forward: false, from: from, velocity: velocity);
-    return super.animateBackWith(_timeline);
+    return _animateBackWith(_timeline);
   }
 
   /// Not supported. Use [forward] to drive the Cue timeline.
   @override
   TickerFuture animateWith(Simulation simulation) {
     throw UnsupportedError('animateWith is not supported by CueController. Use forward instead.');
-  }
-
-  /// Not supported. Use [reverse] to drive the Cue timeline.
-  @override
-  TickerFuture animateBackWith(Simulation simulation) {
-    throw UnsupportedError('animateBackWith is not supported by CueController. Use reverse instead.');
   }
 
   /// Resets the animation to 0 and stops any in-flight animation.
@@ -421,7 +415,7 @@ class CueController extends AnimationController {
     if (forward) {
       return super.animateWith(_timeline);
     } else {
-      return super.animateBackWith(_timeline);
+      return _animateBackWith(_timeline);
     }
   }
 
@@ -465,7 +459,14 @@ class CueController extends AnimationController {
     if (forward) {
       return super.animateWith(simulation)..whenComplete(() => removeListener(listener));
     } else {
-      return super.animateBackWith(simulation)..whenComplete(() => removeListener(listener));
+      return _animateBackWith(simulation)..whenComplete(() => removeListener(listener));
     }
+  }
+
+  TickerFuture _animateBackWith(Simulation simulation) {
+    // Flutter's public API on older SDKs does not expose animateBackWith.
+    // Cue owns reverse state in CueTimeline, so driving the reverse-prepared
+    // simulation through animateWith preserves Cue's public status semantics.
+    return super.animateWith(simulation);
   }
 }

@@ -68,7 +68,7 @@ mixin CueModalRouteMixin<T extends Object?> on ModalRoute<T> {
     super.dispose();
   }
 
-  @override
+  /// Older Flutter versions do not call this hook; keep it for newer route integrations.
   Simulation? createSimulation({required bool forward}) {
     return null;
   }

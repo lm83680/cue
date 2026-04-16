@@ -153,12 +153,12 @@ class PaintActor extends SingleActorBase<double> {
 
   @override
   Act get act => PaintAct(
-    painter: painter,
-    paintOnTop: paintOnTop,
-    motion: motion,
-    reverse: reverse,
-    delay: delay,
-  );
+        painter: painter,
+        paintOnTop: paintOnTop,
+        motion: motion,
+        reverse: reverse,
+        delay: delay,
+      );
 }
 
 class _PainterBase extends CustomPainter {

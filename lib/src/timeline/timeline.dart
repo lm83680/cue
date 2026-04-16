@@ -43,16 +43,16 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   /// Creates a timeline implementation
   CueTimelineImpl(this.defaultConfig, {double initialProgress = 0.0})
-    : assert(
-        initialProgress >= 0.0 && initialProgress <= 1.0,
-        'Initial progress must be between 0.0 and 1.0. Received: $initialProgress',
-      ),
-      _progressPlaceholder = initialProgress,
-      _status = switch (initialProgress) {
-        0.0 => AnimationStatus.dismissed,
-        1.0 => AnimationStatus.completed,
-        _ => AnimationStatus.forward,
-      };
+      : assert(
+          initialProgress >= 0.0 && initialProgress <= 1.0,
+          'Initial progress must be between 0.0 and 1.0. Received: $initialProgress',
+        ),
+        _progressPlaceholder = initialProgress,
+        _status = switch (initialProgress) {
+          0.0 => AnimationStatus.dismissed,
+          1.0 => AnimationStatus.completed,
+          _ => AnimationStatus.forward,
+        };
 
   /// Creates a timeline from a single track configuration.
   /// The track is created immediately and available as the default track.
@@ -465,6 +465,7 @@ abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> 
   TrackConfig get defaultConfig;
 
   @override
+
   /// Disposes timeline resources.
   void dispose();
 

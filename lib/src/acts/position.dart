@@ -79,8 +79,8 @@ class PositionAct extends TweenAct<Position> {
     super.motion,
     super.reverse,
     super.delay,
-  }) : _relativeTo = null,
-       super.tween();
+  })  : _relativeTo = null,
+        super.tween();
 
   /// {@template act.position.relative}
   /// Animates positioning using fractional values (0 to 1).
@@ -95,10 +95,11 @@ class PositionAct extends TweenAct<Position> {
     super.motion,
     super.reverse,
     super.delay,
-  }) : _relativeTo = size,
-       super.tween();
+  })  : _relativeTo = size,
+        super.tween();
 
   @internal
+
   /// Internal constructor for keyframed animations with optional relative sizing.
   const PositionAct.internal({
     required super.from,
@@ -148,8 +149,8 @@ class PositionAct extends TweenAct<Position> {
     super.reverse,
     super.delay,
     Size? relativeTo,
-  }) : _relativeTo = relativeTo,
-       super.keyframed();
+  })  : _relativeTo = relativeTo,
+        super.keyframed();
 
   @override
   Animatable<Position> createSingleTween(Position from, Position to) {
@@ -232,8 +233,8 @@ class Position {
     this.bottom,
     this.width,
     this.height,
-  }) : assert(start == null || end == null || width == null),
-       assert(top == null || bottom == null || height == null);
+  })  : assert(start == null || end == null || width == null),
+        assert(top == null || bottom == null || height == null);
 
   /// {@template position.fill}
   /// Fills the entire stack with all edges at the given distance.
@@ -245,11 +246,13 @@ class Position {
     this.top = 0,
     this.end = 0,
     this.bottom = 0,
-  }) : width = null,
-       height = null;
+  })  : width = null,
+        height = null;
 
   /// Creates a position from STEB values (start, top, end, bottom).
-  const Position.fromSTEB(this.start, this.top, this.end, this.bottom) : width = null, height = null;
+  const Position.fromSTEB(this.start, this.top, this.end, this.bottom)
+      : width = null,
+        height = null;
 
   /// {@template position.top_start}
   /// Positions from the top-start corner.
@@ -396,8 +399,8 @@ class PositionedActor extends SingleActorBase<Position> {
     required super.child,
     super.reverse,
     Size? relativeTo,
-  }) : _relativeTo = relativeTo,
-       super.keyframes();
+  })  : _relativeTo = relativeTo,
+        super.keyframes();
 
   /// {@template actor.position.relative}
   /// Creates a position animation using fractional values.
@@ -418,12 +421,12 @@ class PositionedActor extends SingleActorBase<Position> {
 
   @override
   Act get act => PositionAct.internal(
-    from: from,
-    to: to,
-    delay: delay,
-    frames: frames,
-    relativeTo: _relativeTo,
-    motion: motion,
-    reverse: reverse,
-  );
+        from: from,
+        to: to,
+        delay: delay,
+        frames: frames,
+        relativeTo: _relativeTo,
+        motion: motion,
+        reverse: reverse,
+      );
 }

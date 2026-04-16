@@ -1,8 +1,8 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/animatable_act.dart';
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
 /// Signature for a function that transforms a value from its stored type `T`
 /// to an animated type `R`.
@@ -183,22 +183,22 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
     CueMotion? framesMotion = switch (frames) {
       MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: includeFirstFrame)),
       FractionalKeyframes<T> m => SegmentedMotion(
-        m.extractMotion(
-          includeFirst: includeFirstFrame,
-          duration: m.duration ?? context.motion.baseDuration,
+          m.extractMotion(
+            includeFirst: includeFirstFrame,
+            duration: m.duration ?? context.motion.baseDuration,
+          ),
         ),
-      ),
       _ => null,
     };
 
     CueMotion? reverseFramesMotion = switch (reverse.frames?.reversed) {
       MotionKeyframes<T> m => SegmentedMotion(m.extractMotion(includeFirst: true)),
       FractionalKeyframes<T> m => SegmentedMotion(
-        m.extractMotion(
-          includeFirst: true,
-          duration: m.duration ?? context.reverseMotion.baseDuration,
+          m.extractMotion(
+            includeFirst: true,
+            duration: m.duration ?? context.reverseMotion.baseDuration,
+          ),
         ),
-      ),
       _ => framesMotion,
     };
 
@@ -264,17 +264,17 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animta
     if (keyframes != null) {
       final phases = switch (keyframes) {
         MotionKeyframes<T>(:final frames) => Phase.resolveMotionFrames<T, R>(
-          frames,
-          from: iniitalkeyframe,
-          forReverse: forReverse,
-          transform: (v) => transform(context, v),
-        ),
+            frames,
+            from: iniitalkeyframe,
+            forReverse: forReverse,
+            transform: (v) => transform(context, v),
+          ),
         FractionalKeyframes<T>(:final frames) => Phase.resolveFractionalFrames<T, R>(
-          frames,
-          from: iniitalkeyframe,
-          forReverse: forReverse,
-          transform: (v) => transform(context, v),
-        ),
+            frames,
+            from: iniitalkeyframe,
+            forReverse: forReverse,
+            transform: (v) => transform(context, v),
+          ),
       };
       return SegmentedAnimtable([for (final phase in phases) createSingleTween(phase.begin, phase.end)]);
     } else {
@@ -393,8 +393,7 @@ enum ReverseBehaviorType {
   /// Forward animates to `to`, reverse animates to a custom target
   /// value or keyframes sequence.
   /// Can specify separate motion/delay for reverse.
-  to
-  ;
+  to;
 
   /// Whether this type requires a separate reverse animatable.
   bool get needsReverseTween => this == ReverseBehaviorType.to;
@@ -436,7 +435,7 @@ class KFReverseBehavior<T> extends ReverseBehaviorBase<T> {
   /// pass. Motion is embedded in the keyframes; no per-frame motion override
   /// is supported.
   const KFReverseBehavior.to(Keyframes<T> frames, {super.delay})
-    : super._(type: ReverseBehaviorType.to, frames: frames);
+      : super._(type: ReverseBehaviorType.to, frames: frames);
 }
 
 /// Reverse behavior for tween acts.
@@ -642,7 +641,9 @@ class AnimatableValue<T> {
   });
 
   /// Creates a fixed value that doesn't animate (from and to are the same).
-  const AnimatableValue.fixed(T value) : from = value, to = value;
+  const AnimatableValue.fixed(T value)
+      : from = value,
+        to = value;
 
   /// Alias for the main constructor (from/to as positional args).
   const AnimatableValue.tween(this.from, this.to);

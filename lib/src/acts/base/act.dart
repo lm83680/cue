@@ -5,9 +5,9 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/deferred_tween_act.dart';
 import 'package:cue/src/acts/base/animatable_act.dart';
 import 'package:cue/src/acts/base/tween_act.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:meta/meta.dart';
 
 part '../sized_clip.dart';
 part '../fractional_size.dart';
@@ -31,6 +31,42 @@ part '../transfrom.dart';
 part '../card.dart';
 part '../paint.dart';
 part '../path_motion.dart';
+
+/// Compatibility implementation of Flutter's newer Matrix4.translateByDouble API.
+///
+/// The math matches vector_math's matrix translation formula and lets older
+/// Flutter SDKs keep the same call shape as newer SDKs.
+extension Matrix4TranslateByDouble on Matrix4 {
+  /// Applies a translation to this matrix.
+  void translateByDouble([
+    double x = 0.0,
+    double y = 0.0,
+    double z = 0.0,
+    double w = 1.0,
+  ]) {
+    final double e0 = storage[0];
+    final double e1 = storage[1];
+    final double e2 = storage[2];
+    final double e3 = storage[3];
+    final double e4 = storage[4];
+    final double e5 = storage[5];
+    final double e6 = storage[6];
+    final double e7 = storage[7];
+    final double e8 = storage[8];
+    final double e9 = storage[9];
+    final double e10 = storage[10];
+    final double e11 = storage[11];
+    final double e12 = storage[12];
+    final double e13 = storage[13];
+    final double e14 = storage[14];
+    final double e15 = storage[15];
+
+    storage[12] = x * e0 + y * e4 + z * e8 + w * e12;
+    storage[13] = x * e1 + y * e5 + z * e9 + w * e13;
+    storage[14] = x * e2 + y * e6 + z * e10 + w * e14;
+    storage[15] = x * e3 + y * e7 + z * e11 + w * e15;
+  }
+}
 
 /// A declarative description of a single animated property on a widget.
 ///
@@ -321,7 +357,6 @@ abstract class Act {
     double to,
     CueMotion? motion,
     Duration delay,
-
     ReverseBehavior<double> reverse,
   }) = TranslateAct.fromX;
 
@@ -429,7 +464,6 @@ abstract class Act {
     double from,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
-
     Duration delay,
   }) = OpacityAct.fadeIn;
 

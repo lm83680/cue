@@ -197,8 +197,8 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
     super.delay,
     this.alignment = Alignment.center,
     KFReverseBehavior<Size> super.reverse = const KFReverseBehavior.mirror(),
-  }) : width = null,
-       height = null;
+  })  : width = null,
+        height = null;
 
   @override
   ActContext resolve(ActContext context) {
@@ -292,13 +292,13 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     Alignment alignment = Alignment.center,
     Keyframes<Size>? keyframes,
     required ReverseBehaviorBase<Size> reverse,
-  }) : _driver = driver,
-       _alignment = alignment,
-       _width = widthInput,
-       _height = heightInput,
-       _keyframes = keyframes,
-       _reverse = reverse,
-       super(additionalConstraints: BoxConstraints());
+  })  : _driver = driver,
+        _alignment = alignment,
+        _width = widthInput,
+        _height = heightInput,
+        _keyframes = keyframes,
+        _reverse = reverse,
+        super(additionalConstraints: BoxConstraints());
 
   DeferredCueAnimation<Size?> _driver;
 
@@ -378,8 +378,7 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
 
     if (_width != null || _height != null) {
       final ifrom = _driver.context.implicitFrom as Size?;
-      from =
-          ifrom ??
+      from = ifrom ??
           Size(
             _normalize(_width?.from, constrains.maxWidth),
             _normalize(_height?.from, constrains.maxHeight),

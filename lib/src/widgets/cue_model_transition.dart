@@ -153,7 +153,7 @@ class CueModalTransition extends StatefulWidget {
     this.barrierDismissible = true,
     this.barrierLabel = 'ModalTransition',
     this.barrierColor = const Color(0x80000000),
-    this.motion = .defaultTime,
+    this.motion = CueMotion.defaultTime,
     this.reverseMotion,
     this.hideTriggerOnTransition = false,
     this.useRootNavigator = true,

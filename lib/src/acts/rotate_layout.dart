@@ -128,8 +128,8 @@ class RotateLayoutAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     super.delay,
-  }) : unit = RotateUnit.degrees,
-       super.tween();
+  })  : unit = RotateUnit.degrees,
+        super.tween();
 
   /// {@template act.rotate_layout.turns}
   /// Rotates in quarter-turns (0–4).
@@ -143,8 +143,8 @@ class RotateLayoutAct extends TweenAct<double> {
     super.motion,
     super.delay,
     super.reverse,
-  }) : unit = RotateUnit.quarterTurns,
-       super.tween();
+  })  : unit = RotateUnit.quarterTurns,
+        super.tween();
 
   @override
   double transform(_, double value) {
@@ -159,7 +159,7 @@ class RotateLayoutAct extends TweenAct<double> {
   }
 
   @override
-  Widget apply(BuildContext ctx, Animation<double> animation, Widget child) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return _RotateLayoutTranstion(animation: animation, child: child);
   }
 

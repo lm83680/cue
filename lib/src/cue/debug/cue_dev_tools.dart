@@ -206,8 +206,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
         return GestureDetector(
           onVerticalDragUpdate: (details) {
             final screenHeight = MediaQuery.sizeOf(context).height;
-            final isBottomAligned =
-                _data.alignment == Alignment.bottomLeft ||
+            final isBottomAligned = _data.alignment == Alignment.bottomLeft ||
                 _data.alignment == Alignment.bottomRight ||
                 _data.alignment == Alignment.bottomCenter;
 
@@ -229,7 +228,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
               child: Align(
                 alignment: _data.alignment,
                 child: SafeArea(
-                  minimum: .only(top: 16),
+                  minimum: const EdgeInsets.only(top: 16),
                   child: IconTheme(
                     data: theme.iconTheme.copyWith(color: theme.colorScheme.primary, size: 20),
                     child: Padding(
@@ -257,9 +256,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                 if (_data.isMinimized) {
                                   return IconButton(
                                     style: IconButton.styleFrom(
-                                      tapTargetSize: .shrinkWrap,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       shape: CircleBorder(),
-                                      minimumSize: .square(40),
+                                      minimumSize: const Size.square(40),
                                     ),
                                     icon: Icon(Icons.play_circle),
                                     onPressed: _data.activeTargetId != null && _data.activeTargetId!.isNotEmpty
@@ -273,7 +272,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                 }
 
                                 return Padding(
-                                  padding: const .fromLTRB(8, 4, 8, 8),
+                                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,9 +345,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                               ],
                                             ),
                                           ),
-
                                           IconButton(
-                                            style: IconButton.styleFrom(tapTargetSize: .shrinkWrap),
+                                            style:
+                                                IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                                             onPressed: _toggleSlowMode,
                                             icon: Icon(
                                               Icons.alarm_rounded,
@@ -363,10 +362,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             ),
                                             icon: Icon(
                                               Icons.change_circle_outlined,
-                                              color:
-                                                  IconTheme.of(
-                                                    context,
-                                                  ).color?.withValues(
+                                              color: IconTheme.of(
+                                                context,
+                                              ).color?.withValues(
                                                     alpha: _data.isLooping ? 1 : .4,
                                                   ),
                                             ),
@@ -422,12 +420,11 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           ),
                                         ],
                                       ),
-
                                       Container(
-                                        padding: const .fromLTRB(0, 12, 0, 4),
+                                        padding: const EdgeInsets.fromLTRB(0, 12, 0, 4),
                                         decoration: BoxDecoration(
                                           color: theme.colorScheme.surfaceContainer,
-                                          borderRadius: .circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
                                         child: SliderTheme(
                                           data: SliderThemeData(
@@ -439,7 +436,6 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             thumbShape: _NeedleThumb(height: 56, horizontalPadding: 20),
                                           ),
                                           child: Slider(
-                                            padding: EdgeInsets.zero,
                                             value: _controller?.value ?? 0,
                                             activeColor: Colors.transparent,
                                             thumbColor: theme.colorScheme.primary,
@@ -530,7 +526,8 @@ class _TimelineTickMarkShape extends SliderTrackShape {
     required SliderThemeData sliderTheme,
     bool? isEnabled,
     bool? isDiscrete,
-  }) => offset & parentBox.size;
+  }) =>
+      offset & parentBox.size;
 
   @override
   void paint(
@@ -544,13 +541,14 @@ class _TimelineTickMarkShape extends SliderTrackShape {
     bool? isEnabled,
     bool? isDiscrete,
     required TextDirection textDirection,
-  }) => _paintTimeline(
-    parentBox: parentBox,
-    context: context,
-    sliderTheme: sliderTheme,
-    start: start,
-    end: end,
-  );
+  }) =>
+      _paintTimeline(
+        parentBox: parentBox,
+        context: context,
+        sliderTheme: sliderTheme,
+        start: start,
+        end: end,
+      );
 
   void _paintTimeline({
     required RenderBox parentBox,
@@ -653,15 +651,15 @@ class _OverlayData {
 
   @override
   int get hashCode => Object.hash(
-    isSlowMode,
-    isLooping,
-    isMinimized,
-    verticalOffset,
-    activeTargetId,
-    forward,
-    controller,
-    alignment,
-  );
+        isSlowMode,
+        isLooping,
+        isMinimized,
+        verticalOffset,
+        activeTargetId,
+        forward,
+        controller,
+        alignment,
+      );
 
   _OverlayData copyWith({
     bool? isLooping,

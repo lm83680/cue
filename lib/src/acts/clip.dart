@@ -159,8 +159,8 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
     this.alignment = AlignmentDirectional.centerStart,
     super.motion,
     super.delay,
-  }) : _axis = Axis.horizontal,
-       super.tween(from: fromFactor, to: toFactor);
+  })  : _axis = Axis.horizontal,
+        super.tween(from: fromFactor, to: toFactor);
 
   /// {@macro act.clip.height}
   const AxisClipAct.vertical({
@@ -169,8 +169,8 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
     this.alignment = AlignmentDirectional.topCenter,
     super.motion,
     super.delay,
-  }) : _axis = Axis.vertical,
-       super.tween(from: fromFactor, to: toFactor);
+  })  : _axis = Axis.vertical,
+        super.tween(from: fromFactor, to: toFactor);
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
@@ -238,9 +238,9 @@ class PathClipAct extends TweenAct<double> implements ClipAct {
     super.from = 0,
     super.to = 1,
     super.delay,
-  }) : borderRadius = null,
-       useSuperellipse = false,
-       super.tween();
+  })  : borderRadius = null,
+        useSuperellipse = false,
+        super.tween();
 
   @override
   Widget apply(
@@ -336,7 +336,7 @@ class ExpandingPathClipper extends CustomClipper<Path> {
       return Path()..addRect(rect);
     } else {
       if (useSuperellipse) {
-        return Path()..addRSuperellipse(borderRadius!.toRSuperellipse(rect));
+        return _createSuperellipsePath(rect, borderRadius!);
       }
       return Path()..addRRect(borderRadius!.toRRect(rect));
     }
@@ -349,4 +349,144 @@ class ExpandingPathClipper extends CustomClipper<Path> {
         oldClipper.alignment != alignment ||
         oldClipper.useSuperellipse != useSuperellipse;
   }
+}
+
+Path _createSuperellipsePath(Rect rect, BorderRadius borderRadius) {
+  if (rect.isEmpty) {
+    return Path()..addRect(rect);
+  }
+
+  final _ScaledCornerRadii radii = _scaleCornerRadii(rect, borderRadius);
+  final Path path = Path()..moveTo(rect.left + radii.topLeft.x, rect.top);
+
+  path.lineTo(rect.right - radii.topRight.x, rect.top);
+  _addSuperellipseCorner(
+    path,
+    center: Offset(rect.right - radii.topRight.x, rect.top + radii.topRight.y),
+    radius: radii.topRight,
+    startAngle: -math.pi / 2,
+    endAngle: 0,
+  );
+
+  path.lineTo(rect.right, rect.bottom - radii.bottomRight.y);
+  _addSuperellipseCorner(
+    path,
+    center: Offset(rect.right - radii.bottomRight.x, rect.bottom - radii.bottomRight.y),
+    radius: radii.bottomRight,
+    startAngle: 0,
+    endAngle: math.pi / 2,
+  );
+
+  path.lineTo(rect.left + radii.bottomLeft.x, rect.bottom);
+  _addSuperellipseCorner(
+    path,
+    center: Offset(rect.left + radii.bottomLeft.x, rect.bottom - radii.bottomLeft.y),
+    radius: radii.bottomLeft,
+    startAngle: math.pi / 2,
+    endAngle: math.pi,
+  );
+
+  path.lineTo(rect.left, rect.top + radii.topLeft.y);
+  _addSuperellipseCorner(
+    path,
+    center: Offset(rect.left + radii.topLeft.x, rect.top + radii.topLeft.y),
+    radius: radii.topLeft,
+    startAngle: math.pi,
+    endAngle: math.pi * 3 / 2,
+  );
+
+  return path..close();
+}
+
+_ScaledCornerRadii _scaleCornerRadii(Rect rect, BorderRadius borderRadius) {
+  final Radius topLeft = borderRadius.topLeft;
+  final Radius topRight = borderRadius.topRight;
+  final Radius bottomRight = borderRadius.bottomRight;
+  final Radius bottomLeft = borderRadius.bottomLeft;
+  final double scale = <double>[
+    _safeRadiusScale(rect.width, topLeft.x + topRight.x),
+    _safeRadiusScale(rect.width, bottomLeft.x + bottomRight.x),
+    _safeRadiusScale(rect.height, topLeft.y + bottomLeft.y),
+    _safeRadiusScale(rect.height, topRight.y + bottomRight.y),
+    1.0,
+  ].reduce(math.min);
+
+  return _ScaledCornerRadii(
+    topLeft: Radius.elliptical(topLeft.x * scale, topLeft.y * scale),
+    topRight: Radius.elliptical(topRight.x * scale, topRight.y * scale),
+    bottomRight: Radius.elliptical(bottomRight.x * scale, bottomRight.y * scale),
+    bottomLeft: Radius.elliptical(bottomLeft.x * scale, bottomLeft.y * scale),
+  );
+}
+
+double _safeRadiusScale(double extent, double radiusSum) {
+  if (radiusSum <= 0) {
+    return 1.0;
+  }
+  return (extent / radiusSum).clamp(0.0, 1.0);
+}
+
+void _addSuperellipseCorner(
+  Path path, {
+  required Offset center,
+  required Radius radius,
+  required double startAngle,
+  required double endAngle,
+}) {
+  if (radius.x <= 0 || radius.y <= 0) {
+    path.lineTo(center.dx + radius.x * math.cos(endAngle), center.dy + radius.y * math.sin(endAngle));
+    return;
+  }
+
+  const int segmentCount = 8;
+  const double exponent = 5.0;
+  final List<Offset> points = <Offset>[];
+  for (int i = 0; i <= segmentCount; i += 1) {
+    final double t = i / segmentCount;
+    final double angle = startAngle + (endAngle - startAngle) * t;
+    points.add(
+      Offset(
+        center.dx + radius.x * _signedPow(math.cos(angle), 2 / exponent),
+        center.dy + radius.y * _signedPow(math.sin(angle), 2 / exponent),
+      ),
+    );
+  }
+  _addCatmullRomCubicPath(path, points);
+}
+
+void _addCatmullRomCubicPath(Path path, List<Offset> points) {
+  if (points.length < 2) {
+    return;
+  }
+
+  for (int i = 0; i < points.length - 1; i += 1) {
+    final Offset p0 = i == 0 ? points[i] : points[i - 1];
+    final Offset p1 = points[i];
+    final Offset p2 = points[i + 1];
+    final Offset p3 = i + 2 < points.length ? points[i + 2] : p2;
+    final Offset control1 = p1 + (p2 - p0) / 6;
+    final Offset control2 = p2 - (p3 - p1) / 6;
+    path.cubicTo(control1.dx, control1.dy, control2.dx, control2.dy, p2.dx, p2.dy);
+  }
+}
+
+double _signedPow(double value, double exponent) {
+  if (value == 0) {
+    return 0;
+  }
+  return value.sign * math.pow(value.abs(), exponent).toDouble();
+}
+
+class _ScaledCornerRadii {
+  const _ScaledCornerRadii({
+    required this.topLeft,
+    required this.topRight,
+    required this.bottomRight,
+    required this.bottomLeft,
+  });
+
+  final Radius topLeft;
+  final Radius topRight;
+  final Radius bottomRight;
+  final Radius bottomLeft;
 }

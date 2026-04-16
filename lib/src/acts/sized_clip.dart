@@ -171,8 +171,8 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     this.clipGeometry = const ClipGeometry.rect(),
     super.delay,
     ReverseBehavior<NSize> reverse = const ReverseBehavior.mirror(),
-  }) : frames = null,
-       _reverse = reverse;
+  })  : frames = null,
+        _reverse = reverse;
 
   /// {@template act.sized_clip.keyframed}
   /// Animates through multiple size keyframes with clipping.
@@ -234,9 +234,9 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     this.clipBehavior = Clip.hardEdge,
     this.clipGeometry = const ClipGeometry.rect(),
     KFReverseBehavior<NSize> reverse = const KFReverseBehavior.mirror(),
-  }) : _reverse = reverse,
-       from = null,
-       to = null;
+  })  : _reverse = reverse,
+        from = null,
+        to = null;
 
   @override
   bool operator ==(Object other) =>
@@ -348,13 +348,13 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     super.alignment,
     super.textDirection,
     Clip clipBehavior = Clip.hardEdge,
-  }) : _driver = driver,
-       _from = fromSize,
-       _to = toSize,
-       _frames = frames,
-       _reverse = reverse,
-       _clipBehavior = clipBehavior,
-       _clipGeometry = clipGeometry {
+  })  : _driver = driver,
+        _from = fromSize,
+        _to = toSize,
+        _frames = frames,
+        _reverse = reverse,
+        _clipBehavior = clipBehavior,
+        _clipGeometry = clipGeometry {
     _addintionalConstrains = _calculateAddintionalConstrains();
     _buildClipHandler(clipGeometry);
   }
@@ -702,7 +702,7 @@ class _ClipRRectGeometry extends _ClipGeometryHandler<ClipRRectLayer> {
   int get hashCode => Object.hash(runtimeType, borderRadius);
 }
 
-class _ClipSuperEllipseGeometry extends _ClipGeometryHandler<ClipRSuperellipseLayer> {
+class _ClipSuperEllipseGeometry extends _ClipGeometryHandler<ClipPathLayer> {
   final BorderRadius borderRadius;
 
   _ClipSuperEllipseGeometry(this.borderRadius);
@@ -716,11 +716,11 @@ class _ClipSuperEllipseGeometry extends _ClipGeometryHandler<ClipRSuperellipseLa
     required Rect rect,
     required Clip clipBehavior,
   }) {
-    _handler.layer = context.pushClipRSuperellipse(
+    _handler.layer = context.pushClipPath(
       needsCompositing,
       offset,
       rect,
-      borderRadius.toRSuperellipse(rect),
+      _createSuperellipsePath(rect, borderRadius),
       painter,
       clipBehavior: clipBehavior,
       oldLayer: _handler.layer,
@@ -745,7 +745,9 @@ class ClipGeometry {
   final bool useSuperEllipse;
 
   /// Creates a rectangular (no border radius) clip geometry.
-  const ClipGeometry.rect() : borderRadius = null, useSuperEllipse = false;
+  const ClipGeometry.rect()
+      : borderRadius = null,
+        useSuperEllipse = false;
 
   /// Creates a rounded rectangle clip geometry.
   const ClipGeometry.rrect(BorderRadiusGeometry this.borderRadius) : useSuperEllipse = false;
@@ -807,10 +809,14 @@ class NSize {
   static const NSize zero = NSize(w: 0, h: 0);
 
   /// Creates an [NSize] from a Flutter [Size] (no nulls).
-  NSize.size(Size size) : w = size.width, h = size.height;
+  NSize.size(Size size)
+      : w = size.width,
+        h = size.height;
 
   /// Both axes set to [size] (square).
-  const NSize.square(double size) : w = size, h = size;
+  const NSize.square(double size)
+      : w = size,
+        h = size;
 
   /// Fixed [w], child's natural height
   const NSize.width(double this.w) : h = null;

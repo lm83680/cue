@@ -34,12 +34,12 @@ class CueValueAnimator<T> extends Animation<T> with AnimationWithParentMixin<dou
     required CueMotion motion,
     Duration delay = Duration.zero,
     TweenBuilder<T>? tweenBuilder,
-  }) : _tweenBuilder = tweenBuilder ?? Tween<T>.new,
-       _animatable = ConstantAnimtable<T>(initialValue),
-       _controller = CueController(
-         vsync: vsync,
-         motion: delay == Duration.zero ? motion : motion.delayed(delay),
-       );
+  })  : _tweenBuilder = tweenBuilder ?? Tween<T>.new,
+        _animatable = ConstantAnimtable<T>(initialValue),
+        _controller = CueController(
+          vsync: vsync,
+          motion: delay == Duration.zero ? motion : motion.delayed(delay),
+        );
 
   late final CueTrack _track = _controller.timeline.obtainDefaultTrack().$1;
 

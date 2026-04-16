@@ -80,8 +80,8 @@ class DelayedSimulation extends Simulation with CueSimulation {
   DelayedSimulation({
     required CueSimulation base,
     required double delay,
-  }) : _base = base,
-       _delay = delay;
+  })  : _base = base,
+        _delay = delay;
 
   /// The underlying simulation to delay.
   final CueSimulation _base;
@@ -101,24 +101,23 @@ class DelayedSimulation extends Simulation with CueSimulation {
     final totalDuration = duration;
     final delayProgress = totalDuration <= 0 ? 0.0 : _delay / totalDuration;
 
-    final localProgress = progress <= delayProgress
-        ? 0.0
-        : ((progress - delayProgress) / (1.0 - delayProgress)).clamp(0.0, 1.0);
+    final localProgress =
+        progress <= delayProgress ? 0.0 : ((progress - delayProgress) / (1.0 - delayProgress)).clamp(0.0, 1.0);
 
     return _base.valueAtProgress(localProgress, forceLinear: forceLinear);
   }
 
   @override
-  double x(double t) {
-    final tAfterDelay = (t - _delay).clamp(0.0, double.infinity);
+  double x(double time) {
+    final tAfterDelay = (time - _delay).clamp(0.0, double.infinity);
     return _base.x(tAfterDelay);
   }
 
   @override
-  double dx(double t) => t <= _delay ? 0.0 : _base.dx(t - _delay);
+  double dx(double time) => time <= _delay ? 0.0 : _base.dx(time - _delay);
 
   @override
-  bool isDone(double t) => t > _delay && _base.isDone(t - _delay);
+  bool isDone(double time) => time > _delay && _base.isDone(time - _delay);
 }
 
 /// A timed animation simulation driven by an easing curve.
@@ -162,25 +161,25 @@ class CurvedSimulation extends Simulation with CueSimulation {
     required Curve curve,
     required double from,
     required double to,
-  }) : _duration = baseDuration * (to - from).abs(),
-       _curve = curve,
-       _from = from,
-       _to = to;
+  })  : _duration = baseDuration * (to - from).abs(),
+        _curve = curve,
+        _from = from,
+        _to = to;
 
   @override
-  double x(double t) {
-    final progress = (t / _duration).clamp(0.0, 1.0);
+  double x(double time) {
+    final progress = (time / _duration).clamp(0.0, 1.0);
     return _from + (_to - _from) * _curve.transform(progress);
   }
 
   @override
-  double dx(double t) {
+  double dx(double time) {
     final double epsilon = tolerance.time;
-    return (x(t + epsilon) - x(t - epsilon)) / (2 * epsilon);
+    return (x(time + epsilon) - x(time - epsilon)) / (2 * epsilon);
   }
 
   @override
-  bool isDone(double t) => t >= _duration;
+  bool isDone(double time) => time >= _duration;
 
   @override
   (double value, int phase) valueAtProgress(double progress, {bool forceLinear = false}) {
@@ -247,11 +246,11 @@ class SegmentedSimulation extends Simulation with CueSimulation {
     double startValue = 0,
     int? endPhase,
     double? endValue,
-  }) : _motions = motions,
-       _forward = forward,
-       _phase = initialPhase,
-       endPhase = endPhase ?? (forward ? motions.length - 1 : 0),
-       _endValue = endValue {
+  })  : _motions = motions,
+        _forward = forward,
+        _phase = initialPhase,
+        endPhase = endPhase ?? (forward ? motions.length - 1 : 0),
+        _endValue = endValue {
     final computedEndPhase = endPhase ?? (forward ? motions.length - 1 : 0);
     _current = motions[initialPhase].build(
       SimulationBuildData(
@@ -370,12 +369,16 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
     super.start,
     super.end,
     super.velocity, {
-    super.tolerance,
-    super.snapToEnd,
+    Tolerance? tolerance,
+    this.snapToEnd = true,
     this.samplingStepSize = 1 / 60,
-  }) : _end = end,
-       _start = start,
-       _spring = spring;
+  })  : _end = end,
+        _start = start,
+        _spring = spring {
+    if (tolerance != null) {
+      this.tolerance = tolerance;
+    }
+  }
 
   /// The time step (in seconds) used for numeric integration in [calculateSettleDuration].
   ///
@@ -390,8 +393,19 @@ class CueSpringSimulation extends SpringSimulation with CueSimulation {
   final double _start;
   final double _end;
 
+  /// Whether to snap to the exact target once the spring is considered done.
+  final bool snapToEnd;
+
   @override
   late final double duration = calculateSettleDuration(spring: _spring, stepSize: samplingStepSize);
+
+  @override
+  double x(double time) {
+    if (snapToEnd && isDone(time)) {
+      return _end;
+    }
+    return super.x(time);
+  }
 
   @override
   (double value, int phase) valueAtProgress(double progress, {bool forceLinear = false}) {

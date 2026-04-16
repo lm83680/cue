@@ -217,7 +217,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
       _done = true;
       _progress = _targetProgress;
       notifyListeners();
-      _upateStatus(_forward ? .completed : .dismissed);
+      _upateStatus(_forward ? AnimationStatus.completed : AnimationStatus.dismissed);
       return;
     }
     final newValue = _activeSim!.x(_localT);
@@ -301,5 +301,5 @@ abstract class CueTrack extends Animation<double> with AnimationLocalListenersMi
   int get phase;
 
   /// Whether track is in reverse or dismissed state.
-  bool get isReverseOrDismissed => status == .reverse || status == .dismissed;
+  bool get isReverseOrDismissed => status == AnimationStatus.reverse || status == AnimationStatus.dismissed;
 }

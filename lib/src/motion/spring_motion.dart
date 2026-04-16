@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:flutter/widgets.dart';
@@ -150,10 +152,10 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
     required SpringDescription desc,
     this.tolerance = _kDefaultTolerance,
     this.snapToEnd = true,
-  }) : _rawDesc = desc,
-       mass = null,
-       stiffness = null,
-       dampingRatio = null;
+  })  : _rawDesc = desc,
+        mass = null,
+        stiffness = null,
+        dampingRatio = null;
 
   /// Creates a spring motion with explicit mass, stiffness, and damping ratio.
   ///
@@ -165,8 +167,8 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
     required double ratio,
     this.tolerance = _kDefaultTolerance,
     this.snapToEnd = true,
-  }) : _rawDesc = null,
-       dampingRatio = ratio;
+  })  : _rawDesc = null,
+        dampingRatio = ratio;
 
   /// {@template cue.motion.smooth}
   /// A fast, critically damped spring — the recommended default for most UI.
@@ -501,10 +503,7 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
     bool snapToEnd = true,
   }) {
     return Spring.custom(
-      desc: SpringDescription.withDurationAndBounce(
-        duration: duration,
-        bounce: bounce,
-      ),
+      desc: _springDescriptionWithDurationAndBounce(duration: duration, bounce: bounce),
       snapToEnd: snapToEnd,
     );
   }
@@ -526,4 +525,24 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
     }
     return 'Spring(mass: $mass, stiffness: $stiffness, dampingRatio: $dampingRatio, tolerance: $tolerance, snapToEnd: $snapToEnd)';
   }
+}
+
+SpringDescription _springDescriptionWithDurationAndBounce({
+  required Duration duration,
+  required double bounce,
+}) {
+  assert(duration > Duration.zero, 'Duration must be greater than zero.');
+  assert(bounce > -1.0 && bounce <= 1.0, 'Bounce must be in the range (-1, 1].');
+
+  final double durationInSeconds = duration.inMicroseconds / Duration.microsecondsPerSecond;
+  const double mass = 1.0;
+  final double stiffness = (4 * math.pi * math.pi * mass) / math.pow(durationInSeconds, 2);
+  final double dampingRatio = bounce > 0 ? 1.0 - bounce : 1.0 / (bounce + 1.0);
+  final double damping = dampingRatio * 2.0 * math.sqrt(mass * stiffness);
+
+  return SpringDescription(
+    mass: mass,
+    stiffness: stiffness,
+    damping: damping,
+  );
 }

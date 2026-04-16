@@ -144,11 +144,11 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
     this.position = DecorationPosition.background,
     this.shape = BoxShape.rectangle,
     this.image,
-  }) : color = null,
-       borderRadius = null,
-       border = null,
-       boxShadow = null,
-       gradient = null;
+  })  : color = null,
+        borderRadius = null,
+        border = null,
+        boxShadow = null,
+        gradient = null;
 
   @override
   (CueAnimtable<Decoration>, CueAnimtable<Decoration>?) buildTweens(ActContext context) {
@@ -207,16 +207,16 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
 
   @override
   int get hashCode => Object.hash(
-    super.hashCode,
-    color,
-    borderRadius,
-    border,
-    boxShadow,
-    gradient,
-    shape,
-    position,
-    image,
-  );
+        super.hashCode,
+        color,
+        borderRadius,
+        border,
+        boxShadow,
+        gradient,
+        shape,
+        position,
+        image,
+      );
 
   @override
   ActContext resolve(ActContext context) {

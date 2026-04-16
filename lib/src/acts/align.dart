@@ -85,8 +85,8 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment> {
   }) : super.keyframed();
 
   @override
-  Alignment transform(ActContext ctx, AlignmentGeometry? value) {
-    return value?.resolve(ctx.textDirection) ?? Alignment.center;
+  Alignment transform(ActContext context, AlignmentGeometry? value) {
+    return value?.resolve(context.textDirection) ?? Alignment.center;
   }
 
   @override

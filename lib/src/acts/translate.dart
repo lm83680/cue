@@ -380,8 +380,8 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
     super.motion,
     super.reverse,
     super.delay,
-  }) : _axis = Axis.vertical,
-       super.tween();
+  })  : _axis = Axis.vertical,
+        super.tween();
 
   const _AxisTranslate.horizontal({
     super.from = 0,
@@ -389,22 +389,22 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
     super.motion,
     super.reverse,
     super.delay,
-  }) : _axis = Axis.horizontal,
-       super.tween();
+  })  : _axis = Axis.horizontal,
+        super.tween();
 
   const _AxisTranslate.keyframedY({
     required super.frames,
     super.delay,
     super.reverse,
-  }) : _axis = Axis.vertical,
-       super.keyframed(from: 0);
+  })  : _axis = Axis.vertical,
+        super.keyframed(from: 0);
 
   const _AxisTranslate.keyframedX({
     required super.frames,
     super.delay,
     super.reverse,
-  }) : _axis = Axis.horizontal,
-       super.keyframed(from: 0);
+  })  : _axis = Axis.horizontal,
+        super.keyframed(from: 0);
 
   @override
   Offset transform(_, double value) {
@@ -474,9 +474,9 @@ class _TranslateFromGlobalAct extends DeferredTweenAct<Offset> implements Transl
     this.toLocal = Offset.zero,
     super.delay,
     super.motion,
-  }) : rect = null,
-       alignment = null,
-       globalKey = null;
+  })  : rect = null,
+        alignment = null,
+        globalKey = null;
 
   const _TranslateFromGlobalAct.fromRect(
     this.rect, {
@@ -484,8 +484,8 @@ class _TranslateFromGlobalAct extends DeferredTweenAct<Offset> implements Transl
     this.alignment = Alignment.center,
     super.motion,
     super.delay,
-  }) : offset = null,
-       globalKey = null;
+  })  : offset = null,
+        globalKey = null;
 
   const _TranslateFromGlobalAct.fromKey(
     GlobalKey this.globalKey, {
@@ -493,8 +493,8 @@ class _TranslateFromGlobalAct extends DeferredTweenAct<Offset> implements Transl
     this.alignment = Alignment.center,
     super.motion,
     super.delay,
-  }) : offset = null,
-       rect = null;
+  })  : offset = null,
+        rect = null;
 
   @override
   Widget apply(BuildContext context, DeferredCueAnimation<Offset> animation, Widget child) {
@@ -572,13 +572,13 @@ class _RenderTranslateFromGlobal extends RenderProxyBox {
     AlignmentGeometry? alignment,
     required Offset toLocal,
     TextDirection? textDirection,
-  }) : _driver = driver,
-       _globalOffset = globalOffset,
-       _globalRect = globalRect,
-       _globalKey = globalKey,
-       _alignment = alignment,
-       _toLocal = toLocal,
-       _textDirection = textDirection {
+  })  : _driver = driver,
+        _globalOffset = globalOffset,
+        _globalRect = globalRect,
+        _globalKey = globalKey,
+        _alignment = alignment,
+        _toLocal = toLocal,
+        _textDirection = textDirection {
     _driver.addListener(markNeedsPaint);
   }
 

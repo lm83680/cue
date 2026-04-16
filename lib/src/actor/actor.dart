@@ -462,9 +462,9 @@ abstract class SingleActorBase<T> extends StatelessWidget {
     this.reverseMotion,
     this.reverseDelay = Duration.zero,
     this.reverse = const ReverseBehavior.mirror(),
-  }) : frames = null,
-       _from = from,
-       _to = to;
+  })  : frames = null,
+        _from = from,
+        _to = to;
 
   /// Create a `SingleActorBase` backed by keyframed `frames`.
   ///
@@ -477,10 +477,10 @@ abstract class SingleActorBase<T> extends StatelessWidget {
     this.reverse = const ReverseBehavior.mirror(),
     this.delay = Duration.zero,
     this.reverseDelay = Duration.zero,
-  }) : _from = null,
-       _to = null,
-       motion = null,
-       reverseMotion = null;
+  })  : _from = null,
+        _to = null,
+        motion = null,
+        reverseMotion = null;
 
   /// The single [Act] instance this widget provides to the wrapping [Actor].
   ///

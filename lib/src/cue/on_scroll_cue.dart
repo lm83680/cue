@@ -52,7 +52,7 @@ class _OnScrollCueState extends CueState<OnScrollCue> with SingleTickerProviderS
 
   late final _controller = CueController(
     vsync: this,
-    motion: .linear(500.ms),
+    motion: CueMotion.linear(500.ms),
   );
 
   ScrollPosition? _scrollPosition;

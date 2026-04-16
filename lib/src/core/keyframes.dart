@@ -33,13 +33,13 @@ class FKeyframe<T> extends KeyframeBase<T> {
 
   /// Creates a fractional keyframe with the given [value] at normalized position [at].
   const FKeyframe(super.value, {required this.at, this.curve})
-    : assert(at >= 0.0 && at <= 1.0, 'Relative Keyframe time must be between 0 and 1'),
-      super._();
+      : assert(at >= 0.0 && at <= 1.0, 'Relative Keyframe time must be between 0 and 1'),
+        super._();
 
   /// Creates a fractional keyframe with the shorthand `.key` syntax.
   const FKeyframe.key(super.value, {required this.at, this.curve})
-    : assert(at >= 0.0 && at <= 1.0, 'Relative Keyframe time must be between 0 and 1'),
-      super._();
+      : assert(at >= 0.0 && at <= 1.0, 'Relative Keyframe time must be between 0 and 1'),
+        super._();
 
   @override
   bool operator ==(Object other) =>

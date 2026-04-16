@@ -167,10 +167,10 @@ class _ParallaxRenderTransform extends RenderProxyBox {
     required double slide,
     required Axis axis,
     required ReverseBehavior<double> reverse,
-  }) : _driver = driver,
-       _slide = slide,
-       _axis = axis,
-       _reverse = reverse;
+  })  : _driver = driver,
+        _slide = slide,
+        _axis = axis,
+        _reverse = reverse;
 
   DeferredCueAnimation<Offset> _driver;
 

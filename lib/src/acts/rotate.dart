@@ -147,8 +147,8 @@ class RotateAct extends TweenAct<double> {
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
     super.delay,
-  }) : unit = RotateUnit.radians,
-       super.tween();
+  })  : unit = RotateUnit.radians,
+        super.tween();
 
   /// {@template act.rotate.degrees}
   /// Rotates in degrees (0–360).
@@ -164,8 +164,8 @@ class RotateAct extends TweenAct<double> {
     super.delay,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
-  }) : unit = RotateUnit.degrees,
-       super.tween();
+  })  : unit = RotateUnit.degrees,
+        super.tween();
 
   /// {@template act.rotate.turns}
   /// Rotates in quarter-turns (0–4).
@@ -181,8 +181,8 @@ class RotateAct extends TweenAct<double> {
     super.delay,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
-  }) : unit = RotateUnit.quarterTurns,
-       super.tween();
+  })  : unit = RotateUnit.quarterTurns,
+        super.tween();
 
   @override
   double transform(_, double value) {
@@ -329,11 +329,11 @@ class Rotate3DAct extends TweenAct<Rotation3D> {
     this.alignment = Alignment.center,
     this.perspective = 0.001,
     super.delay,
-  }) : unit = Rotate3DUnit.degrees,
-       super.tween(
-         from: Rotation3D.zero,
-         to: const Rotation3D(y: 180),
-       );
+  })  : unit = Rotate3DUnit.degrees,
+        super.tween(
+          from: Rotation3D.zero,
+          to: const Rotation3D(y: 180),
+        );
 
   /// {@template act.rotate3d.flipY}
   /// Animates a 180° vertical flip with depth (3D flip effect).
@@ -354,11 +354,11 @@ class Rotate3DAct extends TweenAct<Rotation3D> {
     this.alignment = Alignment.center,
     this.perspective = 0.001,
     super.delay,
-  }) : unit = Rotate3DUnit.degrees,
-       super.tween(
-         from: Rotation3D.zero,
-         to: const Rotation3D(x: 180),
-       );
+  })  : unit = Rotate3DUnit.degrees,
+        super.tween(
+          from: Rotation3D.zero,
+          to: const Rotation3D(x: 180),
+        );
 
   /// {@template act.rotate3d.keyframed}
   /// Animates through multiple 3D rotation keyframes.

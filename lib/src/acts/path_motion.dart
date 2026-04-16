@@ -99,8 +99,8 @@ class PathMotionAct extends AnimtableAct<Matrix4, Matrix4> {
     this.alignment = Alignment.center,
     super.motion,
     super.delay,
-  }) : _startAngle = 0.0,
-       super(reverse: const ReverseBehavior.mirror());
+  })  : _startAngle = 0.0,
+        super(reverse: const ReverseBehavior.mirror());
 
   /// {@template act.path_motion.circular}
   /// Animates circular motion with optional rotation.
@@ -118,12 +118,12 @@ class PathMotionAct extends AnimtableAct<Matrix4, Matrix4> {
     double startAngle = 0.0,
     super.motion,
     super.delay,
-  }) : _startAngle = startAngle,
-       path = Path()
-         ..addOval(
-           Rect.fromCircle(center: center, radius: radius),
-         ),
-       super(reverse: const ReverseBehavior.mirror());
+  })  : _startAngle = startAngle,
+        path = Path()
+          ..addOval(
+            Rect.fromCircle(center: center, radius: radius),
+          ),
+        super(reverse: const ReverseBehavior.mirror());
 
   /// {@template act.path_motion.arc}
   /// Animates motion along an arc segment.
@@ -144,14 +144,14 @@ class PathMotionAct extends AnimtableAct<Matrix4, Matrix4> {
     this.alignment = Alignment.center,
     super.motion,
     super.delay,
-  }) : _startAngle = startOffset,
-       path = Path()
-         ..addArc(
-           Rect.fromCircle(center: center, radius: radius),
-           startAngle * math.pi / 180,
-           sweepAngle * math.pi / 180,
-         ),
-       super(reverse: const ReverseBehavior.mirror());
+  })  : _startAngle = startOffset,
+        path = Path()
+          ..addArc(
+            Rect.fromCircle(center: center, radius: radius),
+            startAngle * math.pi / 180,
+            sweepAngle * math.pi / 180,
+          ),
+        super(reverse: const ReverseBehavior.mirror());
 
   @override
   ActContext resolve(ActContext context) {

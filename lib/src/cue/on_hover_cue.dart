@@ -23,7 +23,7 @@ class OnHoverCue extends SelfAnimatedCue {
     super.key,
     required super.child,
     super.debugLabel,
-    super.motion = .defaultTime,
+    super.motion = CueMotion.defaultTime,
     this.cursor = MouseCursor.defer,
     this.opaque = false,
     super.onEnd,

@@ -43,7 +43,7 @@ class CueDialogRoute<T extends Object?> extends RawDialogRoute<T> with CueModalR
     this.reverseMotion,
     this.onAnimationStatusChanged,
     this.hideOnPushNext = true,
-  }) : super(transitionBuilder: (_, _, _, child) => child);
+  }) : super(transitionBuilder: (context, animation, secondaryAnimation, child) => child);
 
   /// Motion used for the enter transition.
   @override
@@ -90,7 +90,7 @@ Future<T?> showCueDialog<T>({
   bool barrierDismissible = true,
   String barrierLabel = 'CueDialog',
   Color barrierColor = const Color(0x80000000),
-  CueMotion motion = .defaultTime,
+  CueMotion motion = CueMotion.defaultTime,
   CueMotion? reverseMotion,
   bool useRootNavigator = true,
 }) {
@@ -101,7 +101,7 @@ Future<T?> showCueDialog<T>({
   );
   return Navigator.of(context, rootNavigator: useRootNavigator).push<T>(
     CueDialogRoute<T>(
-      pageBuilder: (context, _, _) => themes.wrap(builder(context)),
+      pageBuilder: (context, animation, secondaryAnimation) => themes.wrap(builder(context)),
       barrierDismissible: barrierDismissible,
       barrierLabel: barrierLabel,
       barrierColor: barrierColor,

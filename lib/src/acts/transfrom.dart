@@ -367,7 +367,7 @@ class SkewAct extends TweenActBase<Skew, Matrix4> {
   }) : super.keyframed();
 
   @override
-  Matrix4 transform(_, Skew value) => Matrix4.skew(value.x, value.y);
+  Matrix4 transform(ActContext context, Skew value) => Matrix4.skew(value.x, value.y);
 
   @override
   Animatable<Matrix4> createSingleTween(Matrix4 from, Matrix4 to) {
@@ -406,7 +406,9 @@ class Skew {
   static const Skew zero = Skew(x: 0, y: 0);
 
   /// Creates a symmetric skew with the same value for both x and y.
-  const Skew.symmetric(double value) : x = value, y = value;
+  const Skew.symmetric(double value)
+      : x = value,
+        y = value;
 
   @override
   String toString() => 'Skew(x: $x, y: $y)';

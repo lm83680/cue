@@ -73,9 +73,8 @@ abstract class AnimtableAct<T extends Object?, R extends Object?> extends Act {
         reverseType: reverse.type,
       ),
     );
-    CueAnimtable<R> effectiveAnimatable = reverseAnimtable == null
-        ? animtable
-        : DualAnimatable(forward: animtable, reverse: reverseAnimtable);
+    CueAnimtable<R> effectiveAnimatable =
+        reverseAnimtable == null ? animtable : DualAnimatable(forward: animtable, reverse: reverseAnimtable);
     return CueAnimationImpl<R>(parent: track, token: token, animtable: effectiveAnimatable);
   }
 

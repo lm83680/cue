@@ -266,15 +266,15 @@ class TweenActor<T extends Object?> extends SingleActorBase<T> {
 
   @override
   Act get act => CustomTweenAct<T>(
-    from: from,
-    to: to,
-    frames: frames,
-    motion: motion,
-    delay: delay,
-    reverse: reverse,
-    builder: builder,
-    tweenBuilder: tweenBuilder,
-  );
+        from: from,
+        to: to,
+        frames: frames,
+        motion: motion,
+        delay: delay,
+        reverse: reverse,
+        builder: builder,
+        tweenBuilder: tweenBuilder,
+      );
 }
 
 /// Default data class implementing [Lerpable] for common animated values.

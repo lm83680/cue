@@ -355,9 +355,9 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
     super.reverse,
     super.delay,
   }) : super.tween(
-         from: const Offset(0, 1),
-         to: Offset.zero,
-       );
+          from: const Offset(0, 1),
+          to: Offset.zero,
+        );
 
   /// Slides down from top (y=-100%) to center position.
   const _SlideEffect.fromTop({
@@ -365,9 +365,9 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
     super.reverse,
     super.delay,
   }) : super.tween(
-         from: const Offset(0, -1),
-         to: Offset.zero,
-       );
+          from: const Offset(0, -1),
+          to: Offset.zero,
+        );
 
   /// Slides from leading edge (x=-100% in LTR) to center position.
   const _SlideEffect.fromLeading({
@@ -375,9 +375,9 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
     super.reverse,
     super.delay,
   }) : super.tween(
-         from: const Offset(-1, 0),
-         to: Offset.zero,
-       );
+          from: const Offset(-1, 0),
+          to: Offset.zero,
+        );
 
   /// Slides from trailing edge (x=100% in LTR) to center position.
   const _SlideEffect.fromTrailing({
@@ -385,9 +385,9 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
     super.reverse,
     super.delay,
   }) : super.tween(
-         from: const Offset(1, 0),
-         to: Offset.zero,
-       );
+          from: const Offset(1, 0),
+          to: Offset.zero,
+        );
 
   /// Animates through multiple sliding keyframes.
   const _SlideEffect.keyframed({
@@ -416,8 +416,8 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
     super.motion,
     super.reverse,
     super.delay,
-  }) : _axis = Axis.horizontal,
-       super.tween();
+  })  : _axis = Axis.horizontal,
+        super.tween();
 
   /// Vertical-only sliding (y-axis).
   const _AxisSlideEffect.tweenY({
@@ -426,24 +426,24 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
     super.motion,
     super.reverse,
     super.delay,
-  }) : _axis = Axis.vertical,
-       super.tween();
+  })  : _axis = Axis.vertical,
+        super.tween();
 
   /// Horizontal keyframed sliding.
   const _AxisSlideEffect.keyframedX({
     required super.frames,
     super.reverse,
     super.delay,
-  }) : _axis = Axis.horizontal,
-       super.keyframed(from: 0);
+  })  : _axis = Axis.horizontal,
+        super.keyframed(from: 0);
 
   /// Vertical keyframed sliding.
   const _AxisSlideEffect.keyframedY({
     required super.frames,
     super.reverse,
     super.delay,
-  }) : _axis = Axis.vertical,
-       super.keyframed(from: 0);
+  })  : _axis = Axis.vertical,
+        super.keyframed(from: 0);
 
   @override
   Offset transform(_, double value) {

@@ -93,7 +93,7 @@ class IndexedCue extends Cue {
 }
 
 class _IndexedCueState extends CueState<IndexedCue> with SingleTickerProviderStateMixin {
-  late final _controller = CueController(vsync: this, motion: const .linear(Duration(milliseconds: 500)));
+  late final _controller = CueController(vsync: this, motion: const CueMotion.linear(Duration(milliseconds: 500)));
 
   @override
   String get debugName => 'IndexedCue';
@@ -371,14 +371,14 @@ class CueIndexController with ChangeNotifier, IndexedCueController {
     Duration duration = const Duration(milliseconds: 300),
     Duration? reverseDuration,
     this.animateAll = false,
-  }) : assert(length > 0, 'length must be greater than 0'),
-       assert(
-         initialIndex >= 0 && initialIndex < length,
-         'initialIndex must be in range [0, length)',
-       ),
-       _currentIndex = initialIndex,
-       _destinationIndex = initialIndex,
-       _lastSettledIndex = initialIndex {
+  })  : assert(length > 0, 'length must be greater than 0'),
+        assert(
+          initialIndex >= 0 && initialIndex < length,
+          'initialIndex must be in range [0, length)',
+        ),
+        _currentIndex = initialIndex,
+        _destinationIndex = initialIndex,
+        _lastSettledIndex = initialIndex {
     _animationController = AnimationController(
       vsync: vsync,
       duration: duration,
@@ -454,20 +454,19 @@ class CueIndexController with ChangeNotifier, IndexedCueController {
         )
         .orCancel
         .then((_) {
-          _currentIndex = index;
-          _lastSettledIndex = index;
-          notifyListeners();
-        })
-        .catchError(
-          (Object _) {
-            // Animation was cancelled (e.g. jumpTo, stop, or dispose was called).
-            // Snap internal state to the nearest integer at the current position.
-            _currentIndex = _animationController.value.round();
-            _lastSettledIndex = _currentIndex;
-            _destinationIndex = _currentIndex;
-          },
-          test: (e) => e is TickerCanceled,
-        );
+      _currentIndex = index;
+      _lastSettledIndex = index;
+      notifyListeners();
+    }).catchError(
+      (Object _) {
+        // Animation was cancelled (e.g. jumpTo, stop, or dispose was called).
+        // Snap internal state to the nearest integer at the current position.
+        _currentIndex = _animationController.value.round();
+        _lastSettledIndex = _currentIndex;
+        _destinationIndex = _currentIndex;
+      },
+      test: (e) => e is TickerCanceled,
+    );
   }
 
   /// Stops the current animation at its current position.
